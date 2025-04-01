@@ -1,0 +1,16 @@
+# Ignore VS files
+**/.vs/
+
+# Ignore NuGet packages
+build/packages
+
+# Ignore CMake build files
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+*.cmake
+# Ignore build files
+build/*
+!build/*.vcxproj*
+!build/*.sln*

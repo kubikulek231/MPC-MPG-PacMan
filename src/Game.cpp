@@ -6,7 +6,8 @@ Game* gameInstance = nullptr; // Global pointer for static methods
 // Constructor body
 Game::Game() {
     gameInstance = this;
-    map = MapFactory::createMap();
+    MapFactory mapFactory = MapFactory();
+    map = mapFactory.createMap();
     cameraDistance = 50.0f;  // Initial camera distance
 }
 

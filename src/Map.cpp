@@ -49,7 +49,6 @@ void Map::render() {
                 glEnd();
                 glPopMatrix();
 
-
                 glColor3f(1.0f, 1.0f, 0.0f); // Yellow for pellet
                 glPushMatrix();
                 glTranslatef(worldX, TILE_SIZE / 2.0f, worldZ);

@@ -11,8 +11,8 @@ MapFactory::MapFactory() {
 }
 
 Map MapFactory::createMap() {
-    generateEmptyMapFile("C:\\Users\\Kuba\\projects\\MPC-MPG-PacMan\\assets\\maps\\layout.map");
-    loadMapFile("C:\\Users\\Kuba\\projects\\MPC-MPG-PacMan\\assets\\maps\\1.map");
+    generateEmptyMapFile("assets\\maps\\layout.map");
+    loadMapFile("assets\\maps\\1.map");
     //createWalls();
     createPellets();
     return Map(grid, TILE_SIZE);

@@ -47,3 +47,10 @@ add_custom_command(TARGET MPG POST_BUILD
     "${GLUT_DLL_DIR}/freeglut.dll"
     ${CMAKE_BINARY_DIR}  # Copies to the output directory of the executable
 )
+
+# Copy maps dir to the output directory
+add_custom_command(TARGET MPG POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/assets/maps"
+    "${CMAKE_BINARY_DIR}/assets/maps"
+)

@@ -11,7 +11,7 @@ MapFactory::MapFactory() {
 }
 
 Map MapFactory::createMap() {
-    generateEmptyMapFile("assets\\maps\\layout.map");
+    generateEmptyMapFile("assets\\maps\\blank.map");
     loadMapFile("assets\\maps\\1.map");
     //createWalls();
     createPellets();

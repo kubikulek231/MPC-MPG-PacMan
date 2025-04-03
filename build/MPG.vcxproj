@@ -409,6 +409,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Game.cpp" />
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameControl.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Map.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MapFactory.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Player.cpp" />
@@ -416,6 +417,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Tile.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\main.cpp" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Game.h" />
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameControl.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Player.h" />

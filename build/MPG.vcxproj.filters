@@ -4,6 +4,9 @@
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -25,6 +28,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h">

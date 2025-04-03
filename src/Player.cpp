@@ -30,16 +30,16 @@ void Player::move(MoveDir moveDir, float frameTime, float speed) {
 
 void Player::internalMove(MoveDir moveDir, float speed) {
 	if (moveDir == MoveDir::FWD) {
-		posX += speed;
+		posY -= speed;
 		return;
 	}
 	if (moveDir == MoveDir::BWD) {
-		posX -= speed;
-		return;
-	}
-	if (moveDir == MoveDir::RIGHT) {
 		posY += speed;
 		return;
 	}
-	posY -= speed;
+	if (moveDir == MoveDir::RIGHT) {
+		posX += speed;
+		return;
+	}
+	posX -= speed;
 }

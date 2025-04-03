@@ -8,7 +8,7 @@ class MapFactory {
 public:
     MapFactory();
     Map createMap();
-    static const int MAP_HEIGHT = 31;
+    static const int MAP_HEIGHT = 36;
     static const int MAP_WIDTH = 28;
     static constexpr float TILE_SIZE = 1.0f;
 

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.30)
+﻿cmake_minimum_required(VERSION 3.28)
 project(MpgProject)
 
 # Find OpenGL package
@@ -31,11 +31,24 @@ set(GLUT_DLL_DIR "${CMAKE_SOURCE_DIR}/build/packages/nupengl.core.redist.0.1.0.1
 include_directories(${GLUT_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/include)
 link_directories(${GLUT_LIB_DIR})
 
-# Collect all .cpp source files
-file(GLOB SOURCES "src/*.cpp")
+# Define source files one by one
+set(SOURCES
+    "src/Game.cpp"
+    "src/Map.cpp"
+    "src/MapFactory.cpp"
+    "src/PlayerFactory.cpp"
+    "src/Player.cpp"
+    "src/main.cpp"
+)
 
-# Collect all .h header files
-file(GLOB HEADERS "include/*.h")
+# Define header files one by one (if needed for other purposes, like IDE or installation)
+set(HEADERS
+    "include/Game.h"
+    "include/Map.h"
+    "include/MapFactory.h"
+    "include/PlayerFactory.h"
+    "include/Player.h"
+)
 
 # Add executable
 add_executable(MPG ${SOURCES} ${HEADERS})

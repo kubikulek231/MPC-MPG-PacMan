@@ -3,6 +3,7 @@
 
 #include "Map.h"
 #include "MapFactory.h"
+#include "Player.h"
 
 class Game {
 public:
@@ -26,8 +27,10 @@ public:
     static void mouseButton(int button, int state, int x, int y);
     static void mouseMotion(int x, int y);
     static void mouseWheel(int button, int state, int x, int y);
+
 private:
     Map map;  // Store the game map
+    Player player;
 };
 
 #endif // GAME_H

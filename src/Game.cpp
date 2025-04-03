@@ -7,6 +7,7 @@ Game* gameInstance = nullptr; // Global pointer for static methods
 Game::Game() {
     gameInstance = this;
     map = MapFactory::createMap();
+    player = Player(0.0f, 0.0f);
     cameraDistance = 50.0f;  // Initial camera distance
 }
 
@@ -91,6 +92,8 @@ void Game::render() {
 
     // Render map
     map.render();
+    // Render player
+    player.render();
 
     glutSwapBuffers();
 }

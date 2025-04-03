@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "MapFactory.h"
 #include "GameControl.h"
+#include "GameLogic.h"
 
 // Inits new game
 void Game::init() {
@@ -21,8 +22,10 @@ void Game::update(int value) {
     float newFrameTime = glutGet(GLUT_ELAPSED_TIME);
     float frameTimeSeconds = (newFrameTime - game.lastFrameTime) / 1000.0f;
 
-    game.player.move(game.moveDir, frameTimeSeconds, game.moveSpeed);
-    game.lastFrameTime = newFrameTime;
+    GameLogic::update(frameTimeSeconds);
+
+    // Update the frametime
+    game.setLastFrameTime(newFrameTime);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();

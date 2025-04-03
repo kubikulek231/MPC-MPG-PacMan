@@ -10,21 +10,17 @@ public:
     Map createMap();
     static const int MAP_HEIGHT = 31;
     static const int MAP_WIDTH = 28;
+    static constexpr float TILE_SIZE = 1.0f;
 
 private:
-    std::vector<std::vector<TileType>> grid;
+    std::vector<std::vector<Tile>> grid;
     bool isValidCoord(int x, int y);
-    bool canNewBlockFit(int x, int y);
-    void addWallBlock(int x, int y);
-    void expandWall(int x, int y);
-
     bool loadMapFile(const std::string& filename);
     void generateEmptyMapFile(const std::string& filename);
     void createGhostHouse();
     void createWalls();
-    void generateMaze(int startX, int startY);
-    void createGeneratedWalls();
     void createPellets();
+    void createDefaultGrid();
 };
 
 #endif // MAP_FACTORY_H

@@ -3,19 +3,40 @@
 #include <fstream>    // For file I/O
 #include <sstream>    // For stringstream to parse lines
 #include <iostream>   // For error handling
+#include "Tile.h"
 
 MapFactory::MapFactory() {
     // Initialize the grid with the specified dimensions, filled with EMPTY tiles
-    grid = std::vector<std::vector<TileType>>(MAP_HEIGHT, std::vector<TileType>(MAP_WIDTH, TileType::EMPTY));
+    createDefaultGrid();
 }
 
 Map MapFactory::createMap() {
     generateEmptyMapFile("C:\\Users\\Kuba\\projects\\MPC-MPG-PacMan\\assets\\maps\\layout.map");
     loadMapFile("C:\\Users\\Kuba\\projects\\MPC-MPG-PacMan\\assets\\maps\\1.map");
-    createGhostHouse();
     //createWalls();
     createPellets();
-    return Map(grid);
+    return Map(grid, TILE_SIZE);
+}
+
+void MapFactory::createDefaultGrid() {
+    // Initialize the grid with tiles of specific types or positions
+    for (int y = 0; y < MAP_HEIGHT; ++y) {  // Loop through rows (height)
+        std::vector<Tile> row;  // Temporary vector to hold a row of tiles
+
+        for (int x = 0; x < MAP_WIDTH; ++x) {  // Loop through columns (width)
+            // Calculate positions for tile boundaries
+            float xPosMin = static_cast<float>(x) * TILE_SIZE;
+            float yPosMin = static_cast<float>(y) * TILE_SIZE;
+            float xPosMax = static_cast<float>(x + 1) * TILE_SIZE;
+            float yPosMax = static_cast<float>(y + 1) * TILE_SIZE;
+
+            // Add a tile to the row
+            row.push_back(Tile(TileType::EMPTY, xPosMin, yPosMin, xPosMax, yPosMax));
+        }
+
+        // Add the completed row to the grid
+        grid.push_back(row);
+    }
 }
 
 void MapFactory::createGhostHouse() {
@@ -32,10 +53,10 @@ void MapFactory::createGhostHouse() {
             // Check if we are on the border of the ghost house (outside walls)
             if (x == centerX - houseSize / 2 || x == centerX + houseSize / 2 - 1 ||
                 y == centerY - houseSize / 2 || y == centerY + houseSize / 2 - 1) {
-                grid[y][x] = TileType::WALL; // Set as ghost house wall
+                grid[y][x].setType(TileType::WALL); // Set as ghost house wall
             }
             else {
-                grid[y][x] = TileType::EMPTY; // Set as empty space inside the ghost house
+                grid[y][x].setType(TileType::WALL); // Set as empty space inside the ghost house
             }
         }
     }
@@ -43,7 +64,7 @@ void MapFactory::createGhostHouse() {
     // Create a "port" (gap) in the house (e.g., opening on one side of the house)
     // Example: Leaving the left side open
     for (int y = centerY - houseSize / 2 + 1; y < centerY + houseSize / 2 - 1; y++) {
-        grid[y][centerX - houseSize / 2] = TileType::EMPTY; // Leave one column open on the left side
+        grid[y][centerX - houseSize / 2].setType(TileType::EMPTY); // Leave one column open on the left side
     }
 }
 
@@ -53,7 +74,7 @@ void MapFactory::createWalls() {
         for (int x = 0; x < MAP_WIDTH; x++) {
             // Set walls on the borders
             if (x == 0 || x == MAP_WIDTH - 1 || y == 0 || y == MAP_HEIGHT - 1) {
-                grid[y][x] = TileType::WALL;
+                grid[y][x].setType(TileType::WALL);
             }
         }
     }
@@ -64,8 +85,8 @@ void MapFactory::createPellets() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             // Skip already set walls, and fill other tiles with pellets
-            if (grid[y][x] == TileType::EMPTY) {
-                grid[y][x] = TileType::PELLET;
+            if (grid[y][x].getTileType() == TileType::EMPTY) {
+                grid[y][x].setType(TileType::PELLET);
             }
         }
     }
@@ -98,10 +119,10 @@ bool MapFactory::loadMapFile(const std::string& filename) {
         for (int col = 0; col < MAP_WIDTH; col++) {
             char tile = line[col];
             if (tile == 'x') {
-                grid[row][col] = TileType::WALL;
+                grid[row][col].setType(TileType::WALL);
             }
             else if (tile == '*') {
-                grid[row][col] = TileType::EMPTY;
+                grid[row][col].setType(TileType::EMPTY);
             }
             else {
                 std::cerr << "Invalid character '" << tile << "' in map at row " << row << ", column " << col << std::endl;

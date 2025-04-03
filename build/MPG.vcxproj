@@ -377,12 +377,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MapFactory.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Player.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\PlayerFactory.cpp" />
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Tile.cpp" />
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\main.cpp" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Game.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Player.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\PlayerFactory.h" />
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\build\ZERO_CHECK.vcxproj">

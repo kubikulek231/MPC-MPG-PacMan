@@ -2,25 +2,19 @@
 #define MAP_H
 
 #include <vector>
-
-enum class TileType {
-    NONE   = 0, 
-    EMPTY  = 1,  // Empty space
-    WALL   = 2,   // Wall
-    PELLET = 3,  // Pellet
-};
+#include "Tile.h"
 
 class Map {
 public:
-    static constexpr double TILE_SIZE = 1.0f;
     Map();
-    Map(std::vector<std::vector<TileType>> mapGrid);
+    Map(std::vector<std::vector<Tile>> mapGrid, float tileSize);
     void render();  // Draws the map
-    TileType getTile(float posX, float posY);
+    Tile* getTile(float posX, float posY);
 private:
-    std::vector<std::vector<TileType>> grid;
+    std::vector<std::vector<Tile>> grid;
     int width;
     int height;
+    float tileSize;
 };
 
 #endif // MAP_H

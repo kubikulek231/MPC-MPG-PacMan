@@ -13,8 +13,6 @@ MapFactory::MapFactory() {
 Map MapFactory::createMap() {
     generateEmptyMapFile("assets\\maps\\blank.map");
     loadMapFile("assets\\maps\\1.map");
-    //createWalls();
-    createPellets();
     return Map(grid, TILE_SIZE);
 }
 
@@ -82,6 +80,10 @@ bool MapFactory::loadMapFile(const std::string& filename) {
                 continue;
             }
             if (tile == '*') {
+                grid[row][col].setType(TileType::PELLET);
+                continue;
+            }
+            if (tile == 'o') {
                 grid[row][col].setType(TileType::EMPTY);
                 continue;
             }

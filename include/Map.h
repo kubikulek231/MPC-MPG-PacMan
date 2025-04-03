@@ -4,9 +4,10 @@
 #include <vector>
 
 enum class TileType {
-    EMPTY  = 0,  // Empty space
-    WALL   = 1,   // Wall
-    PELLET = 2,  // Pellet
+    NONE   = 0, 
+    EMPTY  = 1,  // Empty space
+    WALL   = 2,   // Wall
+    PELLET = 3,  // Pellet
 };
 
 class Map {
@@ -15,6 +16,8 @@ public:
     Map();
     Map(std::vector<std::vector<TileType>> mapGrid);
     void render();  // Draws the map
+    TileType getTile(float posX, float posY);
+private:
     std::vector<std::vector<TileType>> grid;
     int width;
     int height;

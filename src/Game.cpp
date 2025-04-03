@@ -1,14 +1,15 @@
 #include <GL/glut.h>
+#include <iostream>
 #include "Game.h"
 
-Game* gameInstance = nullptr; // Global pointer for static methods
+Game* game = nullptr; // Global pointer for static methods
 
 // Constructor body
 Game::Game() {
-    gameInstance = this;
+    game = this;
+    Player player = Player(0.0f, 0.0f);
     MapFactory mapFactory = MapFactory();
     map = mapFactory.createMap();
-    cameraDistance = 50.0f;  // Initial camera distance
 }
 
 // Inits new game
@@ -19,6 +20,7 @@ void Game::init() {
     // Register mouse callback functions
     glutMouseFunc(mouseButton);
     glutMotionFunc(mouseMotion);
+    glutKeyboardFunc(keyboard);
 }
 
 // Mouse button callback (detects left button press, wheel)
@@ -26,13 +28,13 @@ void Game::mouseButton(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON) {
         if (state == GLUT_DOWN) {
             // Mouse button is pressed
-            gameInstance->isMousePressed = true;
-            gameInstance->lastMouseX = x;
-            gameInstance->lastMouseY = y;
+            game->isMousePressed = true;
+            game->lastMouseX = x;
+            game->lastMouseY = y;
         }
         else {
             // Mouse button is released
-            gameInstance->isMousePressed = false;
+            game->isMousePressed = false;
         }
     }
     // Handle mouse wheel events
@@ -40,50 +42,79 @@ void Game::mouseButton(int button, int state, int x, int y) {
         if (state == GLUT_DOWN) {
             // Scroll up (zoom in)
             if (button == 3) {
-                gameInstance->cameraDistance -= 2.0f; // Zoom in
+                game->cameraDistance -= 2.0f; // Zoom in
             }
             // Scroll down (zoom out)
             else if (button == 4) {
-                gameInstance->cameraDistance += 2.0f; // Zoom out
+                game->cameraDistance += 2.0f; // Zoom out
             }
 
             // Clamp camera distance to avoid too close or too far
-            if (gameInstance->cameraDistance < 10.0f) gameInstance->cameraDistance = 10.0f;
-            if (gameInstance->cameraDistance > 100.0f) gameInstance->cameraDistance = 100.0f;
+            if (game->cameraDistance < 10.0f) game->cameraDistance = 10.0f;
+            if (game->cameraDistance > 100.0f) game->cameraDistance = 100.0f;
         }
     }
 }
 
 // Mouse motion callback (tracks mouse movement)
 void Game::mouseMotion(int x, int y) {
-    if (gameInstance->isMousePressed) {
+    if (game->isMousePressed) {
         // Calculate the change in mouse position
-        int deltaX = x - gameInstance->lastMouseX;
-        int deltaY = y - gameInstance->lastMouseY;
+        int deltaX = x - game->lastMouseX;
+        int deltaY = y - game->lastMouseY;
 
         // Update camera angles based on mouse movement
-        gameInstance->cameraAngleY += deltaX * 0.1f;  // Adjust for sensitivity (horizontal rotation)
-        gameInstance->cameraAngleX += deltaY * 0.1f;  // Adjust for sensitivity (vertical rotation)
+        game->cameraAngleY += deltaX * 0.1f;  // (horizontal rotation)
+        game->cameraAngleX += deltaY * 0.1f;  // (vertical rotation)
 
         // Clamp vertical angle to prevent flipping
-        if (gameInstance->cameraAngleX > 89.0f) gameInstance->cameraAngleX = 89.0f;
-        if (gameInstance->cameraAngleX < -89.0f) gameInstance->cameraAngleX = -89.0f;
+        if (game->cameraAngleX > 89.0f) game->cameraAngleX = 89.0f;
+        if (game->cameraAngleX < -89.0f) game->cameraAngleX = -89.0f;
 
         // Update last mouse position
-        gameInstance->lastMouseX = x;
-        gameInstance->lastMouseY = y;
+        game->lastMouseX = x;
+        game->lastMouseY = y;
     }
 }
 
-// Update the render to apply the rotation and zoom
+void Game::keyboard(unsigned char key, int x, int y) {
+    if (key == 'w') {
+        game->moveDir = MoveDir::FWD;
+    }
+    if (key == 's') {
+        game->moveDir = MoveDir::BWD;
+    }
+    if (key == 'd') {
+        game->moveDir = MoveDir::RIGHT;
+    }
+    if (key == 'a') {
+        game->moveDir = MoveDir::LEFT;
+    }
+}
+
+// Update positions, handle logic
+void Game::update(int value) {
+    float newFrameTime = glutGet(GLUT_ELAPSED_TIME);
+    float frameTimeSeconds = (newFrameTime - game->lastFrameTime) / 1000.0f;
+
+    game->player.move(game->moveDir, frameTimeSeconds, game->moveSpeed);
+    game->lastFrameTime = newFrameTime;
+
+    // Trigger the display update by calling this to schedule a render
+    glutPostRedisplay();
+
+    glutTimerFunc(8, Game::update, 0);
+}
+
+// Render the game
 void Game::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
     // Calculate camera position based on angles and zoom (distance)
-    float camX = cameraDistance * sin(-cameraAngleY * 3.14159f / 180.0f) * cos(cameraAngleX * 3.14159f / 180.0f);
-    float camY = cameraDistance * sin(cameraAngleX * 3.14159f / 180.0f);
-    float camZ = cameraDistance * cos(cameraAngleY * 3.14159f / 180.0f) * cos(cameraAngleX * 3.14159f / 180.0f);
+    float camX = game->cameraDistance * sin(-game->cameraAngleY * 3.14159f / 180.0f) * cos(game->cameraAngleX * 3.14159f / 180.0f);
+    float camY = game->cameraDistance * sin(game->cameraAngleX * 3.14159f / 180.0f);
+    float camZ = game->cameraDistance * cos(game->cameraAngleY * 3.14159f / 180.0f) * cos(game->cameraAngleX * 3.14159f / 180.0f);
 
     // Set the camera view
     gluLookAt(camX, camY, camZ,  // Eye position (based on camera angles and zoom)
@@ -91,16 +122,10 @@ void Game::render() {
         0.0, 1.0, 0.0);   // Up vector
 
     // Render map
-    map.render();
+    game->map.render();
+    game->player.render();
 
     glutSwapBuffers();
-}
-
-// Callback to trigger on glut display
-void Game::display() {
-    if (gameInstance) {
-        gameInstance->render();
-    }
 }
 
 // Callback to trigger on glut window reshape

@@ -10,6 +10,9 @@
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MapFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\PlayerFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -25,6 +28,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\PlayerFactory.h">

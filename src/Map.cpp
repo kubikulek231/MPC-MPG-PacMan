@@ -10,6 +10,15 @@ Map::Map(std::vector<std::vector<TileType>> mapGrid) {
     this->width = (this->height > 0) ? mapGrid[0].size() : 0;  // Number of columns (checking if the grid is not empty)
 }
 
+TileType Map::getTile(float posX, float posY) {
+    int tileX = (posX + (width * TILE_SIZE / 2)) / TILE_SIZE;
+    int tileY = (posY + (height * TILE_SIZE / 2)) / TILE_SIZE;
+
+    if (tileX >= 0 && tileX < width && tileY >= 0 && tileY < height) {
+        return grid[tileY][tileX];
+    }
+    return TileType::EMPTY;
+}
 
 void Map::render() {
     for (int y = 0; y < height; y++) {
@@ -49,10 +58,10 @@ void Map::render() {
                 glEnd();
                 glPopMatrix();
 
-                glColor3f(1.0f, 1.0f, 0.0f); // Yellow for pellet
+                glColor3f(1.0f, 0.5f, 0.0f); // Yellow for pellet
                 glPushMatrix();
                 glTranslatef(worldX, TILE_SIZE / 2.0f, worldZ);
-                glutSolidSphere(TILE_SIZE / 5.0, 8, 8); // Scale pellets
+                glutSolidSphere(TILE_SIZE / 8.0, 16, 16); // Scale pellets
                 glPopMatrix();
             }
         }

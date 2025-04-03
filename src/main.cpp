@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include "Game.h"
 
-Game game; // Global game instance
+Game game = Game(); // Global game instance
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -10,11 +10,9 @@ int main(int argc, char** argv) {
     glutCreateWindow("Pacman 3D");
 
     game.init();
-
-    glutDisplayFunc(Game::display);
     glutReshapeFunc(Game::reshape);
-    glutIdleFunc(Game::display); // Keeps updating
-
+    glutDisplayFunc(Game::render);
+    glutTimerFunc(16, Game::update, 0);
     glutMainLoop();
     return 0;
 }

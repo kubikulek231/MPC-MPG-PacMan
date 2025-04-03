@@ -39,47 +39,6 @@ void MapFactory::createDefaultGrid() {
     }
 }
 
-void MapFactory::createGhostHouse() {
-    // Calculate the center position
-    int centerX = MAP_WIDTH / 2;
-    int centerY = MAP_HEIGHT / 2;
-
-    // Define the size of the ghost house (e.g., 5x5 block)
-    int houseSize = 5;
-
-    // Create the walls around the ghost house (5x5 border)
-    for (int y = centerY - houseSize / 2; y < centerY + houseSize / 2; y++) {
-        for (int x = centerX - houseSize / 2; x < centerX + houseSize / 2; x++) {
-            // Check if we are on the border of the ghost house (outside walls)
-            if (x == centerX - houseSize / 2 || x == centerX + houseSize / 2 - 1 ||
-                y == centerY - houseSize / 2 || y == centerY + houseSize / 2 - 1) {
-                grid[y][x].setType(TileType::WALL); // Set as ghost house wall
-            }
-            else {
-                grid[y][x].setType(TileType::WALL); // Set as empty space inside the ghost house
-            }
-        }
-    }
-
-    // Create a "port" (gap) in the house (e.g., opening on one side of the house)
-    // Example: Leaving the left side open
-    for (int y = centerY - houseSize / 2 + 1; y < centerY + houseSize / 2 - 1; y++) {
-        grid[y][centerX - houseSize / 2].setType(TileType::EMPTY); // Leave one column open on the left side
-    }
-}
-
-void MapFactory::createWalls() {
-    // Iterate over each tile in the grid to create walls around the border
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            // Set walls on the borders
-            if (x == 0 || x == MAP_WIDTH - 1 || y == 0 || y == MAP_HEIGHT - 1) {
-                grid[y][x].setType(TileType::WALL);
-            }
-        }
-    }
-}
-
 void MapFactory::createPellets() {
     // Fill all non-wall tiles with pellets
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -120,27 +79,23 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             char tile = line[col];
             if (tile == 'x') {
                 grid[row][col].setType(TileType::WALL);
+                continue;
             }
-            else if (tile == '*') {
+            if (tile == '*') {
                 grid[row][col].setType(TileType::EMPTY);
+                continue;
             }
-            else {
-                std::cerr << "Invalid character '" << tile << "' in map at row " << row << ", column " << col << std::endl;
-                return false;
-            }
+            std::cerr << "Invalid character '" << tile << "' in map at row " << row << ", column " << col << std::endl;
+            return false;
         }
-
         row++;
     }
-
     file.close();
-
     // Ensure the map is the correct size
     if (row != MAP_HEIGHT) {
         std::cerr << "File content does not match expected map height." << std::endl;
         return false;
     }
-
     return true;
 }
 
@@ -151,7 +106,6 @@ void MapFactory::generateEmptyMapFile(const std::string& filename) {
         std::cerr << "Failed to open file: " << filename << std::endl;
         return;
     }
-
     // Create a map filled with '*' characters
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
@@ -159,7 +113,6 @@ void MapFactory::generateEmptyMapFile(const std::string& filename) {
         }
         file << '\n';  // New line at the end of each row
     }
-
     file.close();
     std::cout << "Empty map generated and saved to " << filename << std::endl;
 }

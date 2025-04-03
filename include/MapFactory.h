@@ -17,8 +17,6 @@ private:
     bool isValidCoord(int x, int y);
     bool loadMapFile(const std::string& filename);
     void generateEmptyMapFile(const std::string& filename);
-    void createGhostHouse();
-    void createWalls();
     void createPellets();
     void createDefaultGrid();
 };

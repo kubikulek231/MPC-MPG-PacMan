@@ -10,6 +10,10 @@ DirChangeRequest* GameLogic::dirChangeRequest = nullptr;
 MoveDir GameLogic::actualMoveDir = MoveDir::NONE;
 
 void GameLogic::update() {
+    // TODO:
+    // Define change dir method, which will be less frametime dependent.
+    // Perhaps introduce some thresholds.
+
     Game& game = Game::getInstance();
     MoveDir userMoveDir = *game.getMoveDir();
     Player* player = game.getPlayer();

@@ -1,36 +1,47 @@
-struct EntityPosition {
-    float x;
-    float y;
+#ifndef ENTITY_H
+#define ENTITY_H
 
-    EntityPosition(float x = 0.0f, float y = 0.0f) : x(x), y(y) {}
+#include "BoundingBox3D.h"
+#include <GL/glut.h>  // For OpenGL rendering
 
-    void setPosition(float newX, float newY) {
-        x = newX;
-        y = newY;
-    }
-
-    void move(float dx, float dy) {
-        x += dx;
-        y += dy;
-    }
-};
-
+// Each entity is defined by it's origin and bounding box
+// Origin is always bottom left corner.
+// Bounding box is defined relative to the origin.
+// To get absolute Bounding box, call getAbsoluteBounding box method.
+// To check if 2 entities intersect, call intersects.
 class Entity {
 protected:
-    EntityPosition position;
+    Point3D origin = Point3D();
+    BoundingBox3D boundingBox = BoundingBox3D();
+    void setBoundingBox(Point3D newMin, Point3D newMax);
+    void setOrigin(Point3D newOrigin);
 
 public:
-    Entity(float x = 0.0f, float y = 0.0f) : position(x, y) {}
+    Entity() {};
+    Entity(Point3D origin, BoundingBox3D boundingBox);
+    Entity(const Entity& other);
 
-    EntityPosition getPosition() const {
-        return position;
-    }
+    Point3D getOrigin() const;
+    BoundingBox3D getBoundingBox() const;
+    BoundingBox3D getAbsoluteBoundingBox() const;
 
-    void setPosition(float x, float y) {
-        position.setPosition(x, y);
-    }
+    Point3D getMovedOrigin(Point3D dPoint) const;
+    BoundingBox3D getMovedBoundingBox(Point3D dPoint) const;
+    BoundingBox3D getAbsoluteMovedBoundingBox(Point3D dpoint) const;
+    
+    Point3D getAbsoluteCenterPoint() const;
 
-    void move(float dx, float dy) {
-        position.move(dx, dy);
-    }
+    void move(float dx, float dy, float dz);
+    void moveX(float dx);
+    void moveY(float dy);
+    void moveZ(float dz);
+    void move(Point3D dPoint);
+
+    bool intersects(const Entity& otherEntity) const;
+
+    // Debugging functions to render bounding box and origin
+    void renderBoundingBox() const;
+    void renderOrigin() const;
 };
+
+#endif

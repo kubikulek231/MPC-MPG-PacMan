@@ -1,6 +1,8 @@
+#include "GL/glut.h"
+
 #include "GameControl.h"
 #include "Game.h"
-#include "GL/glut.h"
+#include "MoveDir.h"
 
 void GameControl::mouseButton(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON) {

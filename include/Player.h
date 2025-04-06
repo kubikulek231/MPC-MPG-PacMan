@@ -6,12 +6,9 @@
 class Player : public Entity {
 public:
     Player();
-    Player(float initPosX, float initPosY);
-    static constexpr float DEFAULT_SPEED = 0.01f;
-    static constexpr float TILE_SIZE = 1.0f;
+    Player(const Player& other);
+    Player(Point3D playerOrigin, BoundingBox3D playerBoundingBox);
     void render();
-private:
-    EntityPosition position;
 };
 
 #endif // PLAYER_H

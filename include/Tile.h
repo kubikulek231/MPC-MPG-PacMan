@@ -2,24 +2,24 @@
 #define TILE_H
 
 #include <vector>
+#include <string>
+#include "Entity.h"
 
 enum class TileType {
-    EMPTY = 1,  // Empty space
-    WALL = 2,   // Wall
+    EMPTY = 1,   // Empty space
+    WALL = 2,    // Wall
     PELLET = 3,  // Pellet
 };
 
-class Tile {
+class Tile : public Entity {
 public:
-    Tile(TileType tileType, float xPosMin, float yPosMin, float xPosMax, float yPosMax);
-    bool isWalkable();
+    Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox);
+    bool isWalkable() const;
     void setType(TileType tileType);
-    float getCenterX();
-    float getCenterY();
-    TileType getTileType();
+    std::string getTileTypeString();
+    TileType getTileType() const;
 private:
     TileType tileType;
-    float xPosMin, yPosMin, xPosMax, yPosMax, xCenterPos, yCenterPos;
 };
 
 #endif

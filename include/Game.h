@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "MapFactory.h"
+#include "MoveDir.h"
 
 // Singleton class
 class Game {
@@ -13,7 +14,7 @@ public:
         return instance;
     }
 
-    void init();    // Initialize OpenGL settings
+    void init();    // Init new game along with OpenGL settings
     static void update(int value = 0);  // Update game logic
     static void render();  // Display the game scene
 
@@ -21,10 +22,11 @@ public:
     static void reshape(int w, int h);
 
     // Getters
-    Map& getMap() { return map; }
-    Player& getPlayer() { return player; }
-    MoveDir getMoveDir() const { return moveDir; }
+    Map* getMap() { return &map; }
+    Player* getPlayer() { return &player; }
+    MoveDir* getMoveDir() { return &moveDir; }
     float getLastFrameTime() const { return lastFrameTime; }
+    float getLastFrameTimeSeconds() const { return lastFrameTimeSeconds; }
     float getCameraDistance() const { return cameraDistance; }
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
@@ -34,10 +36,11 @@ public:
     float getMoveSpeed() const { return moveSpeed; }
 
     // Setters
-    void setMap(const Map& newMap) { map = newMap; }
-    void setPlayer(const Player& newPlayer) { player = newPlayer; }
+    void setMap(Map newMap) { map = newMap; }
+    void setPlayer(Player newPlayer) { player = newPlayer; }
     void setMoveDir(MoveDir newMoveDir) { moveDir = newMoveDir; }
     void setLastFrameTime(float time) { lastFrameTime = time; }
+    void setLastFrameTimeSeconds(float time) { lastFrameTimeSeconds = time; }
     void setCameraDistance(float distance) { cameraDistance = distance; }
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
@@ -50,11 +53,12 @@ private:
     Game(const Game&) = delete;  // Prevent copy constructor
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
 
-    MapFactory mapFactory = MapFactory();
-    Map map = mapFactory.createMap();
-    Player player = Player(0.0f, 0.0f);;
+    MapFactory mapFactory;
+    Map map;
+    Player player;
     MoveDir moveDir;
     float lastFrameTime = 0.0f;
+    float lastFrameTimeSeconds = 0.0f;
     float cameraDistance = 50.0f;
     float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
     float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)

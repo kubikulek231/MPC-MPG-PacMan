@@ -1,0 +1,161 @@
+#include "Entity.h"
+
+Entity::Entity(Point3D origin, BoundingBox3D boundingBox) {
+	this->origin = origin;
+	this->boundingBox = boundingBox;
+}
+
+Entity::Entity(const Entity& other) {
+    origin = other.origin;
+    boundingBox = other.boundingBox;
+}
+
+Point3D Entity::getOrigin() const {
+    return origin;
+}
+
+BoundingBox3D Entity::getBoundingBox() const {
+    return boundingBox;
+}
+
+BoundingBox3D Entity::getAbsoluteBoundingBox() const {
+    return this->boundingBox.getAbsoluteBoundingBox(origin);
+}
+
+void Entity::setBoundingBox(Point3D newMin, Point3D newMax) {
+	boundingBox.min = newMin;
+	boundingBox.max = newMax;
+}
+
+void Entity::setOrigin(Point3D newOrigin) {
+	origin = newOrigin;
+}
+
+Point3D Entity::getMovedOrigin(Point3D dPoint) const {
+	// Create copy using copy constructor
+	Point3D newPoint = Point3D(this->origin);
+	newPoint.move(dPoint);
+    return newPoint;
+}
+
+BoundingBox3D Entity::getMovedBoundingBox(Point3D dPoint) const {
+	// Create copy using copy constructor
+	BoundingBox3D newBoundingBox = BoundingBox3D(this->boundingBox);
+	newBoundingBox.move(dPoint);
+    return newBoundingBox;
+}
+
+BoundingBox3D Entity::getAbsoluteMovedBoundingBox(Point3D dPoint) const {
+    // Create copy using copy constructor
+    BoundingBox3D newBoundingBox = BoundingBox3D(this->boundingBox);
+    newBoundingBox.move(dPoint);
+    return newBoundingBox.getAbsoluteBoundingBox(newBoundingBox.min);
+
+}
+
+Point3D Entity::getAbsoluteCenterPoint() const {
+    BoundingBox3D absoluteBoundingBox = boundingBox.getAbsoluteBoundingBox(origin);
+    return (absoluteBoundingBox.min + absoluteBoundingBox.max) / 2.0f;
+}
+
+void Entity::move(float dx, float dy, float dz) {
+	origin.move(dx, dy, dz);
+}
+
+void Entity::move(Point3D dPoint) {
+	origin.move(dPoint);
+}
+
+void Entity::moveX(float dx) {
+    origin.move(dx, 0, 0);
+}
+
+void Entity::moveY(float dY) {
+    origin.move(0, dY, 0);
+}
+
+void Entity::moveZ(float dZ) {
+    origin.move(0, 0, dZ);
+}
+
+// Check if this entity intersects with another entity
+bool Entity::intersects(const Entity& otherEntity) const {
+    // Adjust bounding boxes relative to the origin (lower-left corner)
+    BoundingBox3D thisBoundingBox = this->getAbsoluteBoundingBox();
+    BoundingBox3D otherBoundingBox = otherEntity.getAbsoluteBoundingBox();
+
+    return thisBoundingBox.intersects(otherBoundingBox);
+}
+
+void Entity::renderBoundingBox() const {
+    BoundingBox3D abb = getAbsoluteBoundingBox();
+    glPushMatrix();
+
+    // Enable transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Set the color with 10% opacity (red in this case)
+    glColor4f(1.0f, 0.0f, 0.0f, 0.1f);
+
+    glBegin(GL_QUADS);
+
+    // Front face (z = max.z)
+    glVertex3f(abb.min.x, abb.min.y, abb.max.z);
+    glVertex3f(abb.max.x, abb.min.y, abb.max.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.max.z);
+    glVertex3f(abb.min.x, abb.max.y, abb.max.z);
+
+    // Back face (z = min.z)
+    glVertex3f(abb.min.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.min.z);
+    glVertex3f(abb.min.x, abb.max.y, abb.min.z);
+
+    // Top face (y = max.y)
+    glVertex3f(abb.min.x, abb.max.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.max.z);
+    glVertex3f(abb.min.x, abb.max.y, abb.max.z);
+
+    // Bottom face (y = min.y)
+    glVertex3f(abb.min.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.min.y, abb.max.z);
+    glVertex3f(abb.min.x, abb.min.y, abb.max.z);
+
+    // Right face (x = max.x)
+    glVertex3f(abb.max.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.min.z);
+    glVertex3f(abb.max.x, abb.max.y, abb.max.z);
+    glVertex3f(abb.max.x, abb.min.y, abb.max.z);
+
+    // Left face (x = min.x)
+    glVertex3f(abb.min.x, abb.min.y, abb.min.z);
+    glVertex3f(abb.min.x, abb.max.y, abb.min.z);
+    glVertex3f(abb.min.x, abb.max.y, abb.max.z);
+    glVertex3f(abb.min.x, abb.min.y, abb.max.z);
+
+    glEnd();
+
+    // Disable transparency
+    glDisable(GL_BLEND);
+
+    glPopMatrix();
+}
+
+// Debug function to render the origin as a small sphere
+void Entity::renderOrigin() const {
+    glPushMatrix();
+
+    // Translate to the origin position
+    glTranslatef(origin.x, origin.y, origin.z);
+
+    // Color the origin as a debug marker (e.g., green)
+    glColor3f(0.0f, 1.0f, 0.0f);  // Green for origin
+
+    // Render a small sphere at the origin
+    glutSolidSphere(0.1f, 10, 10);  // A small sphere for the origin
+
+    glPopMatrix();
+}

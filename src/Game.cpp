@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include <iostream>
-#include "Game.h"
 #include "MapFactory.h"
+#include "Game.h"
 #include "GameControl.h"
 #include "GameLogic.h"
 
@@ -14,15 +14,20 @@ void Game::init() {
     glutMouseFunc(GameControl::mouseButton);
     glutMotionFunc(GameControl::mouseMotion);
     glutKeyboardFunc(GameControl::keyboard);
+
+    mapFactory = MapFactory();
+    map = mapFactory.createMap();
+    player = Player(Point3D(0, 0, 0), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.985, 0.985, 0.985)));
+    moveDir = MoveDir::NONE;
 }
 
 // Update positions, handle logic
 void Game::update(int value) {
     Game& game = Game::getInstance();
     float newFrameTime = glutGet(GLUT_ELAPSED_TIME);
-    float frameTimeSeconds = (newFrameTime - game.lastFrameTime) / 1000.0f;
+    game.setLastFrameTimeSeconds((newFrameTime - game.lastFrameTime) / 1000.0f);
 
-    GameLogic::update(frameTimeSeconds);
+    GameLogic::update();
 
     // Update the frametime
     game.setLastFrameTime(newFrameTime);
@@ -50,8 +55,8 @@ void Game::render() {
         0.0, 1.0, 0.0);   // Up vector
 
     // Render map
-    game.map.render();
-    game.player.render();
+    game.getMap()->render();
+    game.getPlayer()->render();
 
     glutSwapBuffers();
 }

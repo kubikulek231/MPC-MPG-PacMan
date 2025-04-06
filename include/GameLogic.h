@@ -1,19 +1,25 @@
 #ifndef GAMELOGIC_H
 #define GAMELOGIC_H
 
+#include "Entity.h"
+#include "Player.h"
+#include "Tile.h"
+#include "DirChangeRequest.h"
+#include "MoveDir.h"
+#include <vector>
+
 class Game; // Forward declaration to avoid circular dependency
 
-enum class MoveDir {
-	FWD = 0,
-	BWD = 1,
-	RIGHT = 2,
-	LEFT = 3,
-};
-
 class GameLogic {
+private:
+	static DirChangeRequest* dirChangeRequest;
+	static Player getMovedEntity(Player* player, MoveDir moveDir, float speedNormalized);
+	static std::vector<Tile*> getPlayerTiles(Player* player);
+	static bool areAllTilesWalkable(std::vector<Tile*> tiles);
+	static bool moveEntityIfTileWalkable(Entity* entity, float moveSpeed, MoveDir moveDir);
+	static MoveDir actualMoveDir;
 public:
-    static void update(float frameTimeSeconds);
-	static EntityPosition getNextPlayerPos(MoveDir moveDir, EntityPosition currentPlayerPos, float speedNormalized);
+    static void update();
 };
 
 #endif

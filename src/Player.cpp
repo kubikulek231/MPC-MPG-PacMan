@@ -4,13 +4,25 @@
 Player::Player() {
 }
 
-Player::Player(float initPosX, float initPosY) : Entity(initPosX, initPosY) {
+Player::Player(const Player& other) {
+    this->boundingBox = other.boundingBox;
+    this->origin = other.origin;
+}
+
+Player::Player(Point3D playerOrigin, BoundingBox3D playerBoundingBox) : Entity(playerOrigin, playerBoundingBox) {
 }
 
 void Player::render() {
     glColor3f(1.0f, 1.0f, 0.0f);
     glPushMatrix();
-    glTranslatef(pos.x, TILE_SIZE / 2.0f, pos.y);
-    glutSolidSphere(TILE_SIZE / 2, 16, 16);
+
+    Point3D centerPoint = getAbsoluteCenterPoint();
+    // Sphere is defined by center point, so needs to be translated
+    glTranslatef(centerPoint.x, centerPoint.y, centerPoint.z);
+    glutSolidSphere(0.5f, 16, 16);
+
     glPopMatrix();
+
+    renderBoundingBox();
+    renderOrigin();
 }

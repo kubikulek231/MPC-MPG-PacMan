@@ -1,5 +1,7 @@
 #include "Map.h"
 #include <GL/glut.h>
+#include <cmath>
+#include <iostream>
 
 Map::Map() {
 }
@@ -11,9 +13,12 @@ Map::Map(std::vector<std::vector<Tile>> mapGrid, float tileSize) {
     this->tileSize = tileSize;
 }
 
-Tile* Map::getTile(float posX, float posY) {
-    int tileX = (posX + (width * tileSize / 2)) / tileSize;
-    int tileY = (posY + (height * tileSize / 2)) / tileSize;
+Tile* Map::getTileWithPoint3D(Point3D point) {
+    float originX = (-width / 2.0f) * tileSize;
+    float originY = (-height / 2.0f) * tileSize;
+
+    int tileX = static_cast<int>(std::floor((point.x - originX) / tileSize));
+    int tileY = static_cast<int>(std::floor((point.y - originY) / tileSize));
 
     if (tileX >= 0 && tileX < width && tileY >= 0 && tileY < height) {
         return &grid[tileY][tileX];
@@ -21,62 +26,102 @@ Tile* Map::getTile(float posX, float posY) {
     return nullptr;
 }
 
+// Returns absoluteBoundingBox intersecting tiles 
+std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingBox) {
+    std::vector<Tile*> intersectedTiles;
+
+    // Get 2D bounds of the bounding box (XZ plane in OpenGL)
+    float minX = absoluteBoundingBox->min.x;
+    float maxX = absoluteBoundingBox->max.x;
+    float minZ = absoluteBoundingBox->min.z;
+    float maxZ = absoluteBoundingBox->max.z;
+
+    // Convert world coordinates to tile indices based on the XZ plane
+    int startX = std::max(0, static_cast<int>(std::floor((minX + (width / 2.0f) * tileSize) / tileSize)));
+    int endX = std::min(width - 1, static_cast<int>(std::floor((maxX + (width / 2.0f) * tileSize) / tileSize)));
+    int startZ = std::max(0, static_cast<int>(std::floor((minZ + (height / 2.0f) * tileSize) / tileSize)));
+    int endZ = std::min(height - 1, static_cast<int>(std::floor((maxZ + (height / 2.0f) * tileSize) / tileSize)));
+
+    // Iterate only over potentially intersecting tiles
+    for (int z = startZ; z <= endZ; ++z) {
+        for (int x = startX; x <= endX; ++x) {
+            Tile& tile = grid[z][x];
+
+            if (absoluteBoundingBox->intersects(tile.getAbsoluteBoundingBox())) {
+                intersectedTiles.push_back(&tile);
+
+                // Print the coordinates of the intersected tile
+                //std::cout << "Intersecting tile at: (" << x << ", " << z << ")\n";
+            }
+        }
+    }
+
+    return intersectedTiles;
+}
+
 void Map::render() {
+    // Center marker
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glPushMatrix();
+    glutSolidSphere(0.15f, 16, 16); // Origin marker
+    glPopMatrix();
+
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            float worldX = (x - width / 2.0f) * tileSize;
-            float worldZ = (y - height / 2.0f) * tileSize;
+            Tile tile = grid[y][x];
+            BoundingBox3D abb = tile.getAbsoluteBoundingBox();
+            TileType tileType = tile.getTileType();
 
-            // Get the tile type
-            TileType tileType = grid[y][x].getTileType();
+            // Debug
+            //tile.renderBoundingBox();
+            tile.renderOrigin();
 
-            // Render empty tile
-            if (tileType == TileType::EMPTY) {
-                glColor3f(0.5f, 0.5f, 0.5f); // Dark gray for empty space
-                glPushMatrix();
-                glTranslatef(worldX, 0.0f, worldZ);
+            // Common base plane for all tile types
+            if (tileType == TileType::EMPTY || tileType == TileType::PELLET) {
+                glColor3f(0.5f, 0.5f, 0.5f); // Dark gray for floor
                 glBegin(GL_QUADS);
-                glVertex3f(-tileSize / 2.0f, 0.0f, -tileSize / 2.0f);
-                glVertex3f(tileSize / 2.0f, 0.0f, -tileSize / 2.0f);
-                glVertex3f(tileSize / 2.0f, 0.0f, tileSize / 2.0f);
-                glVertex3f(-tileSize / 2.0f, 0.0f, tileSize / 2.0f);
+                glVertex3f(abb.min.x, abb.min.y, abb.min.z);
+                glVertex3f(abb.max.x, abb.min.y, abb.min.z);
+                glVertex3f(abb.max.x, abb.min.y, abb.max.z);
+                glVertex3f(abb.min.x, abb.min.y, abb.max.z);
                 glEnd();
-                glPopMatrix();
-                continue;
             }
 
-            // Render wall tile
             if (tileType == TileType::WALL) {
                 glColor3f(0.3f, 0.3f, 1.0f); // Blue for wall
+                float centerX = (abb.min.x + abb.max.x) / 2.0f;
+                float centerY = (abb.min.y + abb.max.y) / 2.0f;
+                float centerZ = (abb.min.z + abb.max.z) / 2.0f;
                 glPushMatrix();
-                glTranslatef(worldX, tileSize / 2.0f, worldZ);
-                glutSolidCube(tileSize); // Scale walls correctly
+                glTranslatef(centerX, centerY, centerZ);
+                glutSolidCube(tileSize); // Assumes cube fits bounding box
                 glPopMatrix();
-                continue;
             }
 
-            // Render pellet tile
             if (tileType == TileType::PELLET) {
-                // Dark gray background
-                glColor3f(0.5f, 0.5f, 0.5f);
+                // Draw pellet
+                glColor3f(1.0f, 0.5f, 0.0f); // Orange for pellet
+                float centerX = (abb.min.x + abb.max.x) / 2.0f;
+                float centerY = abb.min.y + tileSize / 2.0f;
+                float centerZ = (abb.min.z + abb.max.z) / 2.0f;
                 glPushMatrix();
-                glTranslatef(worldX, 0.0f, worldZ); // Place flat on the ground
-                glBegin(GL_QUADS); // Draw flat square
-                glVertex3f(-tileSize / 2.0f, 0.0f, -tileSize / 2.0f);
-                glVertex3f(tileSize / 2.0f, 0.0f, -tileSize / 2.0f);
-                glVertex3f(tileSize / 2.0f, 0.0f, tileSize / 2.0f);
-                glVertex3f(-tileSize / 2.0f, 0.0f, tileSize / 2.0f);
-                glEnd();
+                glTranslatef(centerX, centerY, centerZ);
+                glutSolidSphere(tileSize / 8.0, 16, 16);
                 glPopMatrix();
-
-                // Yellow for pellet
-                glColor3f(1.0f, 0.5f, 0.0f); // Yellow for pellet
-                glPushMatrix();
-                glTranslatef(worldX, tileSize / 2.0f, worldZ);
-                glutSolidSphere(tileSize / 8.0, 16, 16); // Scale pellets
-                glPopMatrix();
-                continue;
             }
+
+            //// Render tile coordinate text at center
+            //float textX = (abb.min.x + abb.max.x) / 2.0f;
+            //float textY = abb.min.y + 0.01f; // Slightly above floor
+            //float textZ = (abb.min.z + abb.max.z) / 2.0f;
+
+            //std::string coordStr = "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+            //glColor3f(1.0f, 1.0f, 1.0f); // White text
+
+            //glRasterPos3f(textX, textY, textZ);
+            //for (char c : coordStr) {
+            //    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
+            //}
         }
     }
 }

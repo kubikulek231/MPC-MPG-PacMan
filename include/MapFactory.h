@@ -10,7 +10,7 @@ public:
     Map createMap();
     static const int MAP_HEIGHT = 36;
     static const int MAP_WIDTH = 28;
-    static constexpr float MAP_Z = 0.0f;
+    static constexpr float MAP_Y = 0.0f;
     static constexpr float TILE_SIZE = 1.0f;
 
 private:

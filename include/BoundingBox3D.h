@@ -15,6 +15,7 @@ public:
     void move(Point3D dPoint);
     // Check if two BoundingBox3D objects intersect
     bool intersects(const BoundingBox3D& other) const;
+    float distanceTo(const BoundingBox3D& other) const;
     BoundingBox3D getAbsoluteBoundingBox(Point3D bottomLeftOrigin) const;
 };
 

@@ -18,6 +18,9 @@ public:
     void setType(TileType tileType);
     std::string getTileTypeString();
     TileType getTileType() const;
+    Point3D getCenterPoint() const;
+    float distanceToCenter(const Tile& other) const;
+
 private:
     TileType tileType;
 };

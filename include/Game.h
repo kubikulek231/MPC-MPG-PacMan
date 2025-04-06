@@ -31,9 +31,11 @@ public:
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
     bool getIsMousePressed() const { return isMousePressed; }
+    bool getIsDirectionChanged() const { return isDirectionChanged; }
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
     float getMoveSpeed() const { return moveSpeed; }
+    float getFrametimeNormalizedSpeed();
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -45,6 +47,7 @@ public:
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
     void setIsMousePressed(bool pressed) { isMousePressed = pressed; }
+    void setIsDirectionChanged(bool changed) { isDirectionChanged = true; }
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
     void setMoveSpeed(float speed) { moveSpeed = speed; }
@@ -57,6 +60,7 @@ private:
     Map map;
     Player player;
     MoveDir moveDir;
+    bool isDirectionChanged = true;
     float lastFrameTime = 0.0f;
     float lastFrameTimeSeconds = 0.0f;
     float cameraDistance = 50.0f;
@@ -64,7 +68,8 @@ private:
     float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)
     bool isMousePressed = false; // To check if the left mouse button is pressed
     int lastMouseX, lastMouseY;  // To track the last mouse position
-    float moveSpeed = 1.5f;
+    float moveSpeed = 2.5f;
+    const float maxFrametimeNormalizedSpeed = 0.5f;
 };
 
 #endif // GAME_H

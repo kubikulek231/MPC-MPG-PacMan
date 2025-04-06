@@ -17,7 +17,7 @@ void Game::init() {
 
     mapFactory = MapFactory();
     map = mapFactory.createMap();
-    player = Player(Point3D(0, 0, 0), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.985, 0.985, 0.985)));
+    player = Player(Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.99, 0.99, 0.99)));
     moveDir = MoveDir::NONE;
 }
 
@@ -68,4 +68,10 @@ void Game::reshape(int w, int h) {
     glLoadIdentity();
     gluPerspective(45.0, (float)w / (float)h, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+}
+
+float Game::getFrametimeNormalizedSpeed() {
+    Game& game = Game::getInstance();
+    float frametimeNormalizedSpeed = game.getLastFrameTimeSeconds() * Game::moveSpeed;
+    return std::min(frametimeNormalizedSpeed, Game::maxFrametimeNormalizedSpeed);
 }

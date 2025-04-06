@@ -6,7 +6,7 @@ enum class MoveDir {
 	FWD = 1,
 	BWD = 2,
 	RIGHT = 3,
-	LEFT = 4,
+	LEFT = 4
 };
 
 #endif

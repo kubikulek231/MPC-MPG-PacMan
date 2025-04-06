@@ -1,15 +1,15 @@
 #include "DirChangeRequest.h"
 
-DirChangeRequest::DirChangeRequest(MoveDir moveDir)
-    : dirChangeTime(0.0f), requestedMoveDir(moveDir) {
-}
+using Clock = std::chrono::steady_clock;
 
-void DirChangeRequest::updateTime(float deltaTime) {
-    dirChangeTime += deltaTime;
+DirChangeRequest::DirChangeRequest(MoveDir moveDir)
+    : requestedMoveDir(moveDir), startTime(Clock::now()) {
 }
 
 bool DirChangeRequest::isPending() const {
-    return dirChangeTime < DIR_CHANGE_THRESH_SECS;
+    auto now = Clock::now();
+    auto elapsed = std::chrono::duration<float>(now - startTime).count();
+    return elapsed < DIR_CHANGE_THRESH_SECS;
 }
 
 MoveDir DirChangeRequest::getRequestedMoveDir() const {
@@ -18,5 +18,5 @@ MoveDir DirChangeRequest::getRequestedMoveDir() const {
 
 void DirChangeRequest::reset(MoveDir newDir) {
     requestedMoveDir = newDir;
-    dirChangeTime = 0.0f;
+    startTime = Clock::now();
 }

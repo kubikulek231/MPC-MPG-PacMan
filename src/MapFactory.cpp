@@ -27,7 +27,7 @@ void MapFactory::createDefaultGrid() {
             float yPosMin = (y - MAP_HEIGHT / 2.0f) * TILE_SIZE;
 
             // Set the origin of the tile at the bottom-left corner
-            Point3D tileOrigin = Point3D(xPosMin, MAP_Z, yPosMin);
+            Point3D tileOrigin = Point3D(xPosMin, MAP_Y, yPosMin);
 
             // Define the bounding box relative to the tile's origin
             Point3D bbMin = Point3D(0.0f, 0.0f, 0.0f);  // Minimum of bounding box is the origin
@@ -105,7 +105,7 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             float yPosMax = yCentered + TILE_SIZE;
 
             // Create the origin and bounding box for the tile
-            Point3D tileOrigin = Point3D(xPosMin, MAP_Z, yPosMin);
+            Point3D tileOrigin = Point3D(xPosMin, MAP_Y, yPosMin);
             Point3D bbMin = Point3D(0.0f, 0.0f, 0.0f);  // Min point of bounding box at origin
             Point3D bbMax = Point3D(TILE_SIZE, TILE_SIZE, TILE_SIZE);  // Max point offset by TILE_SIZE
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);

@@ -1,4 +1,5 @@
 #include "Point3D.h"
+#include <cmath>
 
 Point3D::Point3D(float x, float y, float z) {
 	this->x = x;
@@ -22,4 +23,11 @@ void Point3D::move(Point3D dPoint) {
 	x = x + dPoint.x;
 	y = y + dPoint.y;
 	z = z + dPoint.z;
+}
+
+float Point3D::distanceTo(const Point3D& other) const {
+	float dx = x - other.x;
+	float dy = y - other.y;
+	float dz = z - other.z;
+	return std::sqrt(dx * dx + dy * dy + dz * dz);
 }

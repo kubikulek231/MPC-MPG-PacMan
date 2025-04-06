@@ -1,4 +1,6 @@
 #include "BoundingBox3D.h"
+#include <algorithm>
+#include <cmath>
 
 BoundingBox3D::BoundingBox3D(Point3D min, Point3D max) {
 	this->min = min;
@@ -29,6 +31,14 @@ bool BoundingBox3D::intersects(const BoundingBox3D& other) const {
 
     // If no condition is met for non-intersection, they intersect
     return true;
+}
+
+float BoundingBox3D::distanceTo(const BoundingBox3D& other) const {
+    float dx = std::max(std::max(min.x - other.max.x, other.min.x - max.x), 0.0f);
+    float dy = std::max(std::max(min.y - other.max.y, other.min.y - max.y), 0.0f);
+    float dz = std::max(std::max(min.z - other.max.z, other.min.z - max.z), 0.0f);
+
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 BoundingBox3D BoundingBox3D::getAbsoluteBoundingBox(Point3D bottomLeftOrigin) const {

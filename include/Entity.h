@@ -14,7 +14,6 @@ protected:
     Point3D origin = Point3D();
     BoundingBox3D boundingBox = BoundingBox3D();
     void setBoundingBox(Point3D newMin, Point3D newMax);
-    void setOrigin(Point3D newOrigin);
 
 public:
     Entity() {};
@@ -36,6 +35,7 @@ public:
     void moveY(float dy);
     void moveZ(float dz);
     void move(Point3D dPoint);
+    void setOrigin(Point3D newOrigin);
 
     bool intersects(const Entity& otherEntity) const;
 

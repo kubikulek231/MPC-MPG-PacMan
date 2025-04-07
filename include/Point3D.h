@@ -12,6 +12,7 @@ public:
     void move(float dx, float dy, float dz);
     void move(Point3D dPoint);
     float distanceTo(const Point3D& other) const;
+    float distanceTo2D(const Point3D& other) const;
 
     // Overload the + operator to add two Point3D objects
     Point3D operator+(const Point3D& other) const {

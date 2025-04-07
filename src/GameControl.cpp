@@ -53,18 +53,18 @@ void GameControl::keyboard(unsigned char key, int x, int y) {
     Game& game = Game::getInstance();
     if (key == 'w') {
         game.setMoveDir(MoveDir::FWD);
-        game.setIsDirectionChanged(true);
+        game.setIsDirectionKeyPressed(true);
     }
     if (key == 's') {
         game.setMoveDir(MoveDir::BWD);
-        game.setIsDirectionChanged(true);
+        game.setIsDirectionKeyPressed(true);
     }
     if (key == 'd') {
         game.setMoveDir(MoveDir::RIGHT);
-        game.setIsDirectionChanged(true);
+        game.setIsDirectionKeyPressed(true);
     }
     if (key == 'a') {
         game.setMoveDir(MoveDir::LEFT);
-        game.setIsDirectionChanged(true);
+        game.setIsDirectionKeyPressed(true);
     }
 }

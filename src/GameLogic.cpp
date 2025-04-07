@@ -10,11 +10,6 @@ DirChangeRequest* GameLogic::dirChangeRequest = nullptr;
 MoveDir GameLogic::actualMoveDir = MoveDir::NONE;
 
 void GameLogic::update() {
-    // TODO:
-    // Define change dir method, which will be less frametime dependent.
-    // SOLUTION:
-    // Define a method which will move the entity to the nearest center of tile.
-    // After that the direction will be changed.
     Game& game = Game::getInstance();
     Player* player = game.getPlayer();
 
@@ -22,29 +17,25 @@ void GameLogic::update() {
 
     if (userMoveDir == MoveDir::NONE) { return; }
 
-    bool userChangedDir = game.getIsDirectionChanged();
-    game.setIsDirectionChanged(false);
+    bool userChangedDir = game.getIsDirectionKeyPressed();
+    game.setIsDirectionKeyPressed(false);
 
     // User pressed a dir key
     if (userChangedDir) {
         // Delete existing request
         delete dirChangeRequest;
         dirChangeRequest = nullptr;
-        // Try to move in requested direction
-        if (GameLogic::moveEntityIfTileWalkable(player, game.getFrametimeNormalizedSpeed(), userMoveDir)) {
-            // On success, set the actual dir and return
-            actualMoveDir = userMoveDir;
-            return;
+        // If actual direction and requested direction differ, set new change request
+        if (userMoveDir != actualMoveDir) {
+            dirChangeRequest = new DirChangeRequest(userMoveDir);
         }
-        // Set a new request on fail
-        dirChangeRequest = new DirChangeRequest(userMoveDir);
     }
 
     // If the same direction as before, just keep going
     if (userMoveDir == actualMoveDir) {
         delete dirChangeRequest;
         dirChangeRequest = nullptr;
-        GameLogic::moveEntityIfTileWalkable(player, game.getFrametimeNormalizedSpeed(), actualMoveDir);
+        GameLogic::movePlayer(game.getFrametimeNormalizedSpeed(), actualMoveDir);
         return;
     }
 
@@ -54,66 +45,74 @@ void GameLogic::update() {
     // Try to follow a pending direction change
     if (dirChangeRequest != nullptr && dirChangeRequest->isPending()) {
         MoveDir requestedDir = dirChangeRequest->getRequestedMoveDir();
-        if (GameLogic::moveEntityIfTileWalkable(player, game.getFrametimeNormalizedSpeed(), requestedDir)) {
-            actualMoveDir = requestedDir;
-            delete dirChangeRequest;
-            dirChangeRequest = nullptr;
-            return;
-        }
-        // If first attempt fails, snap when within threshold to tile center
-        float distance;
-        Point3D playerClosestTileCenter = GameLogic::getClosestTileCenter(player, playerTiles, distance);
-        if (distance < SNAP_DISTANCE) {
-            player->setOrigin(playerClosestTileCenter);
-            if (!GameLogic::moveEntityIfTileWalkable(player, game.getFrametimeNormalizedSpeed(), requestedDir)) {
-                // This should not happen
-                throw std::runtime_error("Tile move failed unexpectedly.");
-            }
+        if (GameLogic::changePlayerDirection(playerTiles, game.getFrametimeNormalizedSpeed(), requestedDir)) {
             actualMoveDir = requestedDir;
             delete dirChangeRequest;
             dirChangeRequest = nullptr;
             return;
         }
     }
-    // If every attempt fails, move in the current direction
-    GameLogic::moveEntityIfTileWalkable(player, game.getFrametimeNormalizedSpeed(), actualMoveDir);
+    // If every attempt fails, keep moving in the same direction
+    GameLogic::movePlayer(game.getFrametimeNormalizedSpeed(), actualMoveDir);
 }
 
-
-bool GameLogic::moveEntityIfTileWalkable(Entity* entity, float moveSpeed, MoveDir moveDir) {
+bool GameLogic::movePlayer(float moveSpeed, MoveDir moveDir, bool snapToTile, std::vector<Tile*> playerTiles) {
     Game& game = Game::getInstance();
     Map* map = game.getMap();
     Player* player = game.getPlayer();
+    Player playerCopy = Player(*player);
 
-    Player newPlayerEntity = GameLogic::getMovedEntity(player, moveDir, moveSpeed);
-    std::vector<Tile*> movedTiles = GameLogic::getPlayerTiles(&newPlayerEntity);
+    if (snapToTile && playerTiles.size() == 0) {
+        std::cout << "Warning! Snap to tile is enabled but playerTiles.size() is 0!";
+    }
+
+    if (snapToTile && playerTiles.size() != 0) {
+        float distance;
+        Point3D closestTileOrigin = GameLogic::getClosestTileOrigin(&playerCopy, playerTiles, distance);
+        if (distance < SNAP_DISTANCE) {
+            playerCopy.setOrigin(closestTileOrigin);
+        }
+    }
+
+    playerCopy = GameLogic::getMovedEntity(&playerCopy, moveDir, moveSpeed);
+    std::vector<Tile*> movedTiles = GameLogic::getPlayerTiles(&playerCopy);
     
     if (!areAllTilesWalkable(movedTiles)) {
         return false;
     }
 
-    game.setPlayer(newPlayerEntity);
+    game.setPlayer(playerCopy);
     return true;
 }
 
-Player GameLogic::getMovedEntity(Player* player, MoveDir moveDir, float speedNormalized) {
-;   // Create a copy of the player to avoid modifying the original
-    Player movedPlayer = Player(*player);
+bool GameLogic::changePlayerDirection(std::vector<Tile*> playerTiles, float moveSpeed, MoveDir moveDir) {
+    Player* player = Game::getInstance().getPlayer();
+    // Try without snapping at first
+    if (GameLogic::movePlayer(moveSpeed, moveDir)) {
+        return true;
+    }
+    // Try with snapping
+    if (GameLogic::movePlayer(moveSpeed, moveDir, true, playerTiles)) {
+        return true;
+    }
+    return false;
+}
 
+Player GameLogic::getMovedEntity(Player* player, MoveDir moveDir, float speedNormalized) {
     if (moveDir == MoveDir::FWD) {
-        movedPlayer.moveZ(-speedNormalized);
+        player->moveZ(-speedNormalized);
     }
     if (moveDir == MoveDir::BWD) {
-        movedPlayer.moveZ(speedNormalized);
+        player->moveZ(speedNormalized);
     }
     if (moveDir == MoveDir::RIGHT) {
-        movedPlayer.moveX(speedNormalized);
+        player->moveX(speedNormalized);
     }
     if (moveDir == MoveDir::LEFT) {
-        movedPlayer.moveX(-speedNormalized);
+        player->moveX(-speedNormalized);
     }
 
-    return movedPlayer;
+    return *player;
 }
 
 std::vector<Tile*> GameLogic::getPlayerTiles(Player* player) {
@@ -136,60 +135,23 @@ bool GameLogic::areAllTilesWalkable(std::vector<Tile*> tiles) {
     return true;
 }
 
-Point3D GameLogic::getNextTileCenter(Player* player, const std::vector<Tile*>& tiles, MoveDir dir, float& distance) {
-    Point3D playerCenter = player->getAbsoluteCenterPoint();
+Point3D GameLogic::getClosestTileOrigin(Player* player, const std::vector<Tile*>& tiles, float& distance) {
+    Point3D playerOrigin = player->getOrigin();
 
     Tile* closestTile = nullptr;
     float closestDist = FLT_MAX;
 
-    // They both lie on XZ plane
-    playerCenter.y = MapFactory::MAP_Y;
-
     for (Tile* tile : tiles) {
         if (!tile) continue;
-        Point3D tileCenter = tile->getCenterPoint();
-        // Filter by direction
-        bool inDirection = false;
-        switch (dir) {
-        case MoveDir::FWD:    inDirection = tileCenter.z < playerCenter.z; break;
-        case MoveDir::BWD:    inDirection = tileCenter.z > playerCenter.z; break;
-        case MoveDir::LEFT:   inDirection = tileCenter.x < playerCenter.x; break;
-        case MoveDir::RIGHT:  inDirection = tileCenter.x > playerCenter.x; break;
-        default: break;
-        }
-        if (!inDirection) continue;
-        // Calculate distance to the tile
-        float dist = playerCenter.distanceTo(tileCenter);
-        if (dist < closestDist) {
-            closestTile = tile;
-            closestDist = dist;
-            distance = dist;
-        }
-    }
-    // Return the center of the closest tile or the player's center if no tile found
-    return closestTile ? closestTile->getCenterPoint() : playerCenter;
-}
-
-Point3D GameLogic::getClosestTileCenter(Player* player, const std::vector<Tile*>& tiles, float& distance) {
-    Point3D playerCenter = player->getAbsoluteCenterPoint();
-
-    Tile* closestTile = nullptr;
-    float closestDist = FLT_MAX;
-
-    // They both lie on XZ plane
-    playerCenter.y = MapFactory::MAP_Y;
-
-    for (Tile* tile : tiles) {
-        if (!tile) continue;
-        Point3D tileCenter = tile->getCenterPoint();
+        Point3D tileOrigin = tile->getOrigin();
         // Calculate the distance between player and tile
-        float dist = playerCenter.distanceTo(tileCenter);
+        float dist = playerOrigin.distanceTo2D(tileOrigin);
         if (dist < closestDist) {
             closestTile = tile;
             closestDist = dist;
             distance = dist;
         }
     }
-    // Return the center of the closest tile, or the player's center if no tile is found
-    return closestTile ? closestTile->getCenterPoint() : playerCenter;
+    // Return the origin of the closest tile, or the player's origin if no tile is found
+    return closestTile ? closestTile->getOrigin() : playerOrigin;
 }

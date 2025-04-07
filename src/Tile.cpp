@@ -19,8 +19,9 @@ TileType Tile::getTileType() const {
 }
 
 Point3D Tile::getCenterPoint() const {
-	const auto& min = boundingBox.min;
-	const auto& max = boundingBox.max;
+	const auto& absBB = getAbsoluteBoundingBox();
+	const auto& min = absBB.min;
+	const auto& max = absBB.max;
 
 	float centerX = (min.x + max.x) / 2.0f;
 	float centerZ = (min.z + max.z) / 2.0f;

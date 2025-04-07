@@ -31,7 +31,7 @@ public:
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
     bool getIsMousePressed() const { return isMousePressed; }
-    bool getIsDirectionChanged() const { return isDirectionChanged; }
+    bool getIsDirectionKeyPressed() const { return isDirectionKeyPressed; }
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
     float getMoveSpeed() const { return moveSpeed; }
@@ -47,7 +47,7 @@ public:
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
     void setIsMousePressed(bool pressed) { isMousePressed = pressed; }
-    void setIsDirectionChanged(bool changed) { isDirectionChanged = true; }
+    void setIsDirectionKeyPressed(bool changed) { isDirectionKeyPressed = changed; }
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
     void setMoveSpeed(float speed) { moveSpeed = speed; }
@@ -60,7 +60,7 @@ private:
     Map map;
     Player player;
     MoveDir moveDir;
-    bool isDirectionChanged = true;
+    bool isDirectionKeyPressed = true;
     float lastFrameTime = 0.0f;
     float lastFrameTimeSeconds = 0.0f;
     float cameraDistance = 50.0f;

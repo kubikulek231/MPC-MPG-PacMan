@@ -7,16 +7,16 @@
 class DirChangeRequest {
 private:
     MoveDir requestedMoveDir;
-    std::chrono::steady_clock::time_point startTime;
+    uint64_t startTime;
 public:
     // Threshold in which the dir change is executed
-    static constexpr float DIR_CHANGE_THRESH_SECS = 1.0f;
+    const uint64_t DIR_CHANGE_THRESH_MS = 1000; // In ms
 
     DirChangeRequest(MoveDir moveDir);
 
-    bool isPending() const;
+    uint64_t getTimeMs();
+    bool isPending();
     MoveDir getRequestedMoveDir() const;
-    void reset(MoveDir newDir);
 };
 
 #endif

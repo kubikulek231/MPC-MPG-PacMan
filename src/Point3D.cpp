@@ -31,3 +31,9 @@ float Point3D::distanceTo(const Point3D& other) const {
 	float dz = z - other.z;
 	return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
+
+float Point3D::distanceTo2D(const Point3D& other) const {
+	float dx = x - other.x;
+	float dz = z - other.z;
+	return std::sqrt(dx * dx + dz * dz);
+}

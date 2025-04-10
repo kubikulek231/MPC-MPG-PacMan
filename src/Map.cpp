@@ -46,8 +46,8 @@ std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingB
     for (int z = startZ; z <= endZ; ++z) {
         for (int x = startX; x <= endX; ++x) {
             Tile& tile = grid[z][x];
-
-            if (absoluteBoundingBox->intersects(tile.getAbsoluteBoundingBox())) {
+            BoundingBox3D &tileBox = tile.getAbsoluteBoundingBox();
+            if (absoluteBoundingBox->intersects(tileBox)) {
                 intersectedTiles.push_back(&tile);
 
                 // Print the coordinates of the intersected tile

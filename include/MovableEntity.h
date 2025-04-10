@@ -59,6 +59,7 @@ protected:
     bool tryMove(MoveDir moveDir, float frameTimeMs, bool snapToTile = false, const std::vector<Tile*> &playerTiles = {});
     MovableEntity movedCopy(MoveDir moveDir, float frameTimeMs);
     void nudgeToTileCenterAxis(float frameTimeMs);
+    void moveToTileCenter(float frameTimeMs);
 
     static bool areTilesWalkable(std::vector<Tile*> tiles);
     static std::vector<Tile*> intersectingTiles(const MovableEntity* movableEntity);

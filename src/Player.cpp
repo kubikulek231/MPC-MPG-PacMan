@@ -32,8 +32,10 @@ void Player::render() {
     glPopMatrix();
 
     renderBoundingBox();
-    renderOrigin();
+    renderOrigin(true);
 }
+
+
 //
 //Player::move() {
 //

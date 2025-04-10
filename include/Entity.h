@@ -3,6 +3,7 @@
 
 #include "BoundingBox3D.h"
 #include <GL/glut.h>  // For OpenGL rendering
+#include <string>
 
 // Each entity is defined by it's origin and bounding box
 // Origin is always bottom left corner.
@@ -14,6 +15,7 @@ protected:
     Point3D origin = Point3D();
     BoundingBox3D boundingBox = BoundingBox3D();
     void setBoundingBox(Point3D newMin, Point3D newMax);
+    void renderText(const std::string& text) const;
 
 public:
     Entity() {};
@@ -41,7 +43,7 @@ public:
 
     // Debugging functions to render bounding box and origin
     void renderBoundingBox() const;
-    void renderOrigin() const;
+    void renderOrigin(bool renderCoordinates = false) const;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include <iostream>
 
 Entity::Entity(Point3D origin, BoundingBox3D boundingBox) {
 	this->origin = origin;
@@ -145,7 +146,7 @@ void Entity::renderBoundingBox() const {
 }
 
 // Debug function to render the origin as a small sphere
-void Entity::renderOrigin() const {
+void Entity::renderOrigin(bool renderCoordinates) const {
     glPushMatrix();
 
     // Translate to the origin position
@@ -158,4 +159,37 @@ void Entity::renderOrigin() const {
     glutSolidSphere(0.1f, 10, 10);  // A small sphere for the origin
 
     glPopMatrix();
+
+    if (renderCoordinates) {
+        // Switch to 2D text rendering
+        glDisable(GL_DEPTH_TEST);
+
+        glPushMatrix();
+        
+        // Offset the text from the origin by adding an offset to the x and y positions
+        float textOffsetX = 0.2f;  // X offset
+        float textOffsetY = 0.2f;  // Y offset
+        float textOffsetZ = 1.0f;
+        glTranslatef(origin.x + textOffsetX, origin.y + textOffsetY, origin.z + textOffsetZ); // Offset the text position
+
+        // Render the coordinates text
+        renderText("Origin: (" + std::to_string(origin.x) + ", " + std::to_string(origin.y) + ", " + std::to_string(origin.z) + ")");
+        
+        glPopMatrix();
+
+        glEnable(GL_DEPTH_TEST);
+
+        std::cout << "Origin: ("
+            << origin.x << ", "
+            << origin.y << ", "
+            << origin.z << ")"
+            << std::endl;
+    }
+}
+
+void Entity::renderText(const std::string& text) const {
+    // Use GLUT to render text
+    for (size_t i = 0; i < text.length(); ++i) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+    }
 }

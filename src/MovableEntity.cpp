@@ -21,6 +21,8 @@ MovableEntity::MovableEntity(Map* map,
     this->dirChangeRequestExpireAfterMs = dirChangeRequestExpireAfterMs;
 }
 
+// TODO: If there is a wall and can not move, get the center of the current tile and center the entity on that using the move speed.
+
 
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
     // If it is actually a new request
@@ -215,9 +217,9 @@ Point3D MovableEntity::closestTileOrigin(const MovableEntity* movableEntity, con
     Point3D tileOrigin = closestTile->getOrigin();
 
     return Point3D(
-        tileOrigin.x - offsetX,
+        tileOrigin.x + offsetX,
         tileOrigin.y,
-        tileOrigin.z - offsetZ
+        tileOrigin.z + offsetZ
     );
 }
 

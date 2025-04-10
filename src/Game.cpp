@@ -17,7 +17,7 @@ void Game::init() {
 
     mapFactory = MapFactory();
     map = mapFactory.createMap();
-    player = Player(Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.99, 0.99, 0.99)));
+    player = Player(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.985, 0.985, 0.985)));
     moveDir = MoveDir::NONE;
 }
 

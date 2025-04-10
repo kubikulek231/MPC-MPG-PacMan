@@ -1,102 +1,108 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\BoundingBox3D.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\BoundingBox3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\DirChangeRequest.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\DirChangeRequest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Entity.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Game.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\GameControl.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\GameLogic.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Map.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\MapFactory.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MapFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\MovableEntity.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MovableEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Player.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MovementHelpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\PlayerFactory.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Point3D.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\PlayerFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\Tile.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Point3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\239122\MPC-MPG-PacMan\src\main.cpp">
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Tile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\BoundingBox3D.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\BoundingBox3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\DirChangeRequest.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\DirChangeRequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Entity.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Game.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\GameControl.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\GameLogic.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameLogic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Map.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\MapFactory.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\MovableEntity.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MovableEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\MoveDir.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MoveDir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Player.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MovementHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\PlayerFactory.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Point3D.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\PlayerFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\239122\MPC-MPG-PacMan\include\Tile.h">
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Point3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\239122\MPC-MPG-PacMan\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{68A606BC-0B88-3142-B2C2-4897CA615986}</UniqueIdentifier>
+      <UniqueIdentifier>{8919100E-7A62-3E21-9BDE-A37EC7AF8219}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{87B4E9EC-7B57-32A2-88BC-66DA027BD729}</UniqueIdentifier>
+      <UniqueIdentifier>{83A1C980-2EAC-3E63-AF10-06117F62B637}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

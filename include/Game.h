@@ -31,7 +31,7 @@ public:
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
     bool getIsMousePressed() const { return isMousePressed; }
-    bool getIsDirectionKeyPressed() const { return isDirectionKeyPressed; }
+    bool& getIsDirectionKeyPressed() { return isDirectionKeyPressed; }
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
     float getMoveSpeed() const { return moveSpeed; }

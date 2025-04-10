@@ -3,18 +3,23 @@
 
 using namespace std::chrono;
 
-DirChangeRequest::DirChangeRequest(MoveDir moveDir)
-    : requestedMoveDir(moveDir), startTime(DirChangeRequest::getTimeMs()) {
+DirChangeRequest::DirChangeRequest(MoveDir moveDir, float expireAfterMs, bool expire) {
+    this->startTimeMs = DirChangeRequest::getTimeMs();
+    this->requestedMoveDir = moveDir;
+    this->expireAfterMs = expireAfterMs;
+    this->expire = expire;
 }
 
 bool DirChangeRequest::isPending() {
-    return (getTimeMs() - startTime) < DIR_CHANGE_THRESH_MS;
+    if (!expire) return true;
+    return (getTimeMs() - startTimeMs) < expireAfterMs;
 }
 
 uint64_t DirChangeRequest::getTimeMs() {
     return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-MoveDir DirChangeRequest::getRequestedMoveDir() const {
+MoveDir DirChangeRequest::getRequestedMoveDir() {
+    if (!DirChangeRequest::isPending()) { return MoveDir::UNDEFINED; }
     return requestedMoveDir;
 }

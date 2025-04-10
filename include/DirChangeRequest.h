@@ -6,17 +6,17 @@
 
 class DirChangeRequest {
 private:
+    bool expire = false;
+    float expireAfterMs;
     MoveDir requestedMoveDir;
-    uint64_t startTime;
+    uint64_t startTimeMs;
 public:
-    // Threshold in which the dir change is executed
-    const uint64_t DIR_CHANGE_THRESH_MS = 1000; // In ms
+    DirChangeRequest(MoveDir moveDir, float expireAfterMs, bool expire = true);
 
-    DirChangeRequest(MoveDir moveDir);
-
-    uint64_t getTimeMs();
     bool isPending();
-    MoveDir getRequestedMoveDir() const;
+    uint64_t getTimeMs();
+
+    MoveDir getRequestedMoveDir();
 };
 
 #endif

@@ -51,3 +51,47 @@ BoundingBox3D BoundingBox3D::getAbsoluteBoundingBox(Point3D bottomLeftOrigin) co
 
     return BoundingBox3D(bbMin, bbMax);
 }
+
+Point3D BoundingBox3D::getFrontBottomLeft(const Point3D& origin) const {
+    return Point3D(origin.x + min.x, origin.y + min.y, origin.z + min.z);
+}
+
+Point3D BoundingBox3D::getFrontBottomRight(const Point3D& origin) const {
+    return Point3D(origin.x + max.x, origin.y + min.y, origin.z + min.z);
+}
+
+Point3D BoundingBox3D::getFrontTopLeft(const Point3D& origin) const {
+    return Point3D(origin.x + min.x, origin.y + max.y, origin.z + min.z);
+}
+
+Point3D BoundingBox3D::getFrontTopRight(const Point3D& origin) const {
+    return Point3D(origin.x + max.x, origin.y + max.y, origin.z + min.z);
+}
+
+Point3D BoundingBox3D::getBackBottomLeft(const Point3D& origin) const {
+    return Point3D(origin.x + min.x, origin.y + min.y, origin.z + max.z);
+}
+
+Point3D BoundingBox3D::getBackBottomRight(const Point3D& origin) const {
+    return Point3D(origin.x + max.x, origin.y + min.y, origin.z + max.z);
+}
+
+Point3D BoundingBox3D::getBackTopLeft(const Point3D& origin) const {
+    return Point3D(origin.x + min.x, origin.y + max.y, origin.z + max.z);
+}
+
+Point3D BoundingBox3D::getBackTopRight(const Point3D& origin) const {
+    return Point3D(origin.x + max.x, origin.y + max.y, origin.z + max.z);
+}
+
+float BoundingBox3D::getSizeX() const {
+    return std::abs(max.x - min.x);
+}
+
+float BoundingBox3D::getSizeY() const {
+    return std::abs(max.y - min.y);
+}
+
+float BoundingBox3D::getSizeZ() const {
+    return std::abs(max.z - min.z);
+}

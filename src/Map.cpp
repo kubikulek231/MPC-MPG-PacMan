@@ -1,6 +1,8 @@
 #include "Map.h"
 #include <GL/glut.h>
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 #include <iostream>
 
 Map::Map() {
@@ -114,8 +116,14 @@ void Map::render() {
             //float textX = (abb.min.x + abb.max.x) / 2.0f;
             //float textY = abb.min.y + 0.01f; // Slightly above floor
             //float textZ = (abb.min.z + abb.max.z) / 2.0f;
+            //std::ostringstream oss;
 
-            //std::string coordStr = "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+            //oss << "("
+            //    << std::fixed << std::setprecision(2) << abb.min.x << ","
+            //    << std::fixed << std::setprecision(2) << abb.min.z
+            //    << ")";
+            //std::string coordStr = oss.str();
+
             //glColor3f(1.0f, 1.0f, 1.0f); // White text
 
             //glRasterPos3f(textX, textY, textZ);

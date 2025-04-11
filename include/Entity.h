@@ -32,11 +32,6 @@ public:
     
     Point3D getAbsoluteCenterPoint() const;
 
-    void move(float dx, float dy, float dz);
-    void moveX(float dx);
-    void moveY(float dy);
-    void moveZ(float dz);
-    void move(Point3D dPoint);
     void setOrigin(Point3D newOrigin);
 
     bool intersects(const Entity& otherEntity) const;

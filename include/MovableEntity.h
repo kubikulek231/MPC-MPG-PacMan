@@ -15,7 +15,7 @@
 class MovableEntity : public Entity {
 public:
     static constexpr float DEFAULT_SPEED = 1.0f;
-    static constexpr float DEFAULT_SNAP_DISTANCE = 0.01f;
+    static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;
     static const MoveDir DEFAULT_MOVE_DIR = MoveDir::NONE;
     static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = false;
     static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
@@ -58,8 +58,11 @@ protected:
 
     bool tryMove(MoveDir moveDir, float frameTimeMs, bool snapToTile = false, const std::vector<Tile*> &playerTiles = {});
     MovableEntity movedCopy(MoveDir moveDir, float frameTimeMs);
+    bool preciseMove(MoveDir moveDir, float frameTimeMs);
     void nudgeToTileCenterAxis(float frameTimeMs);
     void moveToTileCenter(float frameTimeMs);
+
+    bool trySnapToTileCenter(Point3D& correctedOrigin, const std::vector<Tile*>& tiles, float maxDistance);
 
     static bool areTilesWalkable(std::vector<Tile*> tiles);
     static std::vector<Tile*> intersectingTiles(const MovableEntity* movableEntity);

@@ -20,6 +20,9 @@ public:
     TileType getTileType() const;
     Point3D getCenterPoint() const;
     float distanceToCenter(const Tile& other) const;
+    std::string toString() {
+        return getTileTypeString();
+    }
 
 private:
     TileType tileType;

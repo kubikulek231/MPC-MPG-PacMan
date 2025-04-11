@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
+#include <exception>
 #include "MapFactory.h"
 
 MovableEntity::MovableEntity(Map* map, 
@@ -33,6 +34,7 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         if (requestedMoveDir != moveDir) {
             createDirChangeRequest(requestedMoveDir, dirChangeRequestExpireAfterMs, dirChangeRequestExpire);
         }
+        isNewRequest = false;
     }
     // Get player tiles for next calculations
     std::vector<Tile*> intersectingTiles = MovableEntity::intersectingTiles(this);
@@ -40,12 +42,12 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     // If the same direction as before, just keep going
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
-        MovableEntity::tryMove(moveDir, frameTimeMs, true, intersectingTiles);
+        MovableEntity::preciseMove(moveDir, frameTimeMs);
         return;
     }
 
     // Try to follow a pending direction change
-    if (dirChangeRequest != nullptr && dirChangeRequest->isPending()) {
+    if (dirChangeRequest && dirChangeRequest->isPending()) {
         MoveDir requestedDir = dirChangeRequest->getRequestedMoveDir();
         if (MovableEntity::tryMove(requestedDir, frameTimeMs, true, intersectingTiles)) {
             moveDir = requestedDir;
@@ -53,7 +55,7 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         }
     }
     // If every attempt fails, keep moving in the same direction
-    MovableEntity::tryMove(moveDir, frameTimeMs, true, intersectingTiles);
+    MovableEntity::preciseMove(moveDir, frameTimeMs);
 }
 
 float MovableEntity::getMoveSpeed() const {
@@ -127,15 +129,16 @@ bool MovableEntity::tryMove(MoveDir moveDir, float frameTimeMs, bool snapToTile,
 
     float distance;
     Point3D closestTileOrigin = MovableEntity::closestTileOrigin(this, intersectingTiles, distance);
+    closestTileOrigin.move((MapFactory::TILE_SIZE - this->boundingBox.getSizeX()) / 2, 0, (MapFactory::TILE_SIZE - this->boundingBox.getSizeY()) / 2);
 
     if (distance > snapDistance) {
         return false;
     }
 
     // Snap and try again
-    copy = *this;
+    copy = MovableEntity(*this);
     copy.setOrigin(closestTileOrigin);
-    copy = movedCopy(moveDir, moveSpeed);
+    copy = copy.movedCopy(moveDir, moveSpeed);
     movedTiles = MovableEntity::intersectingTiles(&copy);
 
     if (!areTilesWalkable(movedTiles)) {
@@ -164,6 +167,125 @@ MovableEntity MovableEntity::movedCopy(MoveDir moveDir, float frameTimeMs) {
 
     return copy;
 }
+
+bool MovableEntity::trySnapToTileCenter(Point3D& correctedOrigin, const std::vector<Tile*>& tiles, float maxDistance) {
+    float _;
+    Point3D closestOrigin = closestTileOrigin(this, tiles, _);
+    Point3D currentOrigin = getOrigin();
+    correctedOrigin = currentOrigin;
+
+    float newZ = closestOrigin.z + (MapFactory::TILE_SIZE - getBoundingBox().getSizeZ()) / 2;
+    if (std::abs(newZ - currentOrigin.z) <= maxDistance) {
+        correctedOrigin.z = newZ;
+        return true;
+    }
+    return false;
+}
+
+
+bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
+    MovableEntity copy = MovableEntity(*this);
+    float speed = getFrametimeNormalizedSpeed(frameTimeMs);
+
+    if (moveDir == MoveDir::FWD) {  
+        copy.moveZ(-speed);
+        std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        copy = MovableEntity(*this);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        float _;
+        Point3D closestOrigin = closestTileOrigin(&copy, tiles, _);
+        Point3D copyOrigin = copy.getOrigin();
+        float oldZ = copyOrigin.z;
+        copyOrigin.z = closestOrigin.z + (MapFactory::TILE_SIZE - copy.getBoundingBox().getSizeZ()) / 2;
+        if (speed < std::abs(copyOrigin.z - oldZ)) { throw std::runtime_error("Fuck!"); }
+        copy.setOrigin(copyOrigin);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        return false;
+    }
+
+    if (moveDir == MoveDir::BWD) {
+        copy.moveZ(speed);
+        std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        copy = MovableEntity(*this);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        float _;
+        Point3D closestOrigin = closestTileOrigin(&copy, tiles, _);
+        Point3D copyOrigin = copy.getOrigin();
+        float oldZ = copyOrigin.z;
+        copyOrigin.z = closestOrigin.z + (MapFactory::TILE_SIZE - copy.getBoundingBox().getSizeZ()) / 2;
+        if (speed < std::abs(copyOrigin.z - oldZ)) { throw std::runtime_error("Fuck!"); }
+        copy.setOrigin(copyOrigin);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        return false;
+    }
+
+    if (moveDir == MoveDir::RIGHT) {
+        copy.moveX(speed);
+        std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        copy = MovableEntity(*this);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        float _;
+        Point3D closestOrigin = closestTileOrigin(&copy, tiles, _);
+        Point3D copyOrigin = copy.getOrigin();
+        float oldX = copyOrigin.x;
+        copyOrigin.x = closestOrigin.x + (MapFactory::TILE_SIZE - copy.getBoundingBox().getSizeX()) / 2;
+        if (speed < std::abs(copyOrigin.x - oldX)) { throw std::runtime_error("Fuck!"); }
+        copy.setOrigin(copyOrigin);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        return false;
+    }
+
+    if (moveDir == MoveDir::LEFT) {
+        copy.moveX(-speed);
+        std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        copy = MovableEntity(*this);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        float _;
+        Point3D closestOrigin = closestTileOrigin(&copy, tiles, _);
+        Point3D copyOrigin = copy.getOrigin();
+        float oldX = copyOrigin.x;
+        copyOrigin.x = closestOrigin.x + (MapFactory::TILE_SIZE - copy.getBoundingBox().getSizeX()) / 2;
+        if (speed < std::abs(copyOrigin.x - oldX)) { throw std::runtime_error("Fuck!"); }
+        copy.setOrigin(copyOrigin);
+        tiles = MovableEntity::intersectingTiles(&copy);
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(copy.origin);
+            return true;
+        }
+        return false;
+    }
+
+    return false;
+}
+
 
 bool MovableEntity::areTilesWalkable(std::vector<Tile*> tiles) {
     for (Tile* tile : tiles) {
@@ -206,20 +328,12 @@ Point3D MovableEntity::closestTileOrigin(const MovableEntity* movableEntity, con
     if (!closestTile) {
         return entityOrigin;
     }
-
-    // Compensate for MovableEntity bounding box sizes
-    float entitySizeX = bbox.max.x - bbox.min.x;
-    float entitySizeZ = bbox.max.z - bbox.min.z;
-
-    float offsetX = (MapFactory::TILE_SIZE - entitySizeX) / 2.0f;
-    float offsetZ = (MapFactory::TILE_SIZE - entitySizeZ) / 2.0f;
-
     Point3D tileOrigin = closestTile->getOrigin();
 
     return Point3D(
-        tileOrigin.x + offsetX,
+        tileOrigin.x,
         tileOrigin.y,
-        tileOrigin.z + offsetZ
+        tileOrigin.z
     );
 }
 

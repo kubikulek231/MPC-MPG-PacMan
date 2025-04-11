@@ -29,7 +29,9 @@ void Entity::setBoundingBox(Point3D newMin, Point3D newMax) {
 }
 
 void Entity::setOrigin(Point3D newOrigin) {
-	origin = newOrigin;
+	origin.x = newOrigin.x;
+	origin.y = newOrigin.y;
+	origin.z = newOrigin.z;
 }
 
 Point3D Entity::getMovedOrigin(Point3D dPoint) const {
@@ -57,26 +59,6 @@ BoundingBox3D Entity::getAbsoluteMovedBoundingBox(Point3D dPoint) const {
 Point3D Entity::getAbsoluteCenterPoint() const {
     BoundingBox3D absoluteBoundingBox = boundingBox.getAbsoluteBoundingBox(origin);
     return (absoluteBoundingBox.min + absoluteBoundingBox.max) / 2.0f;
-}
-
-void Entity::move(float dx, float dy, float dz) {
-	origin.move(dx, dy, dz);
-}
-
-void Entity::move(Point3D dPoint) {
-	origin.move(dPoint);
-}
-
-void Entity::moveX(float dx) {
-    origin.move(dx, 0, 0);
-}
-
-void Entity::moveY(float dY) {
-    origin.move(0, dY, 0);
-}
-
-void Entity::moveZ(float dZ) {
-    origin.move(0, 0, dZ);
 }
 
 // Check if this entity intersects with another entity

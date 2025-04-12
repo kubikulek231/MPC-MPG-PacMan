@@ -68,68 +68,28 @@ void Map::render() {
     glutSolidSphere(0.15f, 16, 16); // Origin marker
     glPopMatrix();
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            Tile tile = grid[y][x];
-            BoundingBox3D abb = tile.getAbsoluteBoundingBox();
-            TileType tileType = tile.getTileType();
-
-            // Debug
-            //tile.renderBoundingBox();
+    for (std::vector<Tile> tileRow : grid) {
+        for (Tile tile : tileRow) {
             tile.renderOrigin();
-
-            // Common base plane for all tile types
-            if (tileType == TileType::EMPTY || tileType == TileType::PELLET) {
-                glColor3f(0.5f, 0.5f, 0.5f); // Dark gray for floor
-                glBegin(GL_QUADS);
-                glVertex3f(abb.min.x, abb.min.y, abb.min.z);
-                glVertex3f(abb.max.x, abb.min.y, abb.min.z);
-                glVertex3f(abb.max.x, abb.min.y, abb.max.z);
-                glVertex3f(abb.min.x, abb.min.y, abb.max.z);
-                glEnd();
-            }
-
-            if (tileType == TileType::WALL) {
-                glColor3f(0.3f, 0.3f, 1.0f); // Blue for wall
-                float centerX = (abb.min.x + abb.max.x) / 2.0f;
-                float centerY = (abb.min.y + abb.max.y) / 2.0f;
-                float centerZ = (abb.min.z + abb.max.z) / 2.0f;
-                glPushMatrix();
-                glTranslatef(centerX, centerY, centerZ);
-                glutSolidCube(tileSize); // Assumes cube fits bounding box
-                glPopMatrix();
-            }
-
-            if (tileType == TileType::PELLET) {
-                // Draw pellet
-                glColor3f(1.0f, 0.5f, 0.0f); // Orange for pellet
-                float centerX = (abb.min.x + abb.max.x) / 2.0f;
-                float centerY = abb.min.y + tileSize / 2.0f;
-                float centerZ = (abb.min.z + abb.max.z) / 2.0f;
-                glPushMatrix();
-                glTranslatef(centerX, centerY, centerZ);
-                glutSolidSphere(tileSize / 8.0, 16, 16);
-                glPopMatrix();
-            }
-
-            //// Render tile coordinate text at center
-            //float textX = (abb.min.x + abb.max.x) / 2.0f;
-            //float textY = abb.min.y + 0.01f; // Slightly above floor
-            //float textZ = (abb.min.z + abb.max.z) / 2.0f;
-            //std::ostringstream oss;
-
-            //oss << "("
-            //    << std::fixed << std::setprecision(2) << abb.min.x << ","
-            //    << std::fixed << std::setprecision(2) << abb.min.z
-            //    << ")";
-            //std::string coordStr = oss.str();
-
-            //glColor3f(1.0f, 1.0f, 1.0f); // White text
-
-            //glRasterPos3f(textX, textY, textZ);
-            //for (char c : coordStr) {
-            //    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
-            //}
+            tile.render();
         }
     }
+    //// Render tile coordinate text at center
+    //float textX = (abb.min.x + abb.max.x) / 2.0f;
+    //float textY = abb.min.y + 0.01f; // Slightly above floor
+    //float textZ = (abb.min.z + abb.max.z) / 2.0f;
+    //std::ostringstream oss;
+
+    //oss << "("
+    //    << std::fixed << std::setprecision(2) << abb.min.x << ","
+    //    << std::fixed << std::setprecision(2) << abb.min.z
+    //    << ")";
+    //std::string coordStr = oss.str();
+
+    //glColor3f(1.0f, 1.0f, 1.0f); // White text
+
+    //glRasterPos3f(textX, textY, textZ);
+    //for (char c : coordStr) {
+    //    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
+    //}
 }

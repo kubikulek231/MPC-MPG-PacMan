@@ -12,6 +12,8 @@
 // Guess what this is.
 // Holds a pointer to map for tile colision handling.
 // Todo: rename get/set methods which do not handle properties to more Idiomatic names.
+// TODO: do some tile-involving logic where we could predict tiles where turning can occur
+// That would prevent snapping completely and perhaps set us closer to some ghost logic as well
 class MovableEntity : public Entity {
 public:
     static constexpr float DEFAULT_SPEED = 1.0f;

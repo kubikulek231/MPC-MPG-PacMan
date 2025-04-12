@@ -9,6 +9,8 @@ enum class TileType {
     EMPTY = 1,   // Empty space
     WALL = 2,    // Wall
     PELLET = 3,  // Pellet
+    GHOST_HOUSE = 4,
+    START = 5,
 };
 
 class Tile : public Entity {
@@ -20,9 +22,10 @@ public:
     TileType getTileType() const;
     Point3D getCenterPoint() const;
     float distanceToCenter(const Tile& other) const;
-    std::string toString() {
-        return getTileTypeString();
-    }
+    void render() const;
+    void renderEmpty() const;
+    void renderWall() const;
+    void renderPellet() const;
 
 private:
     TileType tileType;

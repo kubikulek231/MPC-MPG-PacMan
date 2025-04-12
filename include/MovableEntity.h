@@ -57,10 +57,12 @@ protected:
     void moveX(float dx);
     void moveY(float dy);
     void moveZ(float dz);
+    void moveAxis(char axis = 'x', float dAxis = 1.0f);
 
     bool tryMove(MoveDir moveDir, float frameTimeMs, bool snapToTile = false, const std::vector<Tile*> &playerTiles = {});
     MovableEntity movedCopy(MoveDir moveDir, float frameTimeMs);
     bool preciseMove(MoveDir moveDir, float frameTimeMs);
+    bool preciseMoveAxis(MoveDir moveDir, float frameTimeMs);
     void nudgeToTileCenterAxis(float frameTimeMs);
     void moveToTileCenter(float frameTimeMs);
 

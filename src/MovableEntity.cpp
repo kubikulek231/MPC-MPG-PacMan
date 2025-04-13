@@ -38,8 +38,7 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 // === Movement Interface ===
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
-    std::cout << this->toString() << std::endl; // Debug entity movement
-    
+    // std::cout << this->toString() << std::endl; // Debug entity movement
     // If it is actually a new request
     if (isNewRequest) {
         // Delete existing request

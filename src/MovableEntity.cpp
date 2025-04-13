@@ -156,22 +156,22 @@ float MovableEntity::speedMltprForDirection(MoveDir moveDir) {
 
 // === Movement Logic ===
 bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
-    MovableEntity copy = MovableEntity(*this);
+    MovableEntity entityCopy = MovableEntity(*this);
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
 
     // Try move full speed first
-    copy.moveAxis(axis, speed);
-    std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
+    entityCopy.moveAxis(axis, speed);
+    std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&entityCopy);
 
     if (MovableEntity::areTilesWalkable(tiles)) {
-        this->setOrigin(copy.origin);
+        this->setOrigin(entityCopy.origin);
         return true;
     }
 
     // If full speed fails, try to move precisely
-    copy = MovableEntity(*this);
-    tiles = MovableEntity::intersectingTiles(&copy);
+    entityCopy = MovableEntity(*this);
+    tiles = MovableEntity::intersectingTiles(&entityCopy);
 
     if (tiles.empty()) {
         // No tiles to check, early return
@@ -179,25 +179,23 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
     }
 
     float _;
-    Point3D closestOrigin = tileCenteredOrigin(closestTile(&copy, tiles, _));
-    Point3D copyOrigin = copy.getOrigin();
+    Point3D closestTileOrigin = tileCenteredOrigin(closestTile(&entityCopy, tiles, _));
+    Point3D entityCopyOrigin = entityCopy.getOrigin();
 
     // Only move in the requested direction
-    float old = (axis == 'x') ? copyOrigin.x : copyOrigin.z;
-    float* copyOriginAxis = (axis == 'x') ? &copyOrigin.x : &copyOrigin.z;
-    float* closestOriginAxis = (axis == 'x') ? &closestOrigin.x : &closestOrigin.z;
+    float tileAxisValue = closestTileOrigin.getAxisValue(axis);
+    float entityCopyAxisValue = entityCopyOrigin.getAxisValue(axis);
 
-    float distance = std::abs(*closestOriginAxis - old);
-    float maxMove = std::abs(speed);
+    float distance = std::abs(tileAxisValue - entityCopyAxisValue);
+    assert(distance <= std::abs(speed));
 
-    // This should never happen
-    assert(distance <= maxMove);
-
-    copyOrigin.setAxisValue(axis, *closestOriginAxis);
-
-    tiles = MovableEntity::intersectingTiles(&copy);
+    // Align both tile and entity axes
+    entityCopyOrigin.setAxisValue(axis, tileAxisValue);
+    
+    // Check just to be sure
+    tiles = MovableEntity::intersectingTiles(&entityCopy);
     if (MovableEntity::areTilesWalkable(tiles)) {
-        this->setOrigin(copyOrigin);
+        this->setOrigin(entityCopyOrigin);
         return true;
     }
     return false;

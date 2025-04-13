@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include "Game.h"
 
 Map::Map() {
 }
@@ -61,13 +62,16 @@ std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingB
     return intersectedTiles;
 }
 
-void Map::render() {
+void Map::render(bool resetHighlighted, int resetTimerMs) {
     // Center marker
     glColor3f(1.0f, 0.0f, 0.0f);
     glPushMatrix();
     glutSolidSphere(0.15f, 16, 16); // Origin marker
     glPopMatrix();
 
+    if (resetHighlighted) {
+        Map::scheduleHighlightReset(resetTimerMs);
+    }
 
     for (const std::vector<Tile>& tileRow : grid) {        
         for (const Tile& tile : tileRow) {
@@ -105,5 +109,18 @@ void Map::resetHighlightedTiles() {
         for (Tile& tile : tileRow) {
             tile.setHighlight(false);
         }
+    }
+}
+
+// Schedule a reset after a specified delay in milliseconds
+void Map::scheduleHighlightReset(int delay) {
+    if (!isHighlightResetScheduled) {
+        glutTimerFunc(delay, [](int value) {
+            // Reset the highlight of tiles after the specified time
+            Game& game = Game::getInstance();
+            game.getMap()->resetHighlightedTiles();
+            game.getMap()->isHighlightResetScheduled = false;
+            }, 0);
+        isHighlightResetScheduled = true;
     }
 }

@@ -10,15 +10,17 @@ class Map {
 public:
     Map();
     Map(std::vector<std::vector<Tile>> mapGrid, float tileSize);
-    void render();  // Draws the map
+    void render(bool resetHighlighted = false, int resetTimerMs = 5000);  // Draws the map
     Tile* getTileWithPoint3D(Point3D point);
     std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* boundingBox);
     void resetHighlightedTiles();
+    void scheduleHighlightReset(int delay);
 private:
     std::vector<std::vector<Tile>> grid;
     int width;
     int height;
     float tileSize;
+    bool isHighlightResetScheduled = false;
     void renderTileCoordinates(const Tile* tile);
 };
 

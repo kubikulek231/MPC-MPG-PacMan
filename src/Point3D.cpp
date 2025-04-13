@@ -51,3 +51,18 @@ float Point3D::getAxisValue(char axis) const {
 	// Return NaN or handle invalid input
 	return std::nanf("");
 }
+
+void Point3D::setAxisValue(char axis, float value) {
+	if (axis == 'x' || axis == 'X') {
+		this->x = value;
+		return;
+	}
+	if (axis == 'y' || axis == 'Y') {
+		this->y = value;
+		return;
+	}
+	if (axis == 'z' || axis == 'Z') {
+		this->z = value;
+		return;
+	}
+}

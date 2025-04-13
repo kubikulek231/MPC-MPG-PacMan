@@ -38,6 +38,8 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 // === Movement Interface ===
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+    std::cout << this->toString() << std::endl; // Debug entity movement
+    
     // If it is actually a new request
     if (isNewRequest) {
         // Delete existing request
@@ -177,7 +179,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
     }
 
     float _;
-    Point3D closestOrigin = closestTile(&copy, tiles, _)->getOrigin();
+    Point3D closestOrigin = tileCenteredOrigin(closestTile(&copy, tiles, _));
     Point3D copyOrigin = copy.getOrigin();
 
     // Only move in the requested direction
@@ -185,20 +187,17 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
     float* copyOriginAxis = (axis == 'x') ? &copyOrigin.x : &copyOrigin.z;
     float* closestOriginAxis = (axis == 'x') ? &closestOrigin.x : &closestOrigin.z;
 
-    float size = (axis == 'x') ? copy.getBoundingBox().getSizeX() : copy.getBoundingBox().getSizeZ();
-
-    *copyOriginAxis = *closestOriginAxis + (MapFactory::TILE_SIZE - size) / 2.0f;
-
-    float distance = std::abs(*copyOriginAxis - old);
+    float distance = std::abs(*closestOriginAxis - old);
     float maxMove = std::abs(speed);
-    if (distance > maxMove) {
-        // If overshoot happens, adjust the movement to avoid assertion failure
-        *copyOriginAxis = old + std::copysign(maxMove, *copyOriginAxis - old);
-    }
+
+    // This should never happen
+    assert(distance <= maxMove);
+
+    copyOrigin.setAxisValue(axis, *closestOriginAxis);
 
     tiles = MovableEntity::intersectingTiles(&copy);
     if (MovableEntity::areTilesWalkable(tiles)) {
-        this->setOrigin(copy.origin);
+        this->setOrigin(copyOrigin);
         return true;
     }
     return false;
@@ -337,7 +336,6 @@ Point3D MovableEntity::tileCenteredOrigin(const Tile* tile) const {
     tileAlignedOrigin.move((MapFactory::TILE_SIZE - this->boundingBox.getSizeX()) / 2, 0, (MapFactory::TILE_SIZE - this->boundingBox.getSizeY()) / 2);
     return tileAlignedOrigin;
 }
-
 
 // === Tile Utility Functions ===
 bool MovableEntity::areTilesWalkable(std::vector<Tile*> tiles) {

@@ -16,6 +16,7 @@ public:
     float distanceTo(const Point3D& other) const;
     float distanceTo2D(const Point3D& other) const;
     float getAxisValue(char axis = 'x') const;
+    void setAxisValue(char axis = 'x', float value = 0.0f);
 
     // Overload the + operator to add two Point3D objects
     Point3D operator+(const Point3D& other) const {

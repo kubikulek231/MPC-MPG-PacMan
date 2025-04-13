@@ -19,6 +19,7 @@ private:
     int width;
     int height;
     float tileSize;
+    void renderTileCoordinates(const Tile* tile);
 };
 
 #endif // MAP_H

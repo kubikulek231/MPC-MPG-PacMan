@@ -19,8 +19,19 @@ void Game::init() {
     map = mapFactory.createMap();
     player = Player(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
     moveDir = MoveDir::NONE;
-    ghost1 = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
-    ghosts.push_back(&ghost1);
+    pinky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    pinky.setColor(1.0, 0.5, 0.5);
+    blinky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    blinky.setColor(1.0, 0.0, 0.0);
+    inky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    inky.setColor(0.0, 1.0, 1.0);
+    clyde = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    clyde.setColor(1, 0.6, 0);
+
+    ghosts.push_back(&pinky);
+    ghosts.push_back(&blinky);
+    ghosts.push_back(&inky);
+    ghosts.push_back(&clyde);
 }
 
 // Update positions, handle logic

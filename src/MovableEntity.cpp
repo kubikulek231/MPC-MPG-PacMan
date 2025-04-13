@@ -74,7 +74,7 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
             return;
         }
         bool _;
-        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, intersectingTiles, _)) {
+        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, _, intersectingTiles)) {
             if (canTurn) {
                 moveDir = requestedDir;
                 MovableEntity::clearDirChangeRequest();
@@ -161,6 +161,7 @@ float MovableEntity::speedMltprForDirection(MoveDir moveDir) {
 
 // === Movement Logic ===
 bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved) {
+    moved = false;
     MovableEntity entityCopy = MovableEntity(*this);
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
@@ -171,6 +172,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved)
 
     if (MovableEntity::areTilesWalkable(tiles)) {
         this->setOrigin(entityCopy.origin);
+        moved = true;
         return true;
     }
 
@@ -201,6 +203,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved)
     tiles = MovableEntity::intersectingTiles(&entityCopy);
     if (MovableEntity::areTilesWalkable(tiles)) {
         this->setOrigin(entityCopyOrigin);
+        if (distance != 0.f) moved = true;
         return true;
     }
     return false;
@@ -210,7 +213,8 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved)
 // where a turn to the requested direction is possible.
 // Returns true if movement occurs; false otherwise.
 // Sets 'canTurn' to true if the entity reaches a precise location where turning is possible.
-bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles, bool &moved) {
+bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles) {
+    moved = false;
     // Determine the current tile the entity is on
     Tile* tileCurrent = currentTile(intersectingTiles);
     assert(tileCurrent && tileCurrent->isWalkable());
@@ -234,9 +238,8 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     char axis = axisForDirection(moveDir);
 
     bool hit = false;
-    bool _;
     // Move toward the next closest tile; set canTurn if destination reached
-    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit, _)) {
+    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit, moved)) {
         if (hit) canTurn = true;
         return true;
     }
@@ -245,6 +248,7 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
 }
 
 bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved) {
+    moved = false;
     MovableEntity copy = MovableEntity(*movableEntity);
     std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
 
@@ -280,6 +284,7 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     if (MovableEntity::areTilesWalkable(tiles)) {
         movableEntity->setOrigin(copy.origin);
         if (std::fabs(currentAxisVal - closestAxisVal) < 0.0001f) hit = true;
+        if (distanceToMove != 0.f) moved = true;
         return true;
     }
 

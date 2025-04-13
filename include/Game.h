@@ -63,7 +63,10 @@ private:
     MapFactory mapFactory;
     Map map;
     Player player;
-    Ghost ghost1;
+    Ghost pinky;
+    Ghost blinky;
+    Ghost inky;
+    Ghost clyde;
     std::vector<Ghost*> ghosts;
     MoveDir moveDir;
     bool isDirectionKeyPressed = true;

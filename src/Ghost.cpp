@@ -22,7 +22,7 @@ Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox)
 }
 
 void Ghost::render() {
-    glColor3f(0.0f, 1.0f, 0.0f);
+    glColor3f(colorR, colorG, colorB);
     glPushMatrix();
 
     Point3D centerPoint = getAbsoluteCenterPoint();
@@ -37,8 +37,32 @@ void Ghost::render() {
 }
 
 void Ghost::autoMove(float frameTimeMs) {
-    bool _;
-    //this->tryMoveToNextClosestTile();
+    bool moved = false;
+    bool turning = false;
+    bool canTurn = false;
+    std::vector<Tile*> tiles = intersectingTiles(this);
+    while (true) {
+        if (moveDir == MoveDir::NONE) {
+            moveDir = randomDirection();
+            continue;
+        }
+        if (randomBoolWithChance(0.1)) {
+            turning = true;
+        }
+        if (turning) {
+            this->preciseMoveUntilCanTurn(moveDir, frameTimeMs, canTurn, moved, tiles);
+            if (canTurn) {
+                MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+            }
+            turning = false;
+        }
+        this->preciseMove(moveDir, frameTimeMs, moved);
+        if (moved) { break; }
+        moveDir = randomDirection();
+        if (randomBoolWithChance(0.05)) {
+            turning = true;
+        }
+    }
     return;
 }
 
@@ -53,6 +77,21 @@ MoveDir Ghost::randomDirection() {
     case 1: return MoveDir::BWD;
     case 2: return MoveDir::LEFT;
     case 3: return MoveDir::RIGHT;
-    default: return MoveDir::NONE;
     }
+}
+
+bool Ghost::randomBool() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    bool outBool;
+    std::uniform_int_distribution<int> boolDist(0, 1);     // true or false
+    outBool = boolDist(gen); // sets the reference param to true or false
+    return outBool;
+}
+
+bool Ghost::randomBoolWithChance(float chance) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+    return dist(gen) < chance;
 }

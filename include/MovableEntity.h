@@ -70,7 +70,7 @@ protected:
 
     // === Movement Logic ===
     bool preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved);
-    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles = {}, bool &moved);
+    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
     bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved);
 
     // === Tile Navigation & Positioning ===

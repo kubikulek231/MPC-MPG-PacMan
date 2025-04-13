@@ -27,6 +27,7 @@ public:
     void renderEmpty() const;
     void renderWall() const;
     void renderPellet() const;
+    void renderHighlight() const;
 
     // Getter and Setter for neighboring tiles
     Tile* getTileUp() const;
@@ -40,6 +41,7 @@ public:
     void setTileRight(Tile* tile);
 
     void setHighlight(bool value) { this->highlight = value; };
+    void setHighlightColor(float r = 1.0, float g = 0.0, float b = 0.0, float a = 0.1) {};
     std::string toString();
 private:
     TileType tileType;
@@ -47,6 +49,10 @@ private:
     Tile* tileDown;
     Tile* tileLeft;
     Tile* tileRight;
+    float highlightR = 1.0f;
+    float highlightG = 0.0f;
+    float highlightB = 0.0f;
+    float highlightA = 0.1f;
     bool highlight = false;
 
 };

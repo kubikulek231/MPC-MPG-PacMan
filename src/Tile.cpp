@@ -53,6 +53,21 @@ std::string Tile::getTileTypeString() {
 	}
 }
 
+void Tile::renderHighlight() const {
+	BoundingBox3D abb = this->getAbsoluteBoundingBox();
+
+	// Set the color for highlighting
+	glColor4f(highlightR, highlightG, highlightB, highlightA);
+
+	// Render the plane just above the floor to prevent clipping
+	glBegin(GL_QUADS);
+	glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.min.z); // Bottom-left
+	glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.min.z); // Bottom-right
+	glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.max.z); // Top-right
+	glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.max.z); // Top-left
+	glEnd();
+}
+
 void Tile::renderEmpty() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
 	glColor3f(0.5f, 0.5f, 0.5f); // Dark gray for floor
@@ -95,7 +110,7 @@ void Tile::renderPellet() const {
 
 void Tile::render() const {
 	if (highlight) {
-		renderBoundingBox(0, 1.0f, 0, 0.2);
+		renderHighlight();
 	}
 	switch (tileType) {
 	case TileType::EMPTY:

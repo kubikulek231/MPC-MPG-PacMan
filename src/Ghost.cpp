@@ -49,13 +49,18 @@ void Ghost::autoMove(float frameTimeMs) {
         if (randomBoolWithChance(0.1)) {
             turning = true;
         }
+
         if (turning) {
             this->preciseMoveUntilCanTurn(moveDir, frameTimeMs, canTurn, moved, tiles);
             if (canTurn) {
-                MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+                // Choose a direction to turn
+                moveDir = randomDirection();
+                turning = false;
+                return;
             }
-            turning = false;
+            return;
         }
+
         this->preciseMove(moveDir, frameTimeMs, moved);
         if (moved) { break; }
         moveDir = randomDirection();

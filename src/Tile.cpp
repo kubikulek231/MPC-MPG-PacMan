@@ -151,7 +151,7 @@ std::string Tile::toString() {
 
 	// Calculate the center of the tile
 	float textX = (abb.min.x + abb.max.x) / 2.0f;
-	float textY = abb.min.y + 0.01f; // Slightly above floor
+	float textY = abb.min.y;
 	float textZ = (abb.min.z + abb.max.z) / 2.0f;
 
 	// Prepare the coordinate string for output
@@ -163,10 +163,11 @@ std::string Tile::toString() {
 
 	std::string coordStr = oss.str();
 
-	// Create the final string with tile coordinates
+	// Create the final string with tile coordinates and tile type
 	std::ostringstream result;
 	result << "Tile at (" << textX << ", " << textY << ", " << textZ
-		<< ") - Coordinates: " << coordStr;
+		<< ") - Coordinates: " << coordStr
+		<< " - Type: " << this->getTileTypeString();  // Add tileType here
 
 	// Return the generated string
 	return result.str();

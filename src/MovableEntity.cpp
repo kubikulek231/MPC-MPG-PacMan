@@ -43,12 +43,6 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     // Get player tiles for next calculations
     std::vector<Tile*> intersectingTiles = MovableEntity::intersectingTiles(this);
 
-    // If the same direction as before, just keep going
-    //if (requestedMoveDir == moveDir) {
-    //    MovableEntity::clearDirChangeRequest();
-    //    MovableEntity::preciseMove(moveDir, frameTimeMs);
-    //    return;
-    //}
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
         MovableEntity::preciseMove(moveDir, frameTimeMs);
@@ -60,6 +54,13 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         MoveDir requestedDir = dirChangeRequest->getRequestedMoveDir();
         if (moveDir == MoveDir::NONE) { moveDir = requestedDir; }
         bool canTurn = false;
+        // Change the direction right away if request is the same axis
+        if (getAxisForDirection(requestedDir) == getAxisForDirection(moveDir)) {
+            moveDir = requestedDir;
+            MovableEntity::preciseMove(moveDir, frameTimeMs);
+            return;
+        }
+
         if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, intersectingTiles)) {
             if (canTurn) {
                 moveDir = requestedDir;
@@ -196,19 +197,35 @@ MovableEntity MovableEntity::movedCopy(MoveDir moveDir, float frameTimeMs) {
     return copy;
 }
 
-bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& turned, const std::vector<Tile*>& intersectingTiles) {
+// Returns false if turning IS NOT possible
+// Moves entity and returns true if moving IS possible.
+// If precise location for turning is hit, canTurn argument is set to true.
+bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles) {
     // Get current tile
     Tile* tileCurrent = currentTile(intersectingTiles);
-    if (!tileCurrent || !tileCurrent->isWalkable()) return false;  // Ensure the tile is valid and walkable
+    assert(tileCurrent && tileCurrent->isWalkable());
 
-    // Get the next tile after turning
-    Tile* tileCurrentTurned = nextTileInDirection(requestedMoveDir, tileCurrent);
-    if (!tileCurrentTurned || !tileCurrentTurned->isWalkable()) return false;
+    // Get the next tile that will be hit
+    Tile* tileToBeHit = nextTileInDirection(moveDir, tileCurrent);
+    if (!tileToBeHit || !tileToBeHit->isWalkable()) {
+        // Do not move
+        return false;
+    }
+
+    std::cout << "tileToBeHit:" << std::endl;
+    std::cout << tileToBeHit->toString() << std::endl;
+
+    // Check if turning to the requested direction is possible after hitting the next tile
+    Tile* turnedTile = nextTile(requestedMoveDir, tileToBeHit);
+    if (!turnedTile || !turnedTile->isWalkable()) {
+        // Do not move
+        return false;
+    }
 
     this->map->resetHighlightedTiles();
-    tileCurrentTurned->setHighlight(true);
-    std::cout << "tileCurrentTurned:" << std::endl;
-    std::cout << tileCurrentTurned->toString() << std::endl;
+    turnedTile->setHighlight(true);
+    std::cout << "turnedTile:" << std::endl;
+    std::cout << turnedTile->toString() << std::endl;
 
     // Calculate the speed based on frame time
     float speed = getFrametimeNormalizedSpeed(frameTimeMs);
@@ -220,7 +237,7 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     bool hit = false;  // Initialize hit flag
     // Try to move the entity to the closest tile in the given direction
     if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit)) {
-        if (hit) turned = true;  // Update moveDir only if hit is true
+        if (hit) canTurn = true;
         return true;
     }
     return false;
@@ -247,8 +264,7 @@ Tile* MovableEntity::nextTileInDirection(MoveDir moveDir, Tile* currentTile) {
     if (!tileNext) return nullptr;
 
     // Determine the axis of movement based on the direction
-    char axis;
-    if (!getAxisForDirection(moveDir, axis)) return nullptr;
+    char axis = getAxisForDirection(moveDir);
 
     // Get the entity's current position and the positions of the current and next tiles
     Point3D entityDirection = this->getOrigin();
@@ -288,13 +304,13 @@ bool MovableEntity::getAxisAndSpeedForDirection(MoveDir moveDir, char& axis, flo
     }
 }
 
-bool MovableEntity::getAxisForDirection(MoveDir moveDir, char& axis) {
+char MovableEntity::getAxisForDirection(MoveDir moveDir) {
     switch (moveDir) {
-    case MoveDir::RIGHT: axis = 'x'; return true;
-    case MoveDir::LEFT:  axis = 'x'; return true;
-    case MoveDir::FWD:   axis = 'z'; return true;
-    case MoveDir::BWD:   axis = 'z'; return true;
-    default: return false;
+    case MoveDir::RIGHT: return 'x';
+    case MoveDir::LEFT:  return 'x';
+    case MoveDir::FWD:   return 'z';
+    case MoveDir::BWD:   return 'z';
+    default: throw std::runtime_error("Fuck!");
     }
 }
 

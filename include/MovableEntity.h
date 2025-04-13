@@ -60,10 +60,10 @@ protected:
     MovableEntity movedCopy(MoveDir moveDir, float frameTimeMs);
 
     bool getAxisAndSpeedForDirection(MoveDir moveDir, char& axis, float& speed);
-    bool getAxisForDirection(MoveDir moveDir, char& axis);
+    char getAxisForDirection(MoveDir moveDir);
 
     bool preciseMove(MoveDir moveDir, float frameTimeMs);
-    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool &turned, const std::vector<Tile*>& intersectingTiles = {});
+    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool &canTurn, const std::vector<Tile*>& intersectingTiles = {});
     bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit);
     bool tryMoveInAxis(MovableEntity* movableEntity, char axis, float distance);
 

@@ -40,8 +40,8 @@ public:
     void setTileLeft(Tile* tile);
     void setTileRight(Tile* tile);
 
-    void setHighlight(bool value) { this->highlight = value; };
-    void setHighlightColor(float r = 1.0, float g = 0.0, float b = 0.0, float a = 0.1) {};
+    void setHighlight(bool value);
+    void setHighlightColor(float r = 1.0, float g = 0.0, float b = 0.0, float a = 0.1);
     std::string toString();
 private:
     TileType tileType;

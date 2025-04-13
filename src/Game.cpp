@@ -19,18 +19,19 @@ void Game::init() {
     map = mapFactory.createMap();
     player = Player(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
     moveDir = MoveDir::NONE;
+    Ghost ghost1 = Ghost(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    ghosts.push_back(ghost1);
 }
 
 // Update positions, handle logic
 void Game::update(int value) {
     Game& game = Game::getInstance();
-    float newFrameTime = glutGet(GLUT_ELAPSED_TIME);
-    game.setLastFrameTimeSeconds((newFrameTime - game.lastFrameTime) / 1000.0f);
+    float newFrameTimeSeconds = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
+    // Update the frametime
+    game.lastFrameTimeDeltaSeconds = newFrameTimeSeconds - game.lastFrameTimeSeconds;
+    game.lastFrameTimeSeconds = newFrameTimeSeconds;
 
     GameLogic::update();
-
-    // Update the frametime
-    game.setLastFrameTime(newFrameTime);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -57,8 +58,13 @@ void Game::render() {
         0.0, 1.0, 0.0);   // Up vector
 
     // Render map
-    game.getMap()->render();
+    game.getMap()->render(true);
     game.getPlayer()->render();
+
+    // Render ghosts
+    for (Ghost& ghost : game.getGhosts()) {
+        ghost.render();
+    }
 
     glutSwapBuffers();
 }
@@ -70,10 +76,4 @@ void Game::reshape(int w, int h) {
     glLoadIdentity();
     gluPerspective(45.0, (float)w / (float)h, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
-}
-
-float Game::getFrametimeNormalizedSpeed() {
-    Game& game = Game::getInstance();
-    float frametimeNormalizedSpeed = game.getLastFrameTimeSeconds() * Game::moveSpeed;
-    return std::min(frametimeNormalizedSpeed, Game::maxFrametimeNormalizedSpeed);
 }

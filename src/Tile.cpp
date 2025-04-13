@@ -161,6 +161,18 @@ void Tile::setTileRight(Tile* tile) {
 	tileRight = tile;
 }
 
+void Tile::setHighlight(bool value) {
+	this->highlight = value;
+}
+
+void Tile::setHighlightColor(float r, float g, float b, float a) {
+	this->highlightR = r;
+	this->highlightG = g;
+	this->highlightB = b;
+	this->highlightA = a;
+}
+
+
 std::string Tile::toString() {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
 

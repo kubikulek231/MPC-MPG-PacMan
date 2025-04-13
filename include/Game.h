@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "MapFactory.h"
 #include "MoveDir.h"
+#include "Ghost.h"
 
 // Singleton class
 class Game {
@@ -25,8 +26,8 @@ public:
     Map* getMap() { return &map; }
     Player* getPlayer() { return &player; }
     MoveDir* getMoveDir() { return &moveDir; }
-    float getLastFrameTime() const { return lastFrameTime; }
-    float getLastFrameTimeSeconds() const { return lastFrameTimeSeconds; }
+    std::vector<Ghost>& getGhosts() { return ghosts; }
+    float getLastFrameTimeDeltaSeconds() const { return lastFrameTimeDeltaSeconds; }
     float getCameraDistance() const { return cameraDistance; }
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
@@ -38,14 +39,11 @@ public:
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
     float getMoveSpeed() const { return moveSpeed; }
-    float getFrametimeNormalizedSpeed();
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
     void setPlayer(Player newPlayer) { player = newPlayer; }
     void setMoveDir(MoveDir newMoveDir) { moveDir = newMoveDir; }
-    void setLastFrameTime(float time) { lastFrameTime = time; }
-    void setLastFrameTimeSeconds(float time) { lastFrameTimeSeconds = time; }
     void setCameraDistance(float distance) { cameraDistance = distance; }
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
@@ -65,10 +63,11 @@ private:
     MapFactory mapFactory;
     Map map;
     Player player;
+    std::vector<Ghost> ghosts;
     MoveDir moveDir;
     bool isDirectionKeyPressed = true;
-    float lastFrameTime = 0.0f;
     float lastFrameTimeSeconds = 0.0f;
+    float lastFrameTimeDeltaSeconds = 0.0f;
     float cameraDistance = 50.0f;
     float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
     float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)

@@ -19,6 +19,9 @@
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Ghost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -64,6 +67,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameLogic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Ghost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h">

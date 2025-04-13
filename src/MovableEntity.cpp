@@ -39,6 +39,8 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 // === Movement Interface ===
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
     // std::cout << this->toString() << std::endl; // Debug entity movement
+    Tile* tile = currentTile(intersectingTiles(this));
+    if (tile) { tile->setHighlight(true); }
     // If it is actually a new request
     if (isNewRequest) {
         // Delete existing request
@@ -106,7 +108,7 @@ MoveDir MovableEntity::getRequestedDir() {
 
 // === Frame-based Speed Calculation ===
 float MovableEntity::frametimeNormalizedSpeed(float frametimeMs) const {
-    float normalizedSpeed = speed * frametimeMs;
+    float normalizedSpeed = speed * frametimeMs / 1000.0f;
     return std::min(normalizedSpeed, MAX_NORMALIZED_SPEED);
 }
 

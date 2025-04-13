@@ -10,12 +10,14 @@ private:
     static const MoveDir DEFAULT_MOVE_DIR = MoveDir::NONE;
     static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = false;
     static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
+    MoveDir randomDirection();
+    MoveDir currentDirection = MoveDir::NONE;
 public:
     Ghost();
     Ghost(const Ghost& other);
     Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox);
     void render();
-    void move();
+    void autoMove(float frameTimeMs);
 };
 
 #endif // PLAYER_H

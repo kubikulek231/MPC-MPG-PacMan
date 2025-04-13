@@ -1,5 +1,6 @@
 #include "Ghost.h"
 #include <GL/glut.h>
+#include <random>
 
 Ghost::Ghost() {
 }
@@ -35,7 +36,23 @@ void Ghost::render() {
     renderOrigin();
 }
 
-void Ghost::move() {
-    //this->move();
+void Ghost::autoMove(float frameTimeMs) {
+    bool _;
+    //this->tryMoveToNextClosestTile();
     return;
+}
+
+MoveDir Ghost::randomDirection() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(0, 3); // assuming 4 directions
+
+    int random = dist(gen);
+    switch (random) {
+    case 0: return MoveDir::FWD;
+    case 1: return MoveDir::BWD;
+    case 2: return MoveDir::LEFT;
+    case 3: return MoveDir::RIGHT;
+    default: return MoveDir::NONE;
+    }
 }

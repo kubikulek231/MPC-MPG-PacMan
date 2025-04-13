@@ -69,9 +69,9 @@ protected:
     float speedMltprForDirection(MoveDir moveDir);
 
     // === Movement Logic ===
-    bool preciseMove(MoveDir moveDir, float frameTimeMs);
-    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles = {});
-    bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit);
+    bool preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved);
+    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles = {}, bool &moved);
+    bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved);
 
     // === Tile Navigation & Positioning ===
     Tile* currentTile(const std::vector<Tile*>& intersectingTiles = {}) const;

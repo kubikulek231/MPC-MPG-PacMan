@@ -19,8 +19,8 @@ void Game::init() {
     map = mapFactory.createMap();
     player = Player(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
     moveDir = MoveDir::NONE;
-    Ghost ghost1 = Ghost(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
-    ghosts.push_back(ghost1);
+    ghost1 = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+    ghosts.push_back(&ghost1);
 }
 
 // Update positions, handle logic
@@ -62,8 +62,8 @@ void Game::render() {
     game.getPlayer()->render();
 
     // Render ghosts
-    for (Ghost& ghost : game.getGhosts()) {
-        ghost.render();
+    for (Ghost* ghost : game.getGhosts()) {
+        ghost->render();
     }
 
     glutSwapBuffers();

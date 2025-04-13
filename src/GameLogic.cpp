@@ -11,4 +11,8 @@ void GameLogic::update() {
 	if (moveDir == MoveDir::NONE) { return; }
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
 	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+	// Render ghosts
+	for (Ghost* ghost : game.getGhosts()) {
+		ghost->autoMove(lastFrameTimeMs);
+	}
 }

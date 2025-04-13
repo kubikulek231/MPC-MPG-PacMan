@@ -56,7 +56,8 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
 
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
-        MovableEntity::preciseMove(moveDir, frameTimeMs);
+        bool _;
+        MovableEntity::preciseMove(moveDir, frameTimeMs, _);
         return;
     }
 
@@ -68,10 +69,12 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         // Change the direction right away if request is the same axis
         if (axisForDirection(requestedDir) == axisForDirection(moveDir)) {
             moveDir = requestedDir;
-            MovableEntity::preciseMove(moveDir, frameTimeMs);
+            bool _;
+            MovableEntity::preciseMove(moveDir, frameTimeMs, _);
             return;
         }
-        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, intersectingTiles)) {
+        bool _;
+        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, intersectingTiles, _)) {
             if (canTurn) {
                 moveDir = requestedDir;
                 MovableEntity::clearDirChangeRequest();
@@ -80,7 +83,8 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         }
     }
     // If every attempt fails, keep moving in the same direction
-    MovableEntity::preciseMove(moveDir, frameTimeMs);
+    bool _;
+    MovableEntity::preciseMove(moveDir, frameTimeMs, _);
 }
 float MovableEntity::getMoveSpeed() const { return speed; }
 void MovableEntity::setMoveSpeed(float speed) { this->speed = speed; }
@@ -156,7 +160,7 @@ float MovableEntity::speedMltprForDirection(MoveDir moveDir) {
 
 
 // === Movement Logic ===
-bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
+bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved) {
     MovableEntity entityCopy = MovableEntity(*this);
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
@@ -206,7 +210,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs) {
 // where a turn to the requested direction is possible.
 // Returns true if movement occurs; false otherwise.
 // Sets 'canTurn' to true if the entity reaches a precise location where turning is possible.
-bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles) {
+bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, const std::vector<Tile*>& intersectingTiles, bool &moved) {
     // Determine the current tile the entity is on
     Tile* tileCurrent = currentTile(intersectingTiles);
     assert(tileCurrent && tileCurrent->isWalkable());
@@ -230,8 +234,9 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     char axis = axisForDirection(moveDir);
 
     bool hit = false;
+    bool _;
     // Move toward the next closest tile; set canTurn if destination reached
-    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit)) {
+    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit, _)) {
         if (hit) canTurn = true;
         return true;
     }
@@ -239,7 +244,7 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     return false;
 }
 
-bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit) {
+bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved) {
     MovableEntity copy = MovableEntity(*movableEntity);
     std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
 

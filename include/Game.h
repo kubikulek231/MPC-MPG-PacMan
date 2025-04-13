@@ -26,7 +26,7 @@ public:
     Map* getMap() { return &map; }
     Player* getPlayer() { return &player; }
     MoveDir* getMoveDir() { return &moveDir; }
-    std::vector<Ghost>& getGhosts() { return ghosts; }
+    std::vector<Ghost*>& getGhosts() { return ghosts; }
     float getLastFrameTimeDeltaSeconds() const { return lastFrameTimeDeltaSeconds; }
     float getCameraDistance() const { return cameraDistance; }
     float getCameraAngleX() const { return cameraAngleX; }
@@ -63,7 +63,8 @@ private:
     MapFactory mapFactory;
     Map map;
     Player player;
-    std::vector<Ghost> ghosts;
+    Ghost ghost1;
+    std::vector<Ghost*> ghosts;
     MoveDir moveDir;
     bool isDirectionKeyPressed = true;
     float lastFrameTimeSeconds = 0.0f;

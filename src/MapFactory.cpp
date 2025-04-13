@@ -43,16 +43,20 @@ void MapFactory::createDefaultGrid() {
         // Add the completed row to the grid
         grid.push_back(row);
     }
+    // After creating the grid, set tile neighbors for optimized tile search
+    setTileNeighbors();
 }
 
-void MapFactory::createPellets() {
-    // Fill all non-wall tiles with pellets
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            // Skip already set walls, and fill other tiles with pellets
-            if (grid[y][x].getTileType() == TileType::EMPTY) {
-                grid[y][x].setType(TileType::PELLET);
-            }
+void MapFactory::setTileNeighbors() {
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            Tile& tile = grid[y][x];
+
+            // Set neighbors for each tile
+            if (x > 0) tile.setTileLeft(&grid[y][static_cast<std::vector<Tile, std::allocator<Tile>>::size_type>(x) - 1]);   // Set left neighbor
+            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][static_cast<std::vector<Tile, std::allocator<Tile>>::size_type>(x) + 1]);  // Set right neighbor
+            if (y > 0) tile.setTileUp(&grid[static_cast<std::vector<std::vector<Tile, std::allocator<Tile>>, std::allocator<std::vector<Tile, std::allocator<Tile>>>>::size_type>(y) - 1][x]);     // Set up neighbor
+            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[static_cast<std::vector<std::vector<Tile, std::allocator<Tile>>, std::allocator<std::vector<Tile, std::allocator<Tile>>>>::size_type>(y) + 1][x]); // Set down neighbor
         }
     }
 }
@@ -87,25 +91,23 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             char tileChar = line[col];
             TileType type;
 
-            if (tileChar == 'x') type = TileType::WALL;
-            else if (tileChar == '*') type = TileType::PELLET;
-            else if (tileChar == 'o') type = TileType::EMPTY;
-            else {
+            // Map the character from file to TileType
+            switch (tileChar) {
+            case 'x': type = TileType::WALL; break;
+            case '*': type = TileType::PELLET; break;
+            case 'o': type = TileType::EMPTY; break;
+            default:
                 std::cerr << "Invalid character '" << tileChar << "' at row "
                     << row << ", column " << col << std::endl;
                 return false;
             }
 
-            // Centered tile positions
+            // Centered tile positions (around the origin)
             float xCentered = (col - MAP_WIDTH / 2.0f) * TILE_SIZE;
             float yCentered = (row - MAP_HEIGHT / 2.0f) * TILE_SIZE;
-            float xPosMin = xCentered;
-            float yPosMin = yCentered;
-            float xPosMax = xCentered + TILE_SIZE;
-            float yPosMax = yCentered + TILE_SIZE;
 
             // Create the origin and bounding box for the tile
-            Point3D tileOrigin = Point3D(xPosMin, MAP_Y, yPosMin);
+            Point3D tileOrigin = Point3D(xCentered, MAP_Y, yCentered);
             Point3D bbMin = Point3D(0.0f, 0.0f, 0.0f);  // Min point of bounding box at origin
             Point3D bbMax = Point3D(TILE_SIZE, TILE_SIZE, TILE_SIZE);  // Max point offset by TILE_SIZE
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);
@@ -118,12 +120,16 @@ bool MapFactory::loadMapFile(const std::string& filename) {
         row++;
     }
 
+    // After creating the grid, set tile neighbors for optimized tile search
+    setTileNeighbors();
+
     file.close();
 
     if (row != MAP_HEIGHT) {
         std::cerr << "File content does not match expected map height." << std::endl;
         return false;
     }
+
     return true;
 }
 

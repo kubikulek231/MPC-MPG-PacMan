@@ -18,8 +18,8 @@ private:
     bool isValidCoord(int x, int y);
     bool loadMapFile(const std::string& filename);
     void generateEmptyMapFile(const std::string& filename);
-    void createPellets();
     void createDefaultGrid();
+    void setTileNeighbors();
 };
 
 #endif // MAP_FACTORY_H

@@ -13,6 +13,7 @@ public:
     void render();  // Draws the map
     Tile* getTileWithPoint3D(Point3D point);
     std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* boundingBox);
+    void resetHighlightedTiles();
 private:
     std::vector<std::vector<Tile>> grid;
     int width;

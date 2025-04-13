@@ -70,7 +70,7 @@ bool Entity::intersects(const Entity& otherEntity) const {
     return thisBoundingBox.intersects(otherBoundingBox);
 }
 
-void Entity::renderBoundingBox() const {
+void Entity::renderBoundingBox(float r, float g, float b, float alpha) const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
     glPushMatrix();
 
@@ -79,7 +79,7 @@ void Entity::renderBoundingBox() const {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set the color with 10% opacity (red in this case)
-    glColor4f(1.0f, 0.0f, 0.0f, 0.1f);
+    glColor4f(r, g, b, alpha);
 
     glBegin(GL_QUADS);
 
@@ -174,4 +174,8 @@ void Entity::renderText(const std::string& text) const {
     for (size_t i = 0; i < text.length(); ++i) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
     }
+}
+
+std::string Entity::toString() const {
+    return "Origin: (" + std::to_string(origin.x) + ", " + std::to_string(origin.y) + ", " + std::to_string(origin.z) + ")";
 }

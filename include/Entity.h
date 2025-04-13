@@ -16,6 +16,10 @@ protected:
     BoundingBox3D boundingBox = BoundingBox3D();
     void setBoundingBox(Point3D newMin, Point3D newMax);
     void renderText(const std::string& text) const;
+    static constexpr float DEFAULT_BBOX_R = 1.0;
+    static constexpr float DEFAULT_BBOX_G = 0.0;
+    static constexpr float DEFAULT_BBOX_B = 0.0;
+    static constexpr float DEFAULT_BBOX_A = 0.1;
 
 public:
     Entity() {};
@@ -37,8 +41,10 @@ public:
     bool intersects(const Entity& otherEntity) const;
 
     // Debugging functions to render bounding box and origin
-    void renderBoundingBox() const;
+    void renderBoundingBox(float r = DEFAULT_BBOX_R, float g = DEFAULT_BBOX_G, float b = DEFAULT_BBOX_B, float alpha = DEFAULT_BBOX_A) const;
     void renderOrigin(bool renderCoordinates = false) const;
+
+    std::string toString() const;
 };
 
 #endif

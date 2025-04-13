@@ -11,9 +11,6 @@
 
 // Guess what this is.
 // Holds a pointer to map for tile colision handling.
-// Todo: rename get/set methods which do not handle properties to more Idiomatic names.
-// TODO: do some tile-involving logic where we could predict tiles where turning can occur
-// That would prevent snapping completely and perhaps set us closer to some ghost logic as well
 class MovableEntity : public Entity {
 public:
     static constexpr float DEFAULT_SPEED = 1.0f;
@@ -61,16 +58,23 @@ protected:
 
     bool tryMove(MoveDir moveDir, float frameTimeMs, bool snapToTile = false, const std::vector<Tile*> &playerTiles = {});
     MovableEntity movedCopy(MoveDir moveDir, float frameTimeMs);
+
+    bool getAxisAndSpeedForDirection(MoveDir moveDir, char& axis, float& speed);
+    bool getAxisForDirection(MoveDir moveDir, char& axis);
+
     bool preciseMove(MoveDir moveDir, float frameTimeMs);
-    bool preciseMoveAxis(MoveDir moveDir, float frameTimeMs);
-    void nudgeToTileCenterAxis(float frameTimeMs);
-    void moveToTileCenter(float frameTimeMs);
+    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool &turned, const std::vector<Tile*>& intersectingTiles = {});
+    bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit);
+    bool tryMoveInAxis(MovableEntity* movableEntity, char axis, float distance);
 
-    bool trySnapToTileCenter(Point3D& correctedOrigin, const std::vector<Tile*>& tiles, float maxDistance);
+    Tile* nextTile(MoveDir moveDir, Tile* currentTile);
+    Tile* nextTileInDirection(MoveDir moveDir, Tile* currentTile);
+    Tile* currentTile(const std::vector<Tile*>& intersectingTiles = {}) const;
 
+    Point3D tileCenteredOrigin(const Tile* movableEntity) const;
     static bool areTilesWalkable(std::vector<Tile*> tiles);
     static std::vector<Tile*> intersectingTiles(const MovableEntity* movableEntity);
-    static Point3D closestTileOrigin(const MovableEntity* movableEntity, const std::vector<Tile*>& tiles, float& distance);
+    static Tile* closestTile(const MovableEntity* movableEntity, const std::vector<Tile*>& tiles, float& distance);
 };
 
 #endif

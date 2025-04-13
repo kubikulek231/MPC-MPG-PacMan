@@ -68,28 +68,37 @@ void Map::render() {
     glutSolidSphere(0.15f, 16, 16); // Origin marker
     glPopMatrix();
 
-    for (std::vector<Tile> tileRow : grid) {
-        for (Tile tile : tileRow) {
+    for (const std::vector<Tile>& tileRow : grid) {        
+        for (const Tile& tile : tileRow) {
             tile.renderOrigin();
             tile.render();
+            BoundingBox3D abb = tile.getAbsoluteBoundingBox();
+            // Render tile coordinate text at center
+            float textX = (abb.min.x + abb.max.x) / 2.0f;
+            float textY = abb.min.y + 0.01f; // Slightly above floor
+            float textZ = (abb.min.z + abb.max.z) / 2.0f;
+            std::ostringstream oss;
+
+            oss << "("
+                << std::fixed << std::setprecision(2) << abb.min.x << ","
+                << std::fixed << std::setprecision(2) << abb.min.z
+                << ")";
+            std::string coordStr = oss.str();
+
+            glColor3f(1.0f, 1.0f, 1.0f); // White text
+
+            glRasterPos3f(textX, textY, textZ);
+            for (char c : coordStr) {
+                glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
+            }
         }
     }
-    //// Render tile coordinate text at center
-    //float textX = (abb.min.x + abb.max.x) / 2.0f;
-    //float textY = abb.min.y + 0.01f; // Slightly above floor
-    //float textZ = (abb.min.z + abb.max.z) / 2.0f;
-    //std::ostringstream oss;
+}
 
-    //oss << "("
-    //    << std::fixed << std::setprecision(2) << abb.min.x << ","
-    //    << std::fixed << std::setprecision(2) << abb.min.z
-    //    << ")";
-    //std::string coordStr = oss.str();
-
-    //glColor3f(1.0f, 1.0f, 1.0f); // White text
-
-    //glRasterPos3f(textX, textY, textZ);
-    //for (char c : coordStr) {
-    //    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
-    //}
+void Map::resetHighlightedTiles() {
+    for (std::vector<Tile>& tileRow : grid) {
+        for (Tile& tile : tileRow) {
+            tile.setHighlight(false);
+        }
+    }
 }

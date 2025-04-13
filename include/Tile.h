@@ -22,13 +22,33 @@ public:
     TileType getTileType() const;
     Point3D getCenterPoint() const;
     float distanceToCenter(const Tile& other) const;
+   
     void render() const;
     void renderEmpty() const;
     void renderWall() const;
     void renderPellet() const;
 
+    // Getter and Setter for neighboring tiles
+    Tile* getTileUp() const;
+    Tile* getTileDown() const;
+    Tile* getTileLeft() const;
+    Tile* getTileRight() const;
+
+    void setTileUp(Tile* tile);
+    void setTileDown(Tile* tile);
+    void setTileLeft(Tile* tile);
+    void setTileRight(Tile* tile);
+
+    void setHighlight(bool value) { this->highlight = value; };
+    std::string toString();
 private:
     TileType tileType;
+    Tile* tileUp;
+    Tile* tileDown;
+    Tile* tileLeft;
+    Tile* tileRight;
+    bool highlight = false;
+
 };
 
 #endif

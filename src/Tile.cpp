@@ -1,6 +1,10 @@
 #include "Tile.h"
 #include "MapFactory.h"
 #include <cmath>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+
 
 Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox) : Entity(tileOrigin, tileBoundingBox) {
 	this->tileType = tileType;
@@ -90,6 +94,9 @@ void Tile::renderPellet() const {
 }
 
 void Tile::render() const {
+	if (highlight) {
+		renderBoundingBox(0, 1.0f, 0, 0.2);
+	}
 	switch (tileType) {
 	case TileType::EMPTY:
 		renderEmpty();
@@ -104,4 +111,63 @@ void Tile::render() const {
 	default:
 		return;
 	}
+}
+
+// Getter and Setter for neighboring tiles
+Tile* Tile::getTileUp() const {
+	return tileUp;
+}
+
+Tile* Tile::getTileDown() const {
+	return tileDown;
+}
+
+Tile* Tile::getTileLeft() const {
+	return tileLeft;
+}
+
+Tile* Tile::getTileRight() const {
+	return tileRight;
+}
+
+void Tile::setTileUp(Tile* tile) {
+	tileUp = tile;
+}
+
+void Tile::setTileDown(Tile* tile) {
+	tileDown = tile;
+}
+
+void Tile::setTileLeft(Tile* tile) {
+	tileLeft = tile;
+}
+
+void Tile::setTileRight(Tile* tile) {
+	tileRight = tile;
+}
+
+std::string Tile::toString() {
+	BoundingBox3D abb = this->getAbsoluteBoundingBox();
+
+	// Calculate the center of the tile
+	float textX = (abb.min.x + abb.max.x) / 2.0f;
+	float textY = abb.min.y + 0.01f; // Slightly above floor
+	float textZ = (abb.min.z + abb.max.z) / 2.0f;
+
+	// Prepare the coordinate string for output
+	std::ostringstream oss;
+	oss << "("
+		<< std::fixed << std::setprecision(2) << abb.min.x << ","
+		<< std::fixed << std::setprecision(2) << abb.min.z
+		<< ")";
+
+	std::string coordStr = oss.str();
+
+	// Create the final string with tile coordinates
+	std::ostringstream result;
+	result << "Tile at (" << textX << ", " << textY << ", " << textZ
+		<< ") - Coordinates: " << coordStr;
+
+	// Return the generated string
+	return result.str();
 }

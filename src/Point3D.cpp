@@ -37,3 +37,17 @@ float Point3D::distanceTo2D(const Point3D& other) const {
 	float dz = z - other.z;
 	return std::sqrt(dx * dx + dz * dz);
 }
+
+float Point3D::getAxisValue(char axis) const {
+	if (axis == 'x' || axis == 'X') {
+		return this->x;  // Return x value
+	}
+	if (axis == 'y' || axis == 'Y') {
+		return this->y;  // Return y value
+	}
+	if (axis == 'z' || axis == 'Z') {
+		return this->z;  // Return z value
+	}
+	// Return NaN or handle invalid input
+	return std::nanf("");
+}

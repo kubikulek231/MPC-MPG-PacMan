@@ -1,6 +1,8 @@
 #ifndef POINT3D_H
 #define POINT3D_H
 
+#include <cmath>
+
 class Point3D {
 public:
     float x = 0.0f;
@@ -13,6 +15,7 @@ public:
     void move(Point3D dPoint);
     float distanceTo(const Point3D& other) const;
     float distanceTo2D(const Point3D& other) const;
+    float getAxisValue(char axis = 'x') const;
 
     // Overload the + operator to add two Point3D objects
     Point3D operator+(const Point3D& other) const {
@@ -42,6 +45,17 @@ public:
         y -= other.y;
         z -= other.z;
         return *this;
+    }
+
+    bool operator==(const Point3D& other) const {
+        constexpr float EPSILON = 1e-5f;
+        return std::fabs(x - other.x) < EPSILON &&
+            std::fabs(y - other.y) < EPSILON &&
+            std::fabs(z - other.z) < EPSILON;
+    }
+
+    bool operator!=(const Point3D& other) const {
+        return !(*this == other);
     }
 };
 

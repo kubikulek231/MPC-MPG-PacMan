@@ -5,19 +5,19 @@
 #include "MoveDir.h"
 
 void GameControl::mouseButton(int button, int state, int x, int y) {
+    Game& game = Game::getInstance();
     if (button == GLUT_LEFT_BUTTON) {
-        Game& game = Game::getInstance();
         if (state == GLUT_DOWN) {
-            game.setIsMousePressed(true);
+            game.setIsLeftMousePressed(true);
             game.setLastMouseX(x);
             game.setLastMouseY(y);
         }
         else {
-            game.setIsMousePressed(false);
+            game.setIsLeftMousePressed(false);
         }
+        return;
     }
-    else if (button == 3 || button == 4) {
-        Game& game = Game::getInstance();
+    if (button == 3 || button == 4) {
         if (state == GLUT_DOWN) {
             if (button == 3) {
                 game.setCameraDistance(game.getCameraDistance() - 2.0f);
@@ -29,12 +29,24 @@ void GameControl::mouseButton(int button, int state, int x, int y) {
             if (game.getCameraDistance() < 10.0f) game.setCameraDistance(10.0f);
             if (game.getCameraDistance() > 100.0f) game.setCameraDistance(100.0f);
         }
+        return;
+    }
+    if (button == GLUT_MIDDLE_BUTTON) {
+        if (state == GLUT_DOWN) {
+            game.setIsMiddleMousePressed(true);
+            game.setLastMouseX(x);
+            game.setLastMouseY(y);
+        }
+        else {
+            game.setIsMiddleMousePressed(false);
+        }
+        return;
     }
 }
 
 void GameControl::mouseMotion(int x, int y) {
     Game& game = Game::getInstance();
-    if (game.getIsMousePressed()) {
+    if (game.getIsLeftMousePressed()) {
         int deltaX = x - game.getLastMouseX();
         int deltaY = y - game.getLastMouseY();
 
@@ -46,6 +58,18 @@ void GameControl::mouseMotion(int x, int y) {
 
         game.setLastMouseX(x);
         game.setLastMouseY(y);
+        return;
+    }
+    if (game.getIsMiddleMousePressed()) {
+        int deltaX = x - game.getLastMouseX();
+        int deltaY = y - game.getLastMouseY();
+
+        game.setCameraPosX(game.getCameraPosX() + deltaX * 0.01f);
+        game.setCameraPosZ(game.getCameraPosZ() + deltaY * 0.01f);
+
+        game.setLastMouseX(x);
+        game.setLastMouseY(y);
+        return;
     }
 }
 

@@ -30,7 +30,10 @@ public:
     float getCameraDistance() const { return cameraDistance; }
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
-    bool getIsMousePressed() const { return isMousePressed; }
+    float getCameraPosX() const { return cameraPosX; }
+    float getCameraPosZ() const { return cameraPosZ; }
+    bool getIsLeftMousePressed() const { return isLeftMousePressed; }
+    bool getIsMiddleMousePressed() const { return isMiddleMousePressed; }
     bool& getIsDirectionKeyPressed() { return isDirectionKeyPressed; }
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
@@ -46,7 +49,10 @@ public:
     void setCameraDistance(float distance) { cameraDistance = distance; }
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
-    void setIsMousePressed(bool pressed) { isMousePressed = pressed; }
+    void setCameraPosX(float posX) { cameraPosX = posX; }
+    void setCameraPosZ(float posY) { cameraPosZ = posY; }
+    void setIsLeftMousePressed(bool pressed) { isLeftMousePressed = pressed; }
+    void setIsMiddleMousePressed(bool pressed) { isMiddleMousePressed = pressed; }
     void setIsDirectionKeyPressed(bool changed) { isDirectionKeyPressed = changed; }
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
@@ -66,7 +72,10 @@ private:
     float cameraDistance = 50.0f;
     float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
     float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)
-    bool isMousePressed = false; // To check if the left mouse button is pressed
+    float cameraPosX = 0.0f;
+    float cameraPosZ = 0.0f;
+    bool isLeftMousePressed = false; // To check if the left mouse button is pressed
+    bool isMiddleMousePressed = false;
     int lastMouseX, lastMouseY;  // To track the last mouse position
     float moveSpeed = 2.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;

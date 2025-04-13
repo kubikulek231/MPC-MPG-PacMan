@@ -44,14 +44,16 @@ void Game::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    // Calculate camera position based on angles and zoom (distance)
-    float camX = game.cameraDistance * sin(-game.cameraAngleY * 3.14159f / 180.0f) * cos(game.cameraAngleX * 3.14159f / 180.0f);
-    float camY = game.cameraDistance * sin(game.cameraAngleX * 3.14159f / 180.0f);
-    float camZ = game.cameraDistance * cos(game.cameraAngleY * 3.14159f / 180.0f) * cos(game.cameraAngleX * 3.14159f / 180.0f);
+    float radY = game.cameraAngleY * 3.14159f / 180.0f;
+    float radX = game.cameraAngleX * 3.14159f / 180.0f;
+
+    float camX = game.cameraPosX + game.cameraDistance * sin(-radY) * cos(radX);
+    float camY = game.cameraDistance * sin(radX);
+    float camZ = game.cameraPosZ + game.cameraDistance * cos(radY) * cos(radX);
 
     // Set the camera view
     gluLookAt(camX, camY, camZ,  // Eye position (based on camera angles and zoom)
-        0.0, 0.0, 0.0,    // Look-at point (center of the map)
+        game.cameraPosX, 0.0, game.cameraPosZ,    // Look-at point (center of the map)
         0.0, 1.0, 0.0);   // Up vector
 
     // Render map

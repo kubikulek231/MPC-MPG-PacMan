@@ -42,7 +42,7 @@ protected:
     // === State ===
     Map* map = nullptr;
     DirChangeRequest* dirChangeRequest = nullptr;
-    MoveDir moveDir = MoveDir::NONE;
+    MoveDir moveDir = MoveDir::UNDEFINED;
     float speed = DEFAULT_SPEED;
     float snapDistance = DEFAULT_SNAP_DISTANCE;
     bool dirChangeRequestExpire = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE;
@@ -71,12 +71,14 @@ protected:
     // === Movement Logic ===
     bool preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved);
     bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
-    bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved);
+    bool preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles);
+    bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved, bool proceedToNextTile = false);
 
     // === Tile Navigation & Positioning ===
     Tile* currentTile(const std::vector<Tile*>& intersectingTiles = {}) const;
     Tile* nextTile(MoveDir moveDir, Tile* currentTile);
     Tile* nextTileInDirection(MoveDir moveDir, Tile* currentTile);
+    MoveDir dirToTile(Tile* fromTile, Tile* toTile);
     Point3D tileCenteredOrigin(const Tile* movableEntity) const;
 
     // === Tile Utility Functions ===

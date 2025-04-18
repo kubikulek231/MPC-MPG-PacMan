@@ -12,7 +12,15 @@ void GameLogic::update() {
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
 	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
 	// Render ghosts
-	for (Ghost* ghost : game.getGhosts()) {
-		ghost->autoMove(lastFrameTimeMs);
+	//for (Ghost* ghost : game.getGhosts()) {
+	//	ghost->autoMove(lastFrameTimeMs);
+	//	ghost->moveToTile(lastFrameTimeMs, game.getMap()->getTileWithRowCol(18, 15));
+	//}
+	//
+	//game.getGhosts()[0]->autoMove(lastFrameTimeMs);
+	if (game.getGhosts()[0]->isPathEmpty()) {
+		Tile* targetTile = game.getMap()->getTileAt(4, 1);
+		game.getGhosts()[0]->createPathToTile(targetTile);
 	}
+	game.getGhosts()[0]->moveOnPath(lastFrameTimeMs);
 }

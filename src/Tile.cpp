@@ -6,7 +6,9 @@
 #include <sstream>
 
 
-Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox) : Entity(tileOrigin, tileBoundingBox) {
+Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol) : Entity(tileOrigin, tileBoundingBox) {
+	this->tileRow = tileRow;
+	this->tileCol = tileCol;
 	this->tileType = tileType;
 }
 
@@ -143,6 +145,14 @@ Tile* Tile::getTileLeft() const {
 
 Tile* Tile::getTileRight() const {
 	return tileRight;
+}
+
+int Tile::getTileRow() const {
+	return tileRow;
+}
+
+int Tile::getTileCol() const {
+	return tileCol;
 }
 
 void Tile::setTileUp(Tile* tile) {

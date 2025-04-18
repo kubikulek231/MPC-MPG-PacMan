@@ -37,7 +37,7 @@ void MapFactory::createDefaultGrid() {
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);
 
             // Add a tile to the row
-            row.push_back(Tile(TileType::EMPTY, tileOrigin, tileBoundingBox));
+            row.push_back(Tile(TileType::EMPTY, tileOrigin, tileBoundingBox, y, x));
         }
 
         // Add the completed row to the grid
@@ -53,14 +53,13 @@ void MapFactory::setTileNeighbors() {
             Tile& tile = grid[y][x];
 
             // Set neighbors for each tile
-            if (x > 0) tile.setTileLeft(&grid[y][static_cast<std::vector<Tile, std::allocator<Tile>>::size_type>(x) - 1]);   // Set left neighbor
-            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][static_cast<std::vector<Tile, std::allocator<Tile>>::size_type>(x) + 1]);  // Set right neighbor
-            if (y > 0) tile.setTileUp(&grid[static_cast<std::vector<std::vector<Tile, std::allocator<Tile>>, std::allocator<std::vector<Tile, std::allocator<Tile>>>>::size_type>(y) - 1][x]);     // Set up neighbor
-            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[static_cast<std::vector<std::vector<Tile, std::allocator<Tile>>, std::allocator<std::vector<Tile, std::allocator<Tile>>>>::size_type>(y) + 1][x]); // Set down neighbor
+            if (x > 0) tile.setTileLeft(&grid[y][x - 1]);   // Set left neighbor
+            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][x + 1]);  // Set right neighbor
+            if (y > 0) tile.setTileUp(&grid[y - 1][x]);     // Set up neighbor
+            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[y + 1][x]); // Set down neighbor
         }
     }
 }
-
 bool MapFactory::isValidCoord(int x, int y) {
     return x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT;
 }
@@ -113,7 +112,7 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);
 
             // Add the tile to the row
-            tileRow.emplace_back(type, tileOrigin, tileBoundingBox);
+            tileRow.emplace_back(type, tileOrigin, tileBoundingBox, row, col);
         }
 
         grid.push_back(tileRow);

@@ -28,10 +28,11 @@ private:
     float colorR = 0.0f;
     float colorG = 1.0f;
     float colorB = 0.0f;
+    std::string name = "";
 public:
     Ghost();
     Ghost(const Ghost& other);
-    Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox);
+    Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std::string name);
     void render();
     void createPathToTile(Tile* tile);
     void moveOnPath(float frameTimeMs);
@@ -43,6 +44,7 @@ public:
         colorB = b;
     }
     bool isPathEmpty() { return movePath.empty(); }
+    Tile* furthestTileTowardCorner(MapCorner mapCorner);
 };
 
 #endif // PLAYER_H

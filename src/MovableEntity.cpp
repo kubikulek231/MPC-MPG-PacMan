@@ -38,6 +38,14 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 // === Movement Interface ===
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+    if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
+        // Set initial moveDir
+        if (requestedMoveDir != MoveDir::NONE && requestedMoveDir != MoveDir::UNDEFINED) {
+            moveDir = requestedMoveDir;
+        }
+        // No requstedMoveDir nor moveDir
+        return;
+    }
     // std::cout << this->toString() << std::endl; // Debug entity movement
     Tile* tile = currentTile(intersectingTiles(this));
     if (tile) { tile->setHighlight(true); }
@@ -86,6 +94,7 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     bool _;
     MovableEntity::preciseMove(moveDir, frameTimeMs, _);
 }
+
 float MovableEntity::getMoveSpeed() const { return speed; }
 void MovableEntity::setMoveSpeed(float speed) { this->speed = speed; }
 

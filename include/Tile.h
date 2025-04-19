@@ -46,10 +46,8 @@ public:
     void setHighlight(bool value);
     void setHighlightColor(float r = 1.0, float g = 0.0, float b = 0.0, float a = 0.1);
     std::string toString();
-
-    bool operator==(const Tile& other) const {
-        return (this->tileRow == other.tileRow) && (this->tileCol == other.tileCol);
-    }
+    bool isEqual(const Tile* other) const;
+    bool isNeighbor(const Tile* other) const;
 private:
     int tileRow;
     int tileCol;

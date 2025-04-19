@@ -6,6 +6,13 @@
 #include "Point3D.h"
 #include "BoundingBox3D.h"
 
+enum class MapCorner {
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT
+};
+
 class Map {
 public:
     Map();
@@ -16,6 +23,12 @@ public:
     std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* boundingBox);
     void resetHighlightedTiles();
     void scheduleHighlightReset(int delay);
+    std::vector<MapCorner> corners = {
+        MapCorner::TOP_LEFT,
+        MapCorner::TOP_RIGHT,
+        MapCorner::BOTTOM_LEFT,
+        MapCorner::BOTTOM_RIGHT
+    };
 private:
     std::vector<std::vector<Tile>> grid;
     int width;
@@ -24,6 +37,7 @@ private:
     bool isHighlightResetScheduled = false;
     void renderWorldCoordinates(const Tile* tile);
     void renderTileCoordinates(const Tile* tile);
+    void drawCenterAxes(float length = 2.0f);
 };
 
 #endif // MAP_H

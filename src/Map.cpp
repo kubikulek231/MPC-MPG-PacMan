@@ -75,7 +75,7 @@ void Map::render(bool resetHighlighted, int resetTimerMs) {
     glPushMatrix();
     glutSolidSphere(0.15f, 16, 16); // Origin marker
     glPopMatrix();
-
+    drawCenterAxes(2.0f);
     if (resetHighlighted) {
         Map::scheduleHighlightReset(resetTimerMs);
     }
@@ -152,4 +152,40 @@ void Map::scheduleHighlightReset(int delay) {
             }, 0);
         isHighlightResetScheduled = true;
     }
+}
+
+void Map::drawCenterAxes(float length) {
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+
+    // X-axis (Red)
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(length, 0.0f, 0.0f);
+
+    // Y-axis (Green)
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, length, 0.0f);
+
+    // Z-axis (Blue)
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, length);
+
+    glEnd();
+    glLineWidth(1.0f); // Reset to default
+
+    // Axis labels
+    glColor3f(1.0f, 0.0f, 0.0f); // X label
+    glRasterPos3f(length + 0.1f, 0.0f, 0.0f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'X');
+
+    glColor3f(0.0f, 1.0f, 0.0f); // Y label
+    glRasterPos3f(0.0f, length + 0.1f, 0.0f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'Y');
+
+    glColor3f(0.0f, 0.0f, 1.0f); // Z label
+    glRasterPos3f(0.0f, 0.0f, length + 0.1f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'Z');
 }

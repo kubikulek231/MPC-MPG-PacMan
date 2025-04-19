@@ -13,7 +13,7 @@ Ghost::Ghost(const Ghost& other) {
     this->origin = other.origin;
 }
 
-Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox) 
+Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std::string name) 
 : MovableEntity(map,
                 ghostOrigin,
                 ghostBoundingBox,
@@ -22,6 +22,7 @@ Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox)
                 Ghost::DEFAULT_SNAP_DISTANCE,
                 Ghost::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE,
                 Ghost::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS) {
+    this->name = name;
 }
 
 void Ghost::render() {
@@ -47,10 +48,8 @@ void Ghost::moveToTile(float frameTimeMs, Tile* tile) {
     }
 }
 
+// FIX THE BUG IN DETERMINING DIRECTION?
 void Ghost::moveOnPath(float frameTimeMs) {
-    bool moved = false;
-    bool inCenter = false;
-
     std::cout << "current path:" << std::endl;
     for (auto tile : movePath) {
         std::cout << tile->toString() << std::endl;
@@ -64,37 +63,40 @@ void Ghost::moveOnPath(float frameTimeMs) {
         return;
     }
 
-    if (moveDir == MoveDir::UNDEFINED) {
-        Tile* nextTile = movePath.front();
-        if (!nextTile) return;
+    bool stopped;
+    if (this->name == "blinky") {
+        stopped = false;
+    }
+
+    // Do nothing when path is empty
+    if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) {
+        if (movePath.empty()) {
+            moveDir = MoveDir::NONE;
+            return;
+        }
+    }
+
+    Tile* nextTile = movePath.front();
+    // Get next moveDir
+    if (nextTile->isNeighbor(tile)) {
+        // If the current tile and next tile differ, get the moveDir
         moveDir = dirToTile(tile, nextTile);
     }
 
-    if (moveDir == MoveDir::NONE || movePath.empty()) {
-        return;
-    }
-
-    // Use our new center-snapping method
-    preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
-
-    // If we reached the center of the next tile and have more path to follow
-    if (inCenter && !movePath.empty()) {
-        Tile* oldTile = movePath.front();
+    bool moved = false;
+    bool inCenter = false;
+    this->preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
+    tile = currentTile(tiles);
+    if (inCenter && movePath.front()->isEqual(tile)) {
         movePath.pop_front();
-
-        if (!movePath.empty()) {
-            Tile* nextTile = movePath.front();
-            moveDir = dirToTile(oldTile, nextTile);
-        }
-        else {
-            moveDir = MoveDir::NONE;
-        }
     }
 }
 
-
 void Ghost::createPathToTile(Tile* tile) {
     this->movePath = shortestPathToTile(tile);
+    auto tiles = this->intersectingTiles(this);
+    auto entityTile = currentTile(tiles);
+    if (movePath.size() > 0 && movePath.front() == entityTile) { movePath.pop_front(); }
 }
 
 void Ghost::randomMove(float frameTimeMs) {
@@ -244,4 +246,56 @@ std::deque<Tile*> Ghost::reconstructPath(std::unordered_map<Tile*, Tile*> cameFr
     }
     std::reverse(path.begin(), path.end());
     return path;
+}
+
+Tile* Ghost::furthestTileTowardCorner(MapCorner corner) {
+    Tile* bestTile = nullptr;
+    float maxDistance = -1.0f;
+
+    auto currentTiles = intersectingTiles(this);
+    Tile* startTile = currentTile(currentTiles);
+    if (!startTile) return nullptr;
+
+    int startRow = startTile->getTileRow();
+    int startCol = startTile->getTileCol();
+
+    int numRows = MapFactory::MAP_HEIGHT;
+    int numCols = MapFactory::MAP_WIDTH;
+
+    for (int r = 0; r < numRows; ++r) {
+        for (int c = 0; c < numCols; ++c) {
+            Tile* candidate = map->getTileAt(r, c);
+            if (!candidate || !candidate->isWalkable()) continue;
+
+            // Filter based on direction to the corner
+            switch (corner) {
+            case MapCorner::TOP_LEFT:
+                if (r > startRow || c > startCol) continue;
+                break;
+            case MapCorner::TOP_RIGHT:
+                if (r > startRow || c < startCol) continue;
+                break;
+            case MapCorner::BOTTOM_LEFT:
+                if (r < startRow || c > startCol) continue;
+                break;
+            case MapCorner::BOTTOM_RIGHT:
+                if (r < startRow || c < startCol) continue;
+                break;
+            }
+
+            // Use geometric (Manhattan) distance
+            float distance = heuristicCost(startTile, candidate);
+
+            // Optional: only consider reachable ones
+            auto path = shortestPathToTile(candidate);
+            if (path.empty()) continue;
+
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                bestTile = candidate;
+            }
+        }
+    }
+
+    return bestTile;
 }

@@ -209,3 +209,21 @@ std::string Tile::toString() {
 	// Return the generated string
 	return result.str();
 }
+
+bool Tile::isEqual(const Tile* other) const {
+	if (other == nullptr) { return false; }
+	if (this->getTileCol() == other->getTileCol() && this->getTileRow() == other->getTileRow()) {
+		return true;
+	}
+	return false;
+}
+
+bool Tile::isNeighbor(const Tile* other) const {
+	if (other == nullptr) { return false; }
+	if (this->isEqual(other)) { return false; }
+	if (this->isEqual(other->getTileUp())) { return true; }
+	if (this->isEqual(other->getTileDown())) { return true; }
+	if (this->isEqual(other->getTileLeft())) { return true; }
+	if (this->isEqual(other->getTileRight())) { return true; }
+	return false;
+}

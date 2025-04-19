@@ -410,6 +410,7 @@ Point3D MovableEntity::tileCenteredOrigin(const Tile* tile) const {
 
 // === Tile Utility Functions ===
 bool MovableEntity::areTilesWalkable(std::vector<Tile*> tiles) {
+    if (tiles.empty()) { return false; }
     for (Tile* tile : tiles) {
         if (tile == nullptr) {
             continue;

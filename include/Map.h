@@ -32,7 +32,13 @@ public:
     };
     bool areAllPelletsCollected() const;
     bool collectPellet(Tile* tile);
+    Tile* getPlayerSpawn();
+    Tile* getBlinkySpawn();
+    Tile* getPinkySpawn();
+    Tile* getInkySpawn();
+    Tile* getClydeSpawn();
 private:
+    Tile* getFirstTileOfType(TileType type);
     int totalPellets;
     std::vector<std::vector<Tile>> grid;
     int width;

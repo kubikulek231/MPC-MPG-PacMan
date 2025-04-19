@@ -21,8 +21,8 @@ bool Tile::collectPellet() {
 }
 
 bool Tile::isWalkable() const {
-	if (tileType == TileType::PELLET || tileType == TileType::EMPTY) return true;
-	return false;
+	if (tileType == TileType::DOOR_CLOSED || tileType == TileType::WALL) return false;
+	return true;
 }
 
 void Tile::setTileType(TileType tileType) {
@@ -56,12 +56,22 @@ float Tile::distanceToCenter(const Tile& other) const {
 
 std::string Tile::getTileTypeString() {
 	switch (tileType) {
-	case TileType::EMPTY:  return "EMPTY";
-	case TileType::WALL:   return "WALL";
-	case TileType::PELLET: return "PELLET";
-	default:               return "NONE";
+	case TileType::EMPTY:         return "EMPTY";
+	case TileType::WALL:          return "WALL";
+	case TileType::PELLET:        return "PELLET";
+	case TileType::GHOST_HOUSE:   return "GHOST_HOUSE";
+	case TileType::DOOR_OPEN:     return "DOOR_OPEN";
+	case TileType::DOOR_CLOSED:   return "DOOR_CLOSED";
+	case TileType::TELEPORT:      return "TELEPORT";
+	case TileType::SPAWN_PLAYER:  return "SPAWN_PLAYER";
+	case TileType::SPAWN_INKY:    return "SPAWN_INKY";
+	case TileType::SPAWN_BLINKY:  return "SPAWN_BLINKY";
+	case TileType::SPAWN_PINKY:   return "SPAWN_PINKY";
+	case TileType::SPAWN_CLYDE:   return "SPAWN_CLYDE";
+	default:                      return "UNKNOWN";
 	}
 }
+
 
 void Tile::renderHighlight() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
@@ -122,10 +132,8 @@ void Tile::render() const {
 	if (highlight) {
 		renderHighlight();
 	}
+
 	switch (tileType) {
-	case TileType::EMPTY:
-		renderEmpty();
-		break;
 	case TileType::WALL:
 		renderWall();
 		break;
@@ -133,10 +141,23 @@ void Tile::render() const {
 		renderEmpty();
 		renderPellet();
 		break;
+	case TileType::EMPTY:
+	case TileType::GHOST_HOUSE:
+	case TileType::DOOR_OPEN:
+	case TileType::DOOR_CLOSED:
+	case TileType::TELEPORT:
+	case TileType::SPAWN_PLAYER:
+	case TileType::SPAWN_INKY:
+	case TileType::SPAWN_BLINKY:
+	case TileType::SPAWN_PINKY:
+	case TileType::SPAWN_CLYDE:
+		renderEmpty();
+		break;
 	default:
-		return;
+		break;
 	}
 }
+
 
 // Getter and Setter for neighboring tiles
 Tile* Tile::getTileUp() const {

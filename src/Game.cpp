@@ -17,15 +17,22 @@ void Game::init() {
 
     mapFactory = MapFactory();
     map = mapFactory.createMap();
-    player = Player(&map, Point3D(1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
+
+    Point3D playerSpawnOrigin = map.getPlayerSpawn()->getOrigin();
+    Point3D blinkySpawnOrigin = map.getBlinkySpawn()->getOrigin();
+    Point3D pinkySpawnOrigin = map.getPinkySpawn()->getOrigin();
+    Point3D inkySpawnOrigin = map.getInkySpawn()->getOrigin();
+    Point3D clydeSpawnOrigin = map.getClydeSpawn()->getOrigin();
+
+    player = Player(&map, playerSpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
     moveDir = MoveDir::NONE;
-    pinky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "pinky");
+    pinky = Ghost(&map, pinkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "pinky");
     pinky.setColor(1.0, 0.5, 0.5);
-    blinky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "blinky");
+    blinky = Ghost(&map, blinkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "blinky");
     blinky.setColor(1.0, 0.0, 0.0);
-    inky = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "inky");
+    inky = Ghost(&map, inkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "inky");
     inky.setColor(0.0, 1.0, 1.0);
-    clyde = Ghost(&map, Point3D(-1, 0, -1), BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "clyde");
+    clyde = Ghost(&map, clydeSpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "clyde");
     clyde.setColor(1, 0.6, 0);
 
     ghosts.push_back(&pinky);

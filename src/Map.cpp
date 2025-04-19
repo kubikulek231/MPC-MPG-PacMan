@@ -236,3 +236,35 @@ bool Map::collectPellet(Tile* tile) {
     }
     return false;
 }
+
+Tile* Map::getPlayerSpawn() {
+    return getFirstTileOfType(TileType::SPAWN_PLAYER);
+}
+
+Tile* Map::getBlinkySpawn() {
+    return getFirstTileOfType(TileType::SPAWN_BLINKY);
+}
+
+Tile* Map::getPinkySpawn() {
+    return getFirstTileOfType(TileType::SPAWN_PINKY);
+}
+
+Tile* Map::getInkySpawn() {
+    return getFirstTileOfType(TileType::SPAWN_INKY);
+}
+
+Tile* Map::getClydeSpawn() {
+    return getFirstTileOfType(TileType::SPAWN_CLYDE);
+}
+
+// Helper function
+Tile* Map::getFirstTileOfType(TileType type) {
+    for (int y = 0; y < MapFactory::MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MapFactory::MAP_WIDTH; ++x) {
+            if (grid[y][x].getTileType() == type) {
+                return &grid[y][x];
+            }
+        }
+    }
+    return nullptr;  // Not found
+}

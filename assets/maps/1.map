@@ -12,11 +12,11 @@ x*xxxx*xx*xxxxxxxx*xx*xxxx*x
 x******xx****xx****xx******x
 xxxxxx*xxxxxoxxoxxxxx*xxxxxx
 ooooox*xxxxxoxxoxxxxx*xooooo
-ooooox*xxooooooooooxx*xooooo
-ooooox*xxoxxxooxxxoxx*xooooo
-xxxxxx*xxox******xoxx*xxxxxx
-*******ooox******xooo*******
-xxxxxx*xxox******xoxx*xxxxxx
+ooooox*xxooooobooooxx*xooooo
+ooooox*xxoxxxxdxxxoxx*xooooo
+xxxxxx*xxoxooooooxoxx*xxxxxx
+t******oooxoiopocxooo******t
+xxxxxx*xxoxooooooxoxx*xxxxxx
 ooooox*xxoxxxxxxxxoxx*xooooo
 ooooox*xxooooooooooxx*xooooo
 ooooox*xxoxxxxxxxxoxx*xooooo
@@ -24,7 +24,7 @@ xxxxxx*xxoxxxxxxxxoxx*xxxxxx
 x************xx************x
 x*xxxx*xxxxx*xx*xxxxx*xxxx*x
 x*xxxx*xxxxx*xx*xxxxx*xxxx*x
-x***xx****************xx***x
+x***xx*******s********xx***x
 xxx*xx*xx*xxxxxxxx*xx*xx*xxx
 xxx*xx*xx*xxxxxxxx*xx*xx*xxx
 x******xx****xx****xx******x

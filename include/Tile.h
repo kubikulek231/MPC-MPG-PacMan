@@ -10,7 +10,14 @@ enum class TileType {
     WALL = 2,    // Wall
     PELLET = 3,  // Pellet
     GHOST_HOUSE = 4,
-    START = 5,
+    DOOR_OPEN = 5,
+    DOOR_CLOSED = 6,
+    TELEPORT = 7,
+    SPAWN_PLAYER = 8,
+    SPAWN_INKY = 9,
+    SPAWN_BLINKY = 10,
+    SPAWN_PINKY = 11,
+    SPAWN_CLYDE = 12,
 };
 
 class Tile : public Entity {

@@ -15,7 +15,7 @@ enum class TileType {
 
 class Tile : public Entity {
 public:
-    Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox);
+    Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     bool isWalkable() const;
     void setType(TileType tileType);
     std::string getTileTypeString();
@@ -35,6 +35,9 @@ public:
     Tile* getTileLeft() const;
     Tile* getTileRight() const;
 
+    int getTileRow() const;
+    int getTileCol() const;
+
     void setTileUp(Tile* tile);
     void setTileDown(Tile* tile);
     void setTileLeft(Tile* tile);
@@ -43,18 +46,21 @@ public:
     void setHighlight(bool value);
     void setHighlightColor(float r = 1.0, float g = 0.0, float b = 0.0, float a = 0.1);
     std::string toString();
+    bool isEqual(const Tile* other) const;
+    bool isNeighbor(const Tile* other) const;
 private:
+    int tileRow;
+    int tileCol;
     TileType tileType;
-    Tile* tileUp;
-    Tile* tileDown;
-    Tile* tileLeft;
-    Tile* tileRight;
+    Tile* tileUp = nullptr;
+    Tile* tileDown = nullptr;
+    Tile* tileLeft = nullptr;
+    Tile* tileRight = nullptr;
     float highlightR = 1.0f;
     float highlightG = 0.0f;
     float highlightB = 0.0f;
     float highlightA = 0.1f;
     bool highlight = false;
-
 };
 
 #endif

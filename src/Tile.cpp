@@ -6,7 +6,9 @@
 #include <sstream>
 
 
-Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox) : Entity(tileOrigin, tileBoundingBox) {
+Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol) : Entity(tileOrigin, tileBoundingBox) {
+	this->tileRow = tileRow;
+	this->tileCol = tileCol;
 	this->tileType = tileType;
 }
 
@@ -145,6 +147,14 @@ Tile* Tile::getTileRight() const {
 	return tileRight;
 }
 
+int Tile::getTileRow() const {
+	return tileRow;
+}
+
+int Tile::getTileCol() const {
+	return tileCol;
+}
+
 void Tile::setTileUp(Tile* tile) {
 	tileUp = tile;
 }
@@ -198,4 +208,22 @@ std::string Tile::toString() {
 
 	// Return the generated string
 	return result.str();
+}
+
+bool Tile::isEqual(const Tile* other) const {
+	if (other == nullptr) { return false; }
+	if (this->getTileCol() == other->getTileCol() && this->getTileRow() == other->getTileRow()) {
+		return true;
+	}
+	return false;
+}
+
+bool Tile::isNeighbor(const Tile* other) const {
+	if (other == nullptr) { return false; }
+	if (this->isEqual(other)) { return false; }
+	if (this->isEqual(other->getTileUp())) { return true; }
+	if (this->isEqual(other->getTileDown())) { return true; }
+	if (this->isEqual(other->getTileLeft())) { return true; }
+	if (this->isEqual(other->getTileRight())) { return true; }
+	return false;
 }

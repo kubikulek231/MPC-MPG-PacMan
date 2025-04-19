@@ -38,6 +38,14 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 // === Movement Interface ===
 void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+    if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
+        // Set initial moveDir
+        if (requestedMoveDir != MoveDir::NONE && requestedMoveDir != MoveDir::UNDEFINED) {
+            moveDir = requestedMoveDir;
+        }
+        // No requstedMoveDir nor moveDir
+        return;
+    }
     // std::cout << this->toString() << std::endl; // Debug entity movement
     Tile* tile = currentTile(intersectingTiles(this));
     if (tile) { tile->setHighlight(true); }
@@ -86,6 +94,7 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     bool _;
     MovableEntity::preciseMove(moveDir, frameTimeMs, _);
 }
+
 float MovableEntity::getMoveSpeed() const { return speed; }
 void MovableEntity::setMoveSpeed(float speed) { this->speed = speed; }
 
@@ -247,7 +256,7 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     return false;
 }
 
-bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved) {
+bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved, bool proceedToNextTile) {
     moved = false;
     MovableEntity copy = MovableEntity(*movableEntity);
     std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&copy);
@@ -268,6 +277,20 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     float fullDistance = closestAxisVal - currentAxisVal;
     float distanceToMove = 0.0f;
 
+    // Already at the center of the tile, proceed to next in the direction if desired
+    if (fullDistance == 0 && proceedToNextTile) {
+        targetOrigin = tileCenteredOrigin(nextTile(moveDir, current));
+        currentOrigin = copy.getOrigin();
+
+        currentAxisVal = (axis == 'x') ? currentOrigin.x : currentOrigin.z;
+        closestAxisVal = (axis == 'x') ? targetOrigin.x : targetOrigin.z;
+
+        size = (axis == 'x') ? copy.getBoundingBox().getSizeX() : copy.getBoundingBox().getSizeZ();
+
+        fullDistance = closestAxisVal - currentAxisVal;
+        distanceToMove = 0.0f;
+    }
+
     // Only move if fullDistance and maxMoveDistance have the same sign
     if ((fullDistance > 0 && maxMoveDistance > 0) || (fullDistance < 0 && maxMoveDistance < 0)) {
         // Move only up to maxMoveDistance in the correct direction
@@ -283,7 +306,11 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     tiles = MovableEntity::intersectingTiles(&copy);
     if (MovableEntity::areTilesWalkable(tiles)) {
         movableEntity->setOrigin(copy.origin);
-        if (std::fabs(currentAxisVal - closestAxisVal) < 0.0001f) hit = true;
+
+        // Update current position from the modified copy
+        float newAxisVal = (axis == 'x') ? copy.getOrigin().x : copy.getOrigin().z;
+        if (std::fabs(newAxisVal - closestAxisVal) < 0.0001f) hit = true;
+
         if (distanceToMove != 0.f) moved = true;
         return true;
     }
@@ -309,6 +336,15 @@ Tile* MovableEntity::nextTile(MoveDir moveDir, Tile* currentTile) {
         return currentTile;
     }
     return nextTile;
+}
+
+MoveDir MovableEntity::dirToTile(Tile* fromTile, Tile* toTile) {
+    if (!fromTile || !toTile) return MoveDir::NONE;
+    if (fromTile->getTileUp() == toTile) return MoveDir::FWD;
+    if (fromTile->getTileDown() == toTile) return MoveDir::BWD;
+    if (fromTile->getTileLeft() == toTile) return MoveDir::LEFT;
+    if (fromTile->getTileRight() == toTile) return MoveDir::RIGHT;
+    return MoveDir::NONE; // Not adjacent
 }
 
 Tile* MovableEntity::nextTileInDirection(MoveDir moveDir, Tile* currentTile) {
@@ -340,6 +376,34 @@ Tile* MovableEntity::nextTileInDirection(MoveDir moveDir, Tile* currentTile) {
     return currentTile;
 }
 
+bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles) {
+    moved = false;
+    inCenter = false;
+
+    // Determine the current tile the entity is on
+    Tile* tileCurrent = currentTile(intersectingTiles);
+    assert(tileCurrent && tileCurrent->isWalkable());
+
+    // Identify the tile in the current movement direction
+    Tile* tileToBeHit = nextTileInDirection(moveDir, tileCurrent);
+    if (!tileToBeHit || !tileToBeHit->isWalkable()) {
+        // Abort movement if next tile is invalid or not walkable
+        return false;
+    }
+
+    // Get movement axis and adjust speed for current direction
+    float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
+    char axis = axisForDirection(moveDir);
+
+    bool hit = false;
+    // Move toward the next closest tile; set canTurn if destination reached
+    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, inCenter, moved, true)) {
+        return true;
+    }
+
+    return false;
+}
+
 Point3D MovableEntity::tileCenteredOrigin(const Tile* tile) const {
     Point3D tileAlignedOrigin = Point3D(tile->getOrigin());
     tileAlignedOrigin.move((MapFactory::TILE_SIZE - this->boundingBox.getSizeX()) / 2, 0, (MapFactory::TILE_SIZE - this->boundingBox.getSizeY()) / 2);
@@ -367,7 +431,6 @@ std::vector<Tile*> MovableEntity::intersectingTiles(const MovableEntity* movable
 
 Tile* MovableEntity::closestTile(const MovableEntity* movableEntity, const std::vector<Tile*>& tiles, float& distance) {
     Point3D entityOrigin = movableEntity->getOrigin();
-    BoundingBox3D bbox = movableEntity->getBoundingBox();
 
     Tile* closestTile = nullptr;
     float closestDist = FLT_MAX;

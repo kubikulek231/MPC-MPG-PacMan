@@ -15,6 +15,7 @@ public:
 	static constexpr float PLAYER_SPEED = 2.5f;
 	static constexpr float SNAP_DISTANCE = 0.05f;
     static void update();
+	static void init();
 };
 
 #endif

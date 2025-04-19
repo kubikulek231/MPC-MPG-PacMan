@@ -1,6 +1,9 @@
 #include "Ghost.h"
 #include <GL/glut.h>
 #include <random>
+#include <queue>
+#include <iostream>
+#include <unordered_set>
 
 Ghost::Ghost() {
 }
@@ -10,7 +13,7 @@ Ghost::Ghost(const Ghost& other) {
     this->origin = other.origin;
 }
 
-Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox) 
+Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std::string name) 
 : MovableEntity(map,
                 ghostOrigin,
                 ghostBoundingBox,
@@ -19,6 +22,7 @@ Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox)
                 Ghost::DEFAULT_SNAP_DISTANCE,
                 Ghost::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE,
                 Ghost::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS) {
+    this->name = name;
 }
 
 void Ghost::render() {
@@ -33,10 +37,69 @@ void Ghost::render() {
     glPopMatrix();
 
     renderBoundingBox();
-    renderOrigin();
+    renderOrigin(); 
 }
 
-void Ghost::autoMove(float frameTimeMs) {
+void Ghost::moveToTile(float frameTimeMs, Tile* tile) {
+    std::cout << "current path to tile:" << std::endl;
+    if (!tile || !tile->isWalkable()) { return; }
+    for (auto tile : shortestPathToTile(tile)) {
+        std::cout << tile->toString() << std::endl;
+    }
+}
+
+// FIX THE BUG IN DETERMINING DIRECTION?
+void Ghost::moveOnPath(float frameTimeMs) {
+    std::cout << "current path:" << std::endl;
+    for (auto tile : movePath) {
+        std::cout << tile->toString() << std::endl;
+    }
+
+    std::vector<Tile*> tiles = intersectingTiles(this);
+    Tile* tile = currentTile(tiles);
+
+    if (!tile || movePath.empty()) {
+        moveDir = MoveDir::NONE;
+        return;
+    }
+
+    bool stopped;
+    if (this->name == "blinky") {
+        stopped = false;
+    }
+
+    // Do nothing when path is empty
+    if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) {
+        if (movePath.empty()) {
+            moveDir = MoveDir::NONE;
+            return;
+        }
+    }
+
+    Tile* nextTile = movePath.front();
+    // Get next moveDir
+    if (nextTile->isNeighbor(tile)) {
+        // If the current tile and next tile differ, get the moveDir
+        moveDir = dirToTile(tile, nextTile);
+    }
+
+    bool moved = false;
+    bool inCenter = false;
+    this->preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
+    tile = currentTile(tiles);
+    if (inCenter && movePath.front()->isEqual(tile)) {
+        movePath.pop_front();
+    }
+}
+
+void Ghost::createPathToTile(Tile* tile) {
+    this->movePath = shortestPathToTile(tile);
+    auto tiles = this->intersectingTiles(this);
+    auto entityTile = currentTile(tiles);
+    if (movePath.size() > 0 && movePath.front() == entityTile) { movePath.pop_front(); }
+}
+
+void Ghost::randomMove(float frameTimeMs) {
     bool moved = false;
     bool turning = false;
     bool canTurn = false;
@@ -99,4 +162,140 @@ bool Ghost::randomBoolWithChance(float chance) {
     static std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
     return dist(gen) < chance;
+}
+
+std::deque<Tile*> Ghost::shortestPathToTile(Tile* targetTile) {
+    if (!targetTile || !targetTile->isWalkable()) return {};
+
+    auto currentTiles = intersectingTiles(this);
+    Tile* startTile = this->currentTile(currentTiles);
+    if (!startTile) return {};
+
+    std::unordered_map<Tile*, Tile*> cameFrom;
+    std::unordered_map<Tile*, float> gScore;
+    std::unordered_map<Tile*, float> fScore;
+
+    auto cmp = [&](Tile* a, Tile* b) {
+        return fScore[a] > fScore[b];
+        };
+
+    std::priority_queue<Tile*, std::vector<Tile*>, decltype(cmp)> openSet(cmp);
+    std::unordered_set<Tile*> openSetLookup;
+
+    gScore[startTile] = 0.0f;
+    fScore[startTile] = heuristicCost(startTile, targetTile);
+    openSet.push(startTile);
+    openSetLookup.insert(startTile);
+
+    while (!openSet.empty()) {
+        Tile* current = openSet.top();
+        openSet.pop();
+        openSetLookup.erase(current);
+
+        if (current->getTileRow() == targetTile->getTileRow() &&
+            current->getTileCol() == targetTile->getTileCol()) {
+            return reconstructPath(cameFrom, current);
+        }
+
+        for (Tile* neighbor : getNeighbors(current)) {
+
+            float tentativeG = gScore[current] + distance(current, neighbor);
+            if (!gScore.count(neighbor) || tentativeG < gScore[neighbor]) {
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentativeG;
+                fScore[neighbor] = tentativeG + heuristicCost(neighbor, targetTile);
+
+                if (!openSetLookup.count(neighbor)) {
+                    openSet.push(neighbor);
+                    openSetLookup.insert(neighbor);
+                }
+            }
+        }
+    }
+
+    return {}; // No path found
+}
+
+float Ghost::distance(Tile* a, Tile* b) {
+    return 1.0f; // constant for grid-based movement
+}
+
+float Ghost::heuristicCost(Tile* a, Tile* b) {
+    return std::abs(a->getTileRow() - b->getTileRow()) + std::abs(a->getTileCol() - b->getTileCol()); // Manhattan Distance
+}
+
+std::vector<Tile*> Ghost::getNeighbors(Tile* tile) {
+    std::vector<Tile*> neighbors;
+    Tile* up = tile->getTileUp();
+    if (up && up->isWalkable()) neighbors.push_back(up);
+    Tile* down = tile->getTileDown();
+    if (down && down->isWalkable()) neighbors.push_back(down);
+    Tile* left = tile->getTileLeft();
+    if (left && left->isWalkable()) neighbors.push_back(left);
+    Tile* right = tile->getTileRight();
+    if (right && right->isWalkable()) neighbors.push_back(right);
+    return neighbors;
+}
+
+std::deque<Tile*> Ghost::reconstructPath(std::unordered_map<Tile*, Tile*> cameFrom, Tile* current)
+{
+    std::deque<Tile*> path;
+    while (cameFrom.find(current) != cameFrom.end()) {
+        path.push_back(current);
+        current = cameFrom[current];
+    }
+    std::reverse(path.begin(), path.end());
+    return path;
+}
+
+Tile* Ghost::furthestTileTowardCorner(MapCorner corner) {
+    Tile* bestTile = nullptr;
+    float maxDistance = -1.0f;
+
+    auto currentTiles = intersectingTiles(this);
+    Tile* startTile = currentTile(currentTiles);
+    if (!startTile) return nullptr;
+
+    int startRow = startTile->getTileRow();
+    int startCol = startTile->getTileCol();
+
+    int numRows = MapFactory::MAP_HEIGHT;
+    int numCols = MapFactory::MAP_WIDTH;
+
+    for (int r = 0; r < numRows; ++r) {
+        for (int c = 0; c < numCols; ++c) {
+            Tile* candidate = map->getTileAt(r, c);
+            if (!candidate || !candidate->isWalkable()) continue;
+
+            // Filter based on direction to the corner
+            switch (corner) {
+            case MapCorner::TOP_LEFT:
+                if (r > startRow || c > startCol) continue;
+                break;
+            case MapCorner::TOP_RIGHT:
+                if (r > startRow || c < startCol) continue;
+                break;
+            case MapCorner::BOTTOM_LEFT:
+                if (r < startRow || c > startCol) continue;
+                break;
+            case MapCorner::BOTTOM_RIGHT:
+                if (r < startRow || c < startCol) continue;
+                break;
+            }
+
+            // Use geometric (Manhattan) distance
+            float distance = heuristicCost(startTile, candidate);
+
+            // Optional: only consider reachable ones
+            auto path = shortestPathToTile(candidate);
+            if (path.empty()) continue;
+
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                bestTile = candidate;
+            }
+        }
+    }
+
+    return bestTile;
 }

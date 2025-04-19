@@ -29,6 +29,13 @@ Tile* Map::getTileWithPoint3D(Point3D point) {
     return nullptr;
 }
 
+Tile* Map::getTileAt(int row, int col) {
+    if (row >= 0 && row < height && col >= 0 && col < width) {
+        return &grid[row][col];
+    }
+    return nullptr; // Out of bounds
+}
+
 // Returns absoluteBoundingBox intersecting tiles 
 std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingBox) {
     std::vector<Tile*> intersectedTiles;
@@ -68,7 +75,7 @@ void Map::render(bool resetHighlighted, int resetTimerMs) {
     glPushMatrix();
     glutSolidSphere(0.15f, 16, 16); // Origin marker
     glPopMatrix();
-
+    drawCenterAxes(2.0f);
     if (resetHighlighted) {
         Map::scheduleHighlightReset(resetTimerMs);
     }
@@ -77,22 +84,44 @@ void Map::render(bool resetHighlighted, int resetTimerMs) {
         for (const Tile& tile : tileRow) {
             tile.renderOrigin();
             tile.render();
-            // renderTileCoordinates(&tile);
+            renderTileCoordinates(&tile);
         }
+    }
+}
+
+void Map::renderWorldCoordinates(const Tile* tile) {
+    BoundingBox3D abb = tile->getAbsoluteBoundingBox();
+    // Render tile coordinate text at center
+    float textX = abb.min.x + 0.1f;
+    float textY = abb.min.y + 0.01f; // Slightly above floor
+    float textZ = abb.min.z + 0.1f;
+    std::ostringstream oss;
+
+    oss << "("
+        << std::fixed << std::setprecision(2) << "X: " << abb.min.x << ", "
+        << std::fixed << std::setprecision(2) << "Z: " << abb.min.z
+        << ")";
+    std::string coordStr = oss.str();
+
+    glColor3f(1.0f, 1.0f, 1.0f); // White text
+
+    glRasterPos3f(textX, textY, textZ);
+    for (char c : coordStr) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c);
     }
 }
 
 void Map::renderTileCoordinates(const Tile* tile) {
     BoundingBox3D abb = tile->getAbsoluteBoundingBox();
     // Render tile coordinate text at center
-    float textX = (abb.min.x + abb.max.x) / 2.0f;
+    float textX = abb.min.x + 0.1f;
     float textY = abb.min.y + 0.01f; // Slightly above floor
-    float textZ = (abb.min.z + abb.max.z) / 2.0f;
+    float textZ = abb.min.z + 0.1f;
     std::ostringstream oss;
 
     oss << "("
-        << std::fixed << std::setprecision(2) << abb.min.x << ","
-        << std::fixed << std::setprecision(2) << abb.min.z
+        << std::fixed << std::setprecision(2) << "R: " << tile->getTileRow() << ", "
+        << std::fixed << std::setprecision(2) << "C: " << tile->getTileCol()
         << ")";
     std::string coordStr = oss.str();
 
@@ -123,4 +152,40 @@ void Map::scheduleHighlightReset(int delay) {
             }, 0);
         isHighlightResetScheduled = true;
     }
+}
+
+void Map::drawCenterAxes(float length) {
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+
+    // X-axis (Red)
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(length, 0.0f, 0.0f);
+
+    // Y-axis (Green)
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, length, 0.0f);
+
+    // Z-axis (Blue)
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, length);
+
+    glEnd();
+    glLineWidth(1.0f); // Reset to default
+
+    // Axis labels
+    glColor3f(1.0f, 0.0f, 0.0f); // X label
+    glRasterPos3f(length + 0.1f, 0.0f, 0.0f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'X');
+
+    glColor3f(0.0f, 1.0f, 0.0f); // Y label
+    glRasterPos3f(0.0f, length + 0.1f, 0.0f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'Y');
+
+    glColor3f(0.0f, 0.0f, 1.0f); // Z label
+    glRasterPos3f(0.0f, 0.0f, length + 0.1f);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'Z');
 }

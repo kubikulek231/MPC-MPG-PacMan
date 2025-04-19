@@ -44,7 +44,9 @@ void Game::update(int value) {
     game.lastFrameTimeDeltaSeconds = newFrameTimeSeconds - game.lastFrameTimeSeconds;
     game.lastFrameTimeSeconds = newFrameTimeSeconds;
 
-    GameLogic::update();
+    GameLogic::updatePlayer();
+    GameLogic::updateGhosts();
+    GameLogic::updateScore();
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();

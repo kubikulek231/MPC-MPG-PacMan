@@ -14,7 +14,9 @@ class GameLogic {
 public:
 	static constexpr float PLAYER_SPEED = 2.5f;
 	static constexpr float SNAP_DISTANCE = 0.05f;
-    static void update();
+	static void updateScore();
+    static void updatePlayer();
+    static void updateGhosts();
 	static void init();
 };
 

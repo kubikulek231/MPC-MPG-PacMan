@@ -34,3 +34,12 @@ void Player::render() {
     renderBoundingBox();
     renderOrigin();
 }
+
+void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs, int &totalCollectedPellets) {
+    this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
+    // Collect pellets
+    auto tiles = this->intersectingTiles(this);
+    if (map->collectPellet(currentTile(tiles))) {
+        totalCollectedPellets++;
+    }
+}

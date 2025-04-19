@@ -11,11 +11,12 @@
 Map::Map() {
 }
 
-Map::Map(std::vector<std::vector<Tile>> mapGrid, float tileSize) {
+Map::Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellets) {
     this->grid = mapGrid;
     this->height = mapGrid.size();  // Number of rows
     this->width = (this->height > 0) ? mapGrid[0].size() : 0;  // Number of columns (checking if the grid is not empty)
     this->tileSize = tileSize;
+    this->totalPellets = totalPellets;
 }
 
 Tile* Map::getTileWithPoint3D(Point3D point) {
@@ -219,4 +220,19 @@ void Map::drawCenterAxes(float length) {
     glColor3f(0.0f, 0.0f, 1.0f); // Z label
     glRasterPos3f(0.0f, 0.0f, length + 0.1f);
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, 'Z');
+}
+
+bool Map::areAllPelletsCollected() const {
+    if (totalPellets == mapCollectedPellets) {
+        return true;
+    }
+    return false;
+}
+
+bool Map::collectPellet(Tile* tile) {
+    if (tile->collectPellet()) {
+        mapCollectedPellets++;
+        return true;
+    }
+    return false;
 }

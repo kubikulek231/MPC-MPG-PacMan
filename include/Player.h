@@ -15,6 +15,7 @@ public:
     Player(const Player& other);
     Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox);
     virtual void render();
+    void move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs, int &collectedPellets);
 };
 
 #endif // PLAYER_H

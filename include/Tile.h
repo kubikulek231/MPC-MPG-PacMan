@@ -16,8 +16,9 @@ enum class TileType {
 class Tile : public Entity {
 public:
     Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
+    bool collectPellet();
+    
     bool isWalkable() const;
-    void setType(TileType tileType);
     std::string getTileTypeString();
     TileType getTileType() const;
     Point3D getCenterPoint() const;
@@ -49,6 +50,7 @@ public:
     bool isEqual(const Tile* other) const;
     bool isNeighbor(const Tile* other) const;
 private:
+    void setTileType(TileType tileType);
     int tileRow;
     int tileCol;
     TileType tileType;

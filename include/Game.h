@@ -55,6 +55,8 @@ public:
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
     void setMoveSpeed(float speed) { moveSpeed = speed; }
+
+    int gameCollectedPellets = 0;
 private:
     Game() = default;
     Game(const Game&) = delete;  // Prevent copy constructor
@@ -82,6 +84,8 @@ private:
     int lastMouseX, lastMouseY;  // To track the last mouse position
     float moveSpeed = 2.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
+
+    int playerLives = 3;
 };
 
 #endif // GAME_H

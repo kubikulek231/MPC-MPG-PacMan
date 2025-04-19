@@ -21,11 +21,31 @@ void GameLogic::init() {
 	}
 }
 
-void GameLogic::update() {
+void GameLogic::updateScore() {
+	Game& game = Game::getInstance();
+	Map& map = *game.getMap();
+	std::cout << "Total collected pellets: " << game.gameCollectedPellets << std::endl;
+	if (map.areAllPelletsCollected()) {
+		std::cout << "GAME WON!" << std::endl;
+		std::cout << "Collected pellets: " << game.gameCollectedPellets << std::endl;
+		while (true);
+	}
+}
+
+void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
 	MoveDir& moveDir = *game.getMoveDir();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
-	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs, game.gameCollectedPellets);
+}
+
+void GameLogic::updateGhosts() {
+	Game& game = Game::getInstance();
+	MoveDir& moveDir = *game.getMoveDir();
+	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
+
+	// Do not update ghost movement until player chooses moveDir
+	if (moveDir == MoveDir::UNDEFINED) { return; }
 
 	// Render ghosts
 	auto& ghosts = game.getGhosts();

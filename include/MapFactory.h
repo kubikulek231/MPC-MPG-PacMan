@@ -20,6 +20,7 @@ private:
     void generateEmptyMapFile(const std::string& filename);
     void createDefaultGrid();
     void setTileNeighbors();
+    int getTotalGridPellets();
 };
 
 #endif // MAP_FACTORY_H

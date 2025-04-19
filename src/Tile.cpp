@@ -12,12 +12,20 @@ Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox,
 	this->tileType = tileType;
 }
 
+bool Tile::collectPellet() {
+	if (tileType == TileType::PELLET) {
+		this->setTileType(TileType::EMPTY);
+		return true;
+	}
+	return false;
+}
+
 bool Tile::isWalkable() const {
 	if (tileType == TileType::PELLET || tileType == TileType::EMPTY) return true;
 	return false;
 }
 
-void Tile::setType(TileType tileType) {
+void Tile::setTileType(TileType tileType) {
 	this->tileType = tileType;
 }
 

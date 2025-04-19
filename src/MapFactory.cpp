@@ -13,7 +13,7 @@ MapFactory::MapFactory() {
 Map MapFactory::createMap() {
     generateEmptyMapFile("assets\\maps\\blank.map");
     loadMapFile("assets\\maps\\1.map");
-    return Map(grid, TILE_SIZE);
+    return Map(grid, TILE_SIZE, getTotalGridPellets());
 }
 
 void MapFactory::createDefaultGrid() {
@@ -60,6 +60,21 @@ void MapFactory::setTileNeighbors() {
         }
     }
 }
+
+int MapFactory::getTotalGridPellets() {
+    int totalPellets = 0;
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            const Tile* tile = &grid[y][x];
+            if (tile->getTileType() == TileType::PELLET) {
+                totalPellets++;
+            }
+        }
+    }
+    return totalPellets;
+}
+
+
 bool MapFactory::isValidCoord(int x, int y) {
     return x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT;
 }

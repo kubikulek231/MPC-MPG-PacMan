@@ -16,7 +16,7 @@ enum class MapCorner {
 class Map {
 public:
     Map();
-    Map(std::vector<std::vector<Tile>> mapGrid, float tileSize);
+    Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellets);
     void render(bool resetHighlighted = false, int resetTimerMs = 5000);  // Draws the map
     Tile* getTileWithPoint3D(Point3D point);
     Tile* getTileAt(int row, int col);
@@ -30,7 +30,10 @@ public:
         MapCorner::BOTTOM_LEFT,
         MapCorner::BOTTOM_RIGHT
     };
+    bool areAllPelletsCollected() const;
+    bool collectPellet(Tile* tile);
 private:
+    int totalPellets;
     std::vector<std::vector<Tile>> grid;
     int width;
     int height;
@@ -39,6 +42,7 @@ private:
     void renderWorldCoordinates(const Tile* tile);
     void renderTileCoordinates(const Tile* tile);
     void drawCenterAxes(float length = 2.0f);
+    int mapCollectedPellets = 0;
 };
 
 #endif // MAP_H

@@ -41,22 +41,12 @@ void Ghost::render() {
 }
 
 void Ghost::moveOnPath(float frameTimeMs) {
-    std::cout << "current path:" << std::endl;
-    for (auto tile : movePath) {
-        std::cout << tile->toString() << std::endl;
-    }
-
     std::vector<Tile*> tiles = intersectingTiles(this);
     Tile* tile = currentTile(tiles);
 
     if (!tile || movePath.empty()) {
         moveDir = MoveDir::NONE;
         return;
-    }
-
-    bool stopped;
-    if (this->name == "blinky") {
-        stopped = false;
     }
 
     // Do nothing when path is empty

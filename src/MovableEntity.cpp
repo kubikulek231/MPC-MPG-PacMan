@@ -37,15 +37,16 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 
 // === Movement Interface ===
-void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
     if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
         // Set initial moveDir
         if (requestedMoveDir != MoveDir::NONE && requestedMoveDir != MoveDir::UNDEFINED) {
             moveDir = requestedMoveDir;
         }
         // No requstedMoveDir nor moveDir
-        return;
+        return false;
     }
+    bool moved;
     // std::cout << this->toString() << std::endl; // Debug entity movement
     Tile* tile = currentTile(intersectingTiles(this));
     if (tile) { tile->setHighlight(true); }
@@ -64,9 +65,8 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
 
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
-        bool _;
-        MovableEntity::preciseMove(moveDir, frameTimeMs, _);
-        return;
+        MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+        return moved;
     }
 
     // Try to follow a pending direction change
@@ -77,22 +77,20 @@ void MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         // Change the direction right away if request is the same axis
         if (axisForDirection(requestedDir) == axisForDirection(moveDir)) {
             moveDir = requestedDir;
-            bool _;
-            MovableEntity::preciseMove(moveDir, frameTimeMs, _);
-            return;
+            MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+            return moved;
         }
-        bool _;
-        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, _, intersectingTiles)) {
+        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, moved, intersectingTiles)) {
             if (canTurn) {
                 moveDir = requestedDir;
                 MovableEntity::clearDirChangeRequest();
             }
-            return;
+            return moved;
         }
     }
     // If every attempt fails, keep moving in the same direction
-    bool _;
-    MovableEntity::preciseMove(moveDir, frameTimeMs, _);
+    MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+    return moved;
 }
 
 float MovableEntity::getMoveSpeed() const { return speed; }

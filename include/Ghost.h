@@ -13,6 +13,7 @@ private:
     static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = false;
     static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
     MoveDir randomDirection();
+    MoveDir randomTurnDirection();
     bool randomBool();
     bool randomBoolWithChance(float chance = 0.2f);
 
@@ -36,8 +37,8 @@ public:
     void render();
     void createPathToTile(Tile* tile);
     void moveOnPath(float frameTimeMs);
-    void moveToTile(float frameTimeMs, Tile* tile);
     void randomMove(float frameTimeMs);
+    void moveOnRandomPath(float frameTimeMs);
     void setColor(float r, float g, float b) {
         colorR = r;
         colorG = g;

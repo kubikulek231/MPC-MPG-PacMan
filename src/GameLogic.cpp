@@ -36,6 +36,6 @@ void GameLogic::update() {
 			continue;
 		}
 		// Move randomly if path is empty
-		ghost->randomMove(lastFrameTimeMs);
+		ghost->moveOnRandomPath(lastFrameTimeMs);
 	}
 }

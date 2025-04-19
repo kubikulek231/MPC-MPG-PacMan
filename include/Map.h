@@ -23,6 +23,7 @@ public:
     std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* boundingBox);
     void resetHighlightedTiles();
     void scheduleHighlightReset(int delay);
+    Tile* getRandomTile();
     std::vector<MapCorner> corners = {
         MapCorner::TOP_LEFT,
         MapCorner::TOP_RIGHT,

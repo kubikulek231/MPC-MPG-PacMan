@@ -34,7 +34,7 @@ public:
     MovableEntity(const MovableEntity& other);
 
     // === Movement Interface ===
-    void move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs);
+    bool move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs);
     void setMoveSpeed(float speed);
     float getMoveSpeed() const;
 

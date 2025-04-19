@@ -40,15 +40,6 @@ void Ghost::render() {
     renderOrigin(); 
 }
 
-void Ghost::moveToTile(float frameTimeMs, Tile* tile) {
-    std::cout << "current path to tile:" << std::endl;
-    if (!tile || !tile->isWalkable()) { return; }
-    for (auto tile : shortestPathToTile(tile)) {
-        std::cout << tile->toString() << std::endl;
-    }
-}
-
-// FIX THE BUG IN DETERMINING DIRECTION?
 void Ghost::moveOnPath(float frameTimeMs) {
     std::cout << "current path:" << std::endl;
     for (auto tile : movePath) {
@@ -100,38 +91,31 @@ void Ghost::createPathToTile(Tile* tile) {
 }
 
 void Ghost::randomMove(float frameTimeMs) {
-    bool moved = false;
-    bool turning = false;
-    bool canTurn = false;
-    std::vector<Tile*> tiles = intersectingTiles(this);
-    while (true) {
-        if (moveDir == MoveDir::NONE) {
-            moveDir = randomDirection();
-            continue;
-        }
-        if (randomBoolWithChance(0.1)) {
-            turning = true;
-        }
-
-        if (turning) {
-            this->preciseMoveUntilCanTurn(moveDir, frameTimeMs, canTurn, moved, tiles);
-            if (canTurn) {
-                // Choose a direction to turn
-                moveDir = randomDirection();
-                turning = false;
-                return;
-            }
-            return;
-        }
-
-        this->preciseMove(moveDir, frameTimeMs, moved);
-        if (moved) { break; }
+    bool change = true;
+    // Set initial direction
+    if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
         moveDir = randomDirection();
-        if (randomBoolWithChance(0.05)) {
-            turning = true;
-        }
     }
-    return;
+    change = true;
+    while (!this->move(moveDir, change, frameTimeMs)) {
+        moveDir = randomTurnDirection();
+    }
+}
+
+void Ghost::moveOnRandomPath(float frameTimeMs) {
+    if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
+        moveDir = randomDirection();
+    }
+
+    if (!movePath.empty()) {
+        moveOnPath(frameTimeMs);
+    }
+
+    // Pick new path
+    while (movePath.empty()) {
+        Tile* tile = map->getRandomTile();
+        this->createPathToTile(tile);
+    }
 }
 
 MoveDir Ghost::randomDirection() {
@@ -145,6 +129,22 @@ MoveDir Ghost::randomDirection() {
     case 1: return MoveDir::BWD;
     case 2: return MoveDir::LEFT;
     case 3: return MoveDir::RIGHT;
+    }
+}
+
+MoveDir Ghost::randomTurnDirection() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(0, 1); // binary choice
+
+    int random = dist(gen);
+    switch (moveDir) {
+    case MoveDir::FWD:
+    case MoveDir::BWD:
+        return (random == 0) ? MoveDir::LEFT : MoveDir::RIGHT;
+    case MoveDir::LEFT:
+    case MoveDir::RIGHT:
+        return (random == 0) ? MoveDir::FWD : MoveDir::BWD;
     }
 }
 

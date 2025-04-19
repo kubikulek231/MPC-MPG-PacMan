@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <iostream>
 #include "Game.h"
+#include <random>
+
 
 Map::Map() {
 }
@@ -153,6 +155,35 @@ void Map::scheduleHighlightReset(int delay) {
         isHighlightResetScheduled = true;
     }
 }
+
+Tile* Map::getRandomTile() {
+    if (height == 0 || width == 0) return nullptr;
+
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> rowDist(0, height - 1);
+    std::uniform_int_distribution<> colDist(0, width - 1);
+
+    Tile* tile = nullptr;
+    int attempts = 0;
+    const int maxAttempts = 100;
+
+    // Optional: Try to pick a walkable tile
+    while (attempts < maxAttempts) {
+        int row = rowDist(gen);
+        int col = colDist(gen);
+        tile = &grid[row][col];
+
+        if (tile && tile->isWalkable()) {
+            return tile;
+        }
+
+        attempts++;
+    }
+
+    return nullptr; // Fallback if no walkable tile found after maxAttempts
+}
+
 
 void Map::drawCenterAxes(float length) {
     glLineWidth(2.0f);

@@ -73,7 +73,7 @@ protected:
     bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
     bool preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles);
     bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved, bool proceedToNextTile = false);
-    void teleport();
+    void teleport(MoveDir moveDir);
     Point3D furthestPossibleEntityOriginPoint(MoveDir moveDir, Tile* currentTile);
     bool headingOutOfMap(MoveDir moveDir, Tile* currentTile);
 

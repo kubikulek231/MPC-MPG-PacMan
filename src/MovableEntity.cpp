@@ -334,14 +334,19 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     return false;
 }
 
-void MovableEntity::teleport() {
+void MovableEntity::teleport(MoveDir moveDir) {
     auto tiles = this->intersectingTiles(this);
     Tile* tile = this->currentTile(tiles);
     if (!tile) return;
 
-
     // Only teleport if the next tile is a teleport
     if (!tile || tile->getTileType() != TileType::TELEPORT) return;
+
+    Point3D teleportPoint = furthestPossibleEntityOriginPoint(moveDir, tile);
+
+    char movingAxis = axisForDirection(moveDir);
+
+    if (teleportPoint.getAxisValue(movingAxis) != this->getOrigin().getAxisValue(movingAxis)) { return; }
 
     Tile* targetTile = nullptr;
 
@@ -351,19 +356,19 @@ void MovableEntity::teleport() {
     switch (moveDir) {
     case MoveDir::FWD:
         targetTile = tile->getTileUp();
-        originOffsetX = -0.01;
+        originOffsetZ = -0.01;
         break;
     case MoveDir::BWD:
         targetTile = tile->getTileDown();
-        originOffsetX = 0.01;
+        originOffsetZ = +0.01;
         break;
     case MoveDir::LEFT:
         targetTile = tile->getTileLeft();
-        originOffsetZ = 0.01;
+        originOffsetX = +0.3;
         break;
     case MoveDir::RIGHT:
         targetTile = tile->getTileRight();
-        originOffsetZ = -0.01;
+        originOffsetX = -0.3;
         break;
     default:
         return;
@@ -506,7 +511,9 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
 
     // Identify the tile in the current movement direction
     Tile* tileToBeHit = nextTileInDirection(moveDir, tileCurrent);
-    if (!tileToBeHit || !tileToBeHit->isWalkable()) {
+    bool headingOut = headingOutOfMap(moveDir, tileCurrent);
+
+    if (!headingOut && (!tileToBeHit || !tileToBeHit->isWalkable())) {
         // Abort movement if next tile is invalid or not walkable
         return false;
     }
@@ -514,6 +521,12 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
     // Get movement axis and adjust speed for current direction
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
+    bool _;
+
+    if (headingOut) {
+        preciseMove(moveDir, frameTimeMs, _);
+        return true;
+    }
 
     // Move toward the next closest tile; set canTurn if destination reached
     if (tryMoveToNextClosestTile(moveDir, this, axis, speed, inCenter, moved, true)) {

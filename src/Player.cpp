@@ -36,8 +36,8 @@ void Player::render() {
 }
 
 void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs, int &totalCollectedPellets) {
-    if (!this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs)) {
-    };
+    this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
+    this->teleport(moveDir);
     // Collect pellets
     auto tiles = this->intersectingTiles(this);
     auto tile = currentTile(tiles);

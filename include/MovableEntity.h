@@ -18,7 +18,7 @@ public:
     static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;
     static const MoveDir DEFAULT_MOVE_DIR;
     static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = false;
-    static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
+    static constexpr uint64_t DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
     static constexpr float MAX_NORMALIZED_SPEED = MapFactory::TILE_SIZE / 2.0f;
 
     // === Constructors ===
@@ -30,13 +30,14 @@ public:
         float speed = DEFAULT_SPEED,
         float snapDistance = DEFAULT_SNAP_DISTANCE,
         bool dirChangeRequestExpire = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE,
-        float dirChangeRequestExpireAfterMs = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS);
+        uint64_t dirChangeRequestExpireAfterMs = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS);
     MovableEntity(const MovableEntity& other);
 
     // === Movement Interface ===
     bool move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs);
     void setMoveSpeed(float speed);
     float getMoveSpeed() const;
+    void setDirChangeRequestExpireAfterMs(uint64_t expireAfter) { this->dirChangeRequestExpireAfterMs = expireAfter; }
 
 protected:
     // === State ===
@@ -46,7 +47,7 @@ protected:
     float speed = DEFAULT_SPEED;
     float snapDistance = DEFAULT_SNAP_DISTANCE;
     bool dirChangeRequestExpire = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE;
-    float dirChangeRequestExpireAfterMs = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS;
+    uint64_t dirChangeRequestExpireAfterMs = DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS;
 
     // === Direction Change Management ===
     void createDirChangeRequest(MoveDir moveDir, float expireAfterMs, bool expire = true);

@@ -10,6 +10,9 @@ Player::Player() {
 Player::Player(const Player& other) {
     this->boundingBox = other.boundingBox;
     this->origin = other.origin;
+
+    this->blinkDurationMs = DEFAULT_BLINK_DURATION_MS;
+    this->invincibleEndTimeAfterMs = DEFAULT_INVINCIBLE_EXPIRE_AFTER_MS;
 }
 
 Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox) 
@@ -21,6 +24,9 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
                 Player::DEFAULT_SNAP_DISTANCE,
                 Player::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE,
                 Player::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS) {
+
+    this->blinkDurationMs = DEFAULT_BLINK_DURATION_MS;
+    this->invincibleEndTimeAfterMs = DEFAULT_INVINCIBLE_EXPIRE_AFTER_MS;
 }
 
 void Player::render() {
@@ -60,16 +66,16 @@ void Player::update(int& totalCollectedPellets) {
         if (currentTimeMs > invincibleEndTimeMs) { isInvincible = false; }
         if (currentTimeMs > nextBlinkTimeMs) {
             invincibleBlink = !invincibleBlink;
-            nextBlinkTimeMs = currentTimeMs + BLINK_DURATION_MS;
+            nextBlinkTimeMs = currentTimeMs + blinkDurationMs;
         }
         if (invincibleBlink) { playerBodyColorBlue = 1.0f; }
         else { playerBodyColorBlue = 0.0f; }
     }
 }
 
-void Player::setIsInvincible(uint64_t durationMs) {
+void Player::setIsInvincible() {
     uint64_t currentTime = getTimeMs();
-    invincibleEndTimeMs = currentTime + durationMs;
+    invincibleEndTimeMs = currentTime + invincibleEndTimeAfterMs;
     isInvincible = true;
 }
 

@@ -76,7 +76,7 @@ void GameLogic::updatePlayerLives() {
 		Ghost* ghost = ghosts[i];
 		if (ghost->intersects(player)) {
 			game.setPlayerLives(game.getPlayerLives() - 1);
-			player.setIsInvincible(3000);
+			player.setIsInvincible();
 		}
 	}
 }

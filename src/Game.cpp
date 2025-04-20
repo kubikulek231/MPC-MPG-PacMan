@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "GameLogic.h"
+#include "math.h"
 
 // Inits new game
 void Game::init() {
@@ -40,7 +41,15 @@ void Game::initLevel(int level) {
     float levelSpeed = game.getBaseSpeed() + level * LEVEL_SPEED_INCREMENT;
     float ghostSpeed = levelSpeed * (1 + GHOST_SPEED_COMP);
 
+    uint64_t blinkDurationMs = Player::DEFAULT_BLINK_DURATION_MS * std::pow(LEVEL_DURATION_MULTIPLIER, level);
+    uint64_t dirChangeRequestExpireAfterMs = Player::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS * std::pow(LEVEL_DURATION_MULTIPLIER, level);
+    uint64_t invincibleExpireAfterMs = Player::DEFAULT_INVINCIBLE_EXPIRE_AFTER_MS * std::pow(LEVEL_DURATION_MULTIPLIER, level);
+
     player.setMoveSpeed(levelSpeed);
+    player.setDirChangeRequestExpireAfterMs(dirChangeRequestExpireAfterMs);
+    player.setBlinkDuration(blinkDurationMs);
+    player.setInvincibleExpireAfterMs(invincibleExpireAfterMs);
+
     pinky = Ghost(&map, pinkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "pinky");
     pinky.setColor(1.0, 0.5, 0.5);
     pinky.setMoveSpeed(ghostSpeed);

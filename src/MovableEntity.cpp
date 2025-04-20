@@ -15,7 +15,7 @@ MovableEntity::MovableEntity(Map* map,
                              float speed, 
                              float snapDistance,                  
                              bool dirChangeRequestExpire,
-                             float dirChangeRequestExpireAfterMs)
+                             uint64_t dirChangeRequestExpireAfterMs)
                              : Entity(origin, boundingBox) {
     this->map = map;
     this->moveDir = moveDir;
@@ -56,7 +56,7 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         MovableEntity::clearDirChangeRequest();
         // If actual direction and requested direction differ, set new change request
         if (requestedMoveDir != moveDir) {
-            createDirChangeRequest(requestedMoveDir, dirChangeRequestExpireAfterMs, dirChangeRequestExpire);
+            createDirChangeRequest(requestedMoveDir, this->dirChangeRequestExpireAfterMs, this->dirChangeRequestExpire);
         }
         isNewRequest = false;
     }

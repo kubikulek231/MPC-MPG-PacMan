@@ -16,7 +16,8 @@ public:
     }
 
     static constexpr float LEVEL_SPEED_INCREMENT = 0.5f;
-    static constexpr float GHOST_SPEED_COMP = 0.05f;
+    static constexpr float GHOST_SPEED_COMP = 0.1f;
+    static constexpr float LEVEL_DURATION_MULTIPLIER = 0.88f;
 
     void init();    // Init new game along with OpenGL settings
     void initLevel(int level = -1);
@@ -90,7 +91,7 @@ private:
     bool isLeftMousePressed = false; // To check if the left mouse button is pressed
     bool isMiddleMousePressed = false;
     int lastMouseX, lastMouseY;  // To track the last mouse position
-    float baseMoveSpeed = 2.5f;
+    float baseMoveSpeed = 3.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
     int currentLevel;

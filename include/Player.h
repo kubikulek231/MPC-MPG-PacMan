@@ -6,12 +6,6 @@
 
 class Player : public MovableEntity {
 private:
-    static constexpr float DEFAULT_SPEED = 4.0f;
-    static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;
-    static const MoveDir DEFAULT_MOVE_DIR = MoveDir::NONE;
-    static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = true;
-    static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
-    static constexpr int BLINK_DURATION_MS = 500;
     bool invincibleBlink = false;
     uint64_t nextBlinkTimeMs = 0;
     bool isInvincible = false;
@@ -22,6 +16,12 @@ private:
     float playerBodyColorBlue = 0.0f;
 
 public:
+    static constexpr float DEFAULT_SPEED = 4.0f;
+    static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;
+    static const MoveDir DEFAULT_MOVE_DIR = MoveDir::NONE;
+    static constexpr bool DEFAULT_DIR_CHANGE_REQUEST_EXPIRE = true;
+    static constexpr float DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS = 1000;
+    static constexpr int BLINK_DURATION_MS = 500;
     Player();
     Player(const Player& other);
     Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox);

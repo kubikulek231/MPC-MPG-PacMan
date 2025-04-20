@@ -15,6 +15,17 @@ void Game::init() {
     glutMotionFunc(GameControl::mouseMotion);
     glutKeyboardFunc(GameControl::keyboard);
 
+    currentLevel = 0;
+    playerLives = 100;
+
+    Game::initLevel();
+}
+
+void Game::initLevel(int level) {
+    Game& game = getInstance();
+    game.moveDir = MoveDir::NONE;
+
+    if (level < 0) { level = getCurrentLevel(); }
     mapFactory = MapFactory();
     map = mapFactory.createMap();
 
@@ -25,22 +36,32 @@ void Game::init() {
     Point3D clydeSpawnOrigin = map.getClydeSpawn()->getOrigin();
 
     player = Player(&map, playerSpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
-    moveDir = MoveDir::NONE;
+    
+    float levelSpeed = game.getBaseSpeed() + level * LEVEL_SPEED_INCREMENT;
+    float ghostSpeed = levelSpeed * (1 + GHOST_SPEED_COMP);
+
+    player.setMoveSpeed(levelSpeed);
     pinky = Ghost(&map, pinkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "pinky");
     pinky.setColor(1.0, 0.5, 0.5);
+    pinky.setMoveSpeed(ghostSpeed);
     blinky = Ghost(&map, blinkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "blinky");
     blinky.setColor(1.0, 0.0, 0.0);
+    blinky.setMoveSpeed(ghostSpeed);
     inky = Ghost(&map, inkySpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "inky");
     inky.setColor(0.0, 1.0, 1.0);
+    inky.setMoveSpeed(ghostSpeed);
     clyde = Ghost(&map, clydeSpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)), "clyde");
     clyde.setColor(1, 0.6, 0);
+    clyde.setMoveSpeed(ghostSpeed);
+    
+    ghosts.clear();
 
     ghosts.push_back(&pinky);
     ghosts.push_back(&blinky);
     ghosts.push_back(&inky);
     ghosts.push_back(&clyde);
 
-    GameLogic::init();
+    GameLogic::initLevel();
 }
 
 // Update positions, handle logic

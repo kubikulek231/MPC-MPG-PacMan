@@ -6,7 +6,7 @@
 #include "MoveDir.h"
 #include "Macro.h"
 
-void GameLogic::init() {
+void GameLogic::initLevel() {
 	// Create ghosts path to move them into corners
 	Game& game = Game::getInstance();
 	std::vector<Ghost*>& ghosts = game.getGhosts();
@@ -26,10 +26,13 @@ void GameLogic::updateScore() {
 	Game& game = Game::getInstance();
 	Map& map = *game.getMap();
 	std::cout << "Total collected pellets: " << game.gameCollectedPellets << std::endl;
-	if (map.areAllPelletsCollected()) {
+	if (game.gameCollectedPellets % 50 == 0) {
+		game.gameCollectedPellets = game.gameCollectedPellets + 1;
 		std::cout << "GAME WON!" << std::endl;
 		std::cout << "Collected pellets: " << game.gameCollectedPellets << std::endl;
-		while (true);
+		// Set new level
+		game.setCurrentLevel(game.getCurrentLevel() + 1);
+		game.initLevel();
 	}
 }
 
@@ -38,7 +41,7 @@ void GameLogic::updatePlayer() {
 	MoveDir& moveDir = *game.getMoveDir();
 	Player& player = *game.getPlayer();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
-	player.move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+	player.move(moveDir, game.getIsDirectionKeyPressed(), lastFrameTimeMs);
 	player.update(game.gameCollectedPellets);
 }
 
@@ -48,7 +51,7 @@ void GameLogic::updateGhosts() {
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
 
 	// Do not update ghost movement until player chooses moveDir
-	if (moveDir == MoveDir::UNDEFINED) { return; }
+	if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) { return; }
 
 	// Render ghosts
 	auto& ghosts = game.getGhosts();

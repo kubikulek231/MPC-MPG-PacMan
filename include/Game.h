@@ -15,7 +15,11 @@ public:
         return instance;
     }
 
+    static constexpr float LEVEL_SPEED_INCREMENT = 0.5f;
+    static constexpr float GHOST_SPEED_COMP = 0.05f;
+
     void init();    // Init new game along with OpenGL settings
+    void initLevel(int level = -1);
     static void update(int value = 0);  // Update game logic
     static void render();  // Display the game scene
 
@@ -38,8 +42,9 @@ public:
     bool& getIsDirectionKeyPressed() { return isDirectionKeyPressed; }
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
-    float getMoveSpeed() const { return moveSpeed; }
+    float getBaseSpeed() const { return baseMoveSpeed; }
     int getPlayerLives() const { return playerLives; }
+    int getCurrentLevel() const { return currentLevel; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -55,8 +60,9 @@ public:
     void setIsDirectionKeyPressed(bool changed) { isDirectionKeyPressed = changed; }
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
-    void setMoveSpeed(float speed) { moveSpeed = speed; }
+    void setBaseSpeed(float speed) { baseMoveSpeed = speed; }
     void setPlayerLives(int lives) { playerLives = lives; }
+    void setCurrentLevel(int level) { currentLevel = level; }
 
     int gameCollectedPellets = 0;
 private:
@@ -84,10 +90,10 @@ private:
     bool isLeftMousePressed = false; // To check if the left mouse button is pressed
     bool isMiddleMousePressed = false;
     int lastMouseX, lastMouseY;  // To track the last mouse position
-    float moveSpeed = 2.5f;
+    float baseMoveSpeed = 2.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
-
-    int playerLives = 3;
+    int playerLives;
+    int currentLevel;
 };
 
 #endif // GAME_H

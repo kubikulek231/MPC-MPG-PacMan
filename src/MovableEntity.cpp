@@ -291,10 +291,10 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     float size = (axis == 'x') ? copy.getBoundingBox().getSizeX() : copy.getBoundingBox().getSizeZ();
 
     float fullDistance = closestAxisVal - currentAxisVal;
-    float distanceToMove = 0.0f;
 
     // Already at the center of the tile, proceed to next in the direction if desired
     if (fullDistance == 0 && proceedToNextTile) {
+        copy = MovableEntity(*movableEntity);
         targetOrigin = entityCenteredOrigin(nextTile(moveDir, current));
         currentOrigin = copy.getOrigin();
 
@@ -304,9 +304,9 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
         size = (axis == 'x') ? copy.getBoundingBox().getSizeX() : copy.getBoundingBox().getSizeZ();
 
         fullDistance = closestAxisVal - currentAxisVal;
-        distanceToMove = 0.0f;
     }
 
+    float distanceToMove = 0.0f;
     // Only move if fullDistance and maxMoveDistance have the same sign
     if ((fullDistance > 0 && maxMoveDistance > 0) || (fullDistance < 0 && maxMoveDistance < 0)) {
         // Move only up to maxMoveDistance in the correct direction

@@ -18,7 +18,7 @@ public:
     static void updatePlayer();
     static void updateGhosts();
 	static void updatePlayerLives();
-	static void init();
+	static void initLevel();
 };
 
 #endif

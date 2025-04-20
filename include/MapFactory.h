@@ -1,6 +1,7 @@
 #ifndef MAP_FACTORY_H
 #define MAP_FACTORY_H
 
+#include "gl_includes.h"
 #include "Map.h"
 #include <string>
 

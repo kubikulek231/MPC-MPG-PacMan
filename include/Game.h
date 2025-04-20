@@ -1,11 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "gl_includes.h"
 #include "Map.h"
 #include "Player.h"
 #include "MapFactory.h"
 #include "MoveDir.h"
 #include "Ghost.h"
+#include "glft2/TextRenderer.hpp"
 
 // Singleton class
 class Game {
@@ -23,6 +25,8 @@ public:
     void initLevel(int level = -1);
     static void update(int value = 0);  // Update game logic
     static void render();  // Display the game scene
+    static void renderScore();
+    void print3D(const glfreetype::font_data& ft_font, float x, float y, float z, const std::string& text, float scale);
 
     // GLUT Callbacks
     static void reshape(int w, int h);
@@ -95,6 +99,7 @@ private:
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
     int currentLevel;
+    glfreetype::font_data gameFont;
 };
 
 #endif // GAME_H

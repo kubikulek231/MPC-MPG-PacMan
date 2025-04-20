@@ -1,6 +1,7 @@
 #ifndef GHOST_H
 #define GHOST_H
 
+#include "gl_includes.h"
 #include "MovableEntity.h"
 #include <unordered_map>
 #include <deque>

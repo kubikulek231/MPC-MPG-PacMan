@@ -1,6 +1,7 @@
 #ifndef GAMELOGIC_H
 #define GAMELOGIC_H
 
+#include "gl_includes.h"
 #include "Entity.h"
 #include "Player.h"
 #include "Tile.h"

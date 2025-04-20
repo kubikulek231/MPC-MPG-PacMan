@@ -1,5 +1,5 @@
 #include "Map.h"
-#include <GL/glut.h>
+#include "gl_includes.h"
 #include <cmath>
 #include <sstream>
 #include <iomanip>

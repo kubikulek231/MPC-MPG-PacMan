@@ -1,5 +1,3 @@
-#include "GL/glut.h"
-
 #include "GameControl.h"
 #include "Game.h"
 #include "MoveDir.h"

@@ -1,7 +1,7 @@
 #ifndef MOVABLEENTITY_H
 #define MOVABLEENTITY_H
 
-#include <GL/glut.h>  // For OpenGL rendering
+#include "gl_includes.h"
 #include <vector>
 #include "Entity.h"
 #include "MoveDir.h"

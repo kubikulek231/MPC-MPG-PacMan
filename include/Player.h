@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "gl_includes.h"
 #include "MovableEntity.h"
 #include <chrono>
 

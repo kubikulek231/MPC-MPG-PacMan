@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include "gl_includes.h"
 #include <vector>
 #include "Tile.h"
 #include "Point3D.h"

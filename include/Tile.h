@@ -1,6 +1,7 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include "gl_includes.h"
 #include <vector>
 #include <string>
 #include "Entity.h"

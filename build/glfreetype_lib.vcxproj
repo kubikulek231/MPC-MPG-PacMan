@@ -22,31 +22,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{484CBDBF-16E8-3F6B-ABF8-61A0DBE9DBE7}</ProjectGuid>
+    <ProjectGuid>{2FA5317F-A877-396A-87C0-C91E6384B8A0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
-    <ProjectName>MPG</ProjectName>
+    <ProjectName>glfreetype_lib</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
@@ -60,38 +60,31 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Kuba\projects\MPC-MPG-PacMan\build\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MPG.dir\Debug\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MPG</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glfreetype_lib.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glfreetype_lib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Kuba\projects\MPC-MPG-PacMan\build\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MPG.dir\Release\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MPG</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glfreetype_lib.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glfreetype_lib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Kuba\projects\MPC-MPG-PacMan\build\MinSizeRel\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">MPG.dir\MinSizeRel\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">MPG</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">glfreetype_lib.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">glfreetype_lib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Kuba\projects\MPC-MPG-PacMan\build\RelWithDebInfo\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">MPG.dir\RelWithDebInfo\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">MPG</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">glfreetype_lib.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">glfreetype_lib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild></MinimalRebuild>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -104,67 +97,28 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <PostBuildEvent>
-      <Message>		</Message>
-      <Command>setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.redist.0.1.0.1/build/native/bin/x64/freeglut.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory C:/Users/Kuba/projects/MPC-MPG-PacMan/assets/ C:/Users/Kuba/projects/MPC-MPG-PacMan/build/assets/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-    </PostBuildEvent>
-    <Link>
-      <AdditionalDependencies>lib\glft2\Debug\glft2_lib.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;packages\freetype.2.8.0.1\build\native\lib\x64\v141\dynamic\Release\freetype28.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64/$(Configuration);C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/Debug/MPG.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/Debug/MPG.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild></MinimalRebuild>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -179,67 +133,28 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <PostBuildEvent>
-      <Message>		</Message>
-      <Command>setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.redist.0.1.0.1/build/native/bin/x64/freeglut.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory C:/Users/Kuba/projects/MPC-MPG-PacMan/assets/ C:/Users/Kuba/projects/MPC-MPG-PacMan/build/assets/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-    </PostBuildEvent>
-    <Link>
-      <AdditionalDependencies>lib\glft2\Release\glft2_lib.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;packages\freetype.2.8.0.1\build\native\lib\x64\v141\dynamic\Release\freetype28.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64/$(Configuration);C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/Release/MPG.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/Release/MPG.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild></MinimalRebuild>
       <Optimization>MinSpace</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -254,68 +169,29 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <PostBuildEvent>
-      <Message>		</Message>
-      <Command>setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.redist.0.1.0.1/build/native/bin/x64/freeglut.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory C:/Users/Kuba/projects/MPC-MPG-PacMan/assets/ C:/Users/Kuba/projects/MPC-MPG-PacMan/build/assets/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-    </PostBuildEvent>
-    <Link>
-      <AdditionalDependencies>lib\glft2\MinSizeRel\glft2_lib.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;packages\freetype.2.8.0.1\build\native\lib\x64\v141\dynamic\Release\freetype28.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64/$(Configuration);C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/MinSizeRel/MPG.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/MinSizeRel/MPG.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild></MinimalRebuild>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -328,59 +204,19 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\lib\glft2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\nupengl.core.0.1.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\build\packages\freetype.2.8.0.1\build\native\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\include;C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <PostBuildEvent>
-      <Message>		</Message>
-      <Command>setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.redist.0.1.0.1/build/native/bin/x64/freeglut.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll C:/Users/Kuba/projects/MPC-MPG-PacMan/build
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory C:/Users/Kuba/projects/MPC-MPG-PacMan/assets/ C:/Users/Kuba/projects/MPC-MPG-PacMan/build/assets/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-    </PostBuildEvent>
-    <Link>
-      <AdditionalDependencies>lib\glft2\RelWithDebInfo\glft2_lib.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;packages\freetype.2.8.0.1\build\native\lib\x64\v141\dynamic\Release\freetype28.lib;packages\nupengl.core.0.1.0.1\build\native\lib\x64\freeglut.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/nupengl.core.0.1.0.1/build/native/lib/x64/$(Configuration);C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release;C:/Users/Kuba/projects/MPC-MPG-PacMan/build/packages/freetype.2.8.0.1/build/native/lib/x64/v141/dynamic/Release/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/RelWithDebInfo/MPG.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Kuba/projects/MPC-MPG-PacMan/build/RelWithDebInfo/MPG.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\CMakeLists.txt">
@@ -440,39 +276,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\BoundingBox3D.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\DirChangeRequest.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Entity.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Game.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameControl.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\GameLogic.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Ghost.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Map.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MapFactory.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MovableEntity.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\MovementHelpers.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Player.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\PlayerFactory.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Point3D.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\Tile.cpp" />
-    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\src\main.cpp" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\BoundingBox3D.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\DirChangeRequest.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Entity.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Game.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameControl.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameLogic.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Ghost.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Macro.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MovableEntity.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MoveDir.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MovementHelpers.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Player.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\PlayerFactory.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Point3D.h" />
-    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Tile.h" />
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\include\glfreetype\TextRenderer.hpp" />
+    <ClCompile Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\external\glfreetype\src\TextRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\build\ZERO_CHECK.vcxproj">
@@ -480,10 +285,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\build\lib\glft2\glft2_lib.vcxproj">
-      <Project>{21DD3983-49AF-3D34-8514-504BA2080945}</Project>
-      <Name>glft2_lib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

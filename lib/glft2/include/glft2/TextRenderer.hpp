@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <string>
 #include <vector>
-namespace glfreetype {
+namespace glft2 {
 
     // This Holds All Of The Information Related To Any
     // FreeType Font That We Want To Create. 

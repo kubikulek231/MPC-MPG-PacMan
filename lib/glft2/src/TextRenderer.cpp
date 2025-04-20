@@ -15,7 +15,7 @@
 // All ideas here ripped from a NEHE tutorial
 // http://nehe.gamedev.net/tutorial/freetype_fonts_in_opengl/24001/
 
-namespace glfreetype {
+namespace glft2 {
     // Gets the first power of 2 >= 
     // for the given int  
     inline int next_p2 (int a )
@@ -260,7 +260,7 @@ namespace glfreetype {
         pop_projection_matrix();
     }
 
-	void render3D(const glfreetype::font_data& ft_font,
+	void render3D(const glft2::font_data& ft_font,
 		float x, float y, float z,
 		const std::string& text,
 		float scale)

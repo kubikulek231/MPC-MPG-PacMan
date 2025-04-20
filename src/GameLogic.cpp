@@ -36,7 +36,8 @@ void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
 	MoveDir& moveDir = *game.getMoveDir();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
-	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs, game.gameCollectedPellets);
+	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+	game.getPlayer()->update(game.gameCollectedPellets);
 }
 
 void GameLogic::updateGhosts() {

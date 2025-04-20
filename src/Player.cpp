@@ -1,5 +1,8 @@
 #include "Player.h"
 #include <GL/glut.h>
+#include <chrono>
+
+using namespace std::chrono;
 
 Player::Player() {
 }
@@ -21,7 +24,8 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
 }
 
 void Player::render() {
-    glColor3f(1.0f, 1.0f, 0.0f);
+    glColor3f(playerBodyColorRed, playerBodyColorGreen, playerBodyColorBlue);
+
     glPushMatrix();
 
     Point3D centerPoint = getAbsoluteCenterPoint();
@@ -35,13 +39,40 @@ void Player::render() {
     renderOrigin();
 }
 
-void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs, int &totalCollectedPellets) {
+void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+    // Handle movement and teleportation
     this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
     this->teleport(moveDir);
+}
+
+void Player::update(int& totalCollectedPellets) {
+    uint64_t currentTimeMs = getTimeMs();
+
     // Collect pellets
     auto tiles = this->intersectingTiles(this);
     auto tile = currentTile(tiles);
     if (tile && map->collectPellet(tile)) {
         totalCollectedPellets++;
     }
+
+    // Update invincibility and blinking
+    if (isInvincible) {
+        if (currentTimeMs > invincibleEndTimeMs) { isInvincible = false; }
+        if (currentTimeMs > nextBlinkTimeMs) {
+            invincibleBlink = !invincibleBlink;
+            nextBlinkTimeMs = currentTimeMs + BLINK_DURATION_MS;
+        }
+        if (invincibleBlink) { playerBodyColorBlue = 1.0f; }
+        else { playerBodyColorBlue = 0.0f; }
+    }
+}
+
+void Player::setInvincible(uint64_t durationMs) {
+    uint64_t currentTime = getTimeMs();
+    invincibleEndTimeMs = currentTime + durationMs;
+    isInvincible = true;
+}
+
+uint64_t Player::getTimeMs() {
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }

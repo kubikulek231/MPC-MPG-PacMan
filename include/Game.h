@@ -39,6 +39,7 @@ public:
     int getLastMouseX() const { return lastMouseX; }
     int getLastMouseY() const { return lastMouseY; }
     float getMoveSpeed() const { return moveSpeed; }
+    int getPlayerLives() const { return playerLives; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -55,6 +56,7 @@ public:
     void setLastMouseX(int x) { lastMouseX = x; }
     void setLastMouseY(int y) { lastMouseY = y; }
     void setMoveSpeed(float speed) { moveSpeed = speed; }
+    void setPlayerLives(int lives) { playerLives = lives; }
 
     int gameCollectedPellets = 0;
 private:

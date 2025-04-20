@@ -54,6 +54,7 @@ void Game::update(int value) {
     GameLogic::updatePlayer();
     GameLogic::updateGhosts();
     GameLogic::updateScore();
+    GameLogic::updatePlayerLives();
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();

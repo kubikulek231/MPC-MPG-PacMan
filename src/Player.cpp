@@ -56,7 +56,7 @@ void Player::update(int& totalCollectedPellets) {
     }
 
     // Update invincibility and blinking
-    if (isInvincible) {
+    if (getIsInvincible()) {
         if (currentTimeMs > invincibleEndTimeMs) { isInvincible = false; }
         if (currentTimeMs > nextBlinkTimeMs) {
             invincibleBlink = !invincibleBlink;
@@ -67,7 +67,7 @@ void Player::update(int& totalCollectedPellets) {
     }
 }
 
-void Player::setInvincible(uint64_t durationMs) {
+void Player::setIsInvincible(uint64_t durationMs) {
     uint64_t currentTime = getTimeMs();
     invincibleEndTimeMs = currentTime + durationMs;
     isInvincible = true;

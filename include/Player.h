@@ -28,7 +28,8 @@ public:
     virtual void render();
     void move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs);
     void update(int& collectedPellets);
-    void setInvincible(uint64_t durationMs);
+    void setIsInvincible(uint64_t durationMs);
+    bool getIsInvincible() const { return isInvincible; }
 };
 
 #endif // PLAYER_H

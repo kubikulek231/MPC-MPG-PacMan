@@ -4,11 +4,12 @@
 #include <iostream>
 #include "DirChangeRequest.h"
 #include "MoveDir.h"
+#include "Macro.h"
 
 void GameLogic::init() {
 	// Create ghosts path to move them into corners
 	Game& game = Game::getInstance();
-	auto& ghosts = game.getGhosts();
+	std::vector<Ghost*>& ghosts = game.getGhosts();
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
 		if (ghost->isPathEmpty()) {
@@ -35,9 +36,10 @@ void GameLogic::updateScore() {
 void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
 	MoveDir& moveDir = *game.getMoveDir();
+	Player& player = *game.getPlayer();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
-	game.getPlayer()->move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
-	game.getPlayer()->update(game.gameCollectedPellets);
+	player.move(*game.getMoveDir(), game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+	player.update(game.gameCollectedPellets);
 }
 
 void GameLogic::updateGhosts() {
@@ -58,5 +60,20 @@ void GameLogic::updateGhosts() {
 		}
 		// Move randomly if path is empty
 		ghost->moveOnRandomPath(lastFrameTimeMs);
+	}
+}
+
+void GameLogic::updatePlayerLives() {
+	Game& game = Game::getInstance();
+	std::vector<Ghost*>& ghosts = game.getGhosts();
+	Player& player = *game.getPlayer();
+
+	if (player.getIsInvincible()) { return; }
+	for (size_t i = 0; i < ghosts.size(); ++i) {
+		Ghost* ghost = ghosts[i];
+		if (ghost->intersects(player)) {
+			game.setPlayerLives(game.getPlayerLives() - 1);
+			player.setIsInvincible(3000);
+		}
 	}
 }

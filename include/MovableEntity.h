@@ -73,18 +73,22 @@ protected:
     bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
     bool preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles);
     bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved, bool proceedToNextTile = false);
+    void teleport();
+    Point3D furthestPossibleEntityOriginPoint(MoveDir moveDir, Tile* currentTile);
+    bool headingOutOfMap(MoveDir moveDir, Tile* currentTile);
 
     // === Tile Navigation & Positioning ===
     Tile* currentTile(const std::vector<Tile*>& intersectingTiles = {}) const;
     Tile* nextTile(MoveDir moveDir, Tile* currentTile);
     Tile* nextTileInDirection(MoveDir moveDir, Tile* currentTile);
     MoveDir dirToTile(Tile* fromTile, Tile* toTile);
-    Point3D tileCenteredOrigin(const Tile* movableEntity) const;
+    Point3D entityCenteredOrigin(const Tile* movableEntity) const;
 
     // === Tile Utility Functions ===
     static bool areTilesWalkable(std::vector<Tile*> tiles);
     static std::vector<Tile*> intersectingTiles(const MovableEntity* movableEntity);
     static Tile* closestTile(const MovableEntity* movableEntity, const std::vector<Tile*>& tiles, float& distance);
+    static float clampMoveDistance(float moveDistance, float maxDistance);
 };
 
 #endif

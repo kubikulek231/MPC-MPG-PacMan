@@ -427,6 +427,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameControl.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\GameLogic.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Ghost.h" />
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Macro.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MapFactory.h" />
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\MovableEntity.h" />

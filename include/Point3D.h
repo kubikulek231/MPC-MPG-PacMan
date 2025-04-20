@@ -58,6 +58,13 @@ public:
     bool operator!=(const Point3D& other) const {
         return !(*this == other);
     }
+
+    bool isZero() const {
+        if (x != 0) return false;
+        if (y != 0) return false;
+        if (z != 0) return false;
+        return true;
+    }
 };
 
 #endif

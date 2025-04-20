@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
-#include <cassert>
+#include "Macro.h"
 
 
 // === Constructors ===
@@ -31,8 +31,8 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
     this->moveDir = other.moveDir;
     this->speed = other.speed;
     this->snapDistance = other.snapDistance;
-    assert(this->boundingBox.getSizeX() < MapFactory::TILE_SIZE);
-    assert(this->boundingBox.getSizeZ() < MapFactory::TILE_SIZE);
+    ASSERT_MSG(this->boundingBox.getSizeX() < MapFactory::TILE_SIZE, "Bounding box size in X dimension of MovableEntity must be less than MapFactory::TILE_SIZE!");
+    ASSERT_MSG(this->boundingBox.getSizeZ() < MapFactory::TILE_SIZE, "Bounding box size in Z dimension of MovableEntity must be less than MapFactory::TILE_SIZE!");
 }
 
 
@@ -62,6 +62,9 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     }
     // Get player tiles for next calculations
     std::vector<Tile*> intersectingTiles = MovableEntity::intersectingTiles(this);
+
+    // Do not move when out of bounds
+    if (intersectingTiles.empty()) { return false; }
 
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
@@ -169,48 +172,61 @@ float MovableEntity::speedMltprForDirection(MoveDir moveDir) {
 // === Movement Logic ===
 bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved) {
     moved = false;
+
+    auto initialTiles = intersectingTiles(this);
+    auto initialTile = currentTile(initialTiles);
+
     MovableEntity entityCopy = MovableEntity(*this);
-    float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
-    char axis = axisForDirection(moveDir);
+    float fullSpeed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
+    char moveAxis = axisForDirection(moveDir);
 
-    // Try move full speed first
-    entityCopy.moveAxis(axis, speed);
-    std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&entityCopy);
+    bool headingOut = headingOutOfMap(moveDir, initialTile);
 
-    if (MovableEntity::areTilesWalkable(tiles)) {
-        this->setOrigin(entityCopy.origin);
-        moved = true;
-        return true;
+    // Move at full speed if not heading out of map bounds
+    if (!headingOut) {
+        entityCopy.moveAxis(moveAxis, fullSpeed);
+        std::vector<Tile*> tiles = MovableEntity::intersectingTiles(&entityCopy);
+
+        if (MovableEntity::areTilesWalkable(tiles)) {
+            this->setOrigin(entityCopy.origin);
+            moved = true;
+            return true;
+        }
     }
-
+    
     // If full speed fails, try to move precisely
     entityCopy = MovableEntity(*this);
-    tiles = MovableEntity::intersectingTiles(&entityCopy);
-
-    if (tiles.empty()) {
-        // No tiles to check, early return
-        return false;
-    }
 
     float _;
-    Point3D closestTileOrigin = tileCenteredOrigin(closestTile(&entityCopy, tiles, _));
+    // Determine if heading out of bounds
+    Point3D targetTileOrigin;
+    if (headingOut) {
+        targetTileOrigin = furthestPossibleEntityOriginPoint(moveDir, initialTile);
+    }
+    else {
+        targetTileOrigin = entityCenteredOrigin(closestTile(&entityCopy, initialTiles, _));
+    }
+
     Point3D entityCopyOrigin = entityCopy.getOrigin();
 
     // Only move in the requested direction
-    float tileAxisValue = closestTileOrigin.getAxisValue(axis);
-    float entityCopyAxisValue = entityCopyOrigin.getAxisValue(axis);
+    float targetAxisValue = targetTileOrigin.getAxisValue(moveAxis);
+    float entityCopyAxisValue = entityCopyOrigin.getAxisValue(moveAxis);
 
-    float distance = std::abs(tileAxisValue - entityCopyAxisValue);
-    assert(distance <= std::abs(speed));
+    // Get distance between the target point and actual point
+    float distanceToMove = targetAxisValue - entityCopyAxisValue;
 
-    // Align both tile and entity axes
-    entityCopyOrigin.setAxisValue(axis, tileAxisValue);
+    // Clamp the distanceToMove to fullSpeed (move at fullSpeed max)
+    distanceToMove = clampMoveDistance(distanceToMove, frametimeNormalizedSpeed(frameTimeMs));
     
+    // Move the copy
+    entityCopy.moveAxis(moveAxis, distanceToMove);
+
     // Check just to be sure
-    tiles = MovableEntity::intersectingTiles(&entityCopy);
-    if (MovableEntity::areTilesWalkable(tiles)) {
-        this->setOrigin(entityCopyOrigin);
-        if (distance != 0.f) moved = true;
+    auto finalTiles = MovableEntity::intersectingTiles(&entityCopy);
+    if (MovableEntity::areTilesWalkable(finalTiles)) {
+        this->setOrigin(entityCopy.getOrigin());
+        if (distanceToMove != 0.f) moved = true;
         return true;
     }
     return false;
@@ -244,10 +260,12 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
 
-    bool hit = false;
+    bool inCenter = false;
     // Move toward the next closest tile; set canTurn if destination reached
-    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, hit, moved)) {
-        if (hit) canTurn = true;
+    if (tryMoveToNextClosestTile(moveDir, this, axis, speed, inCenter, moved)) {
+        if (inCenter) {
+            canTurn = true; 
+        }
         return true;
     }
 
@@ -264,7 +282,7 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     Tile* closest = nextTileInDirection(moveDir, current);
     if (!closest) return false;
 
-    Point3D targetOrigin = tileCenteredOrigin(closest);
+    Point3D targetOrigin = entityCenteredOrigin(closest);
     Point3D currentOrigin = copy.getOrigin();
 
     float currentAxisVal = (axis == 'x') ? currentOrigin.x : currentOrigin.z;
@@ -277,7 +295,7 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
 
     // Already at the center of the tile, proceed to next in the direction if desired
     if (fullDistance == 0 && proceedToNextTile) {
-        targetOrigin = tileCenteredOrigin(nextTile(moveDir, current));
+        targetOrigin = entityCenteredOrigin(nextTile(moveDir, current));
         currentOrigin = copy.getOrigin();
 
         currentAxisVal = (axis == 'x') ? currentOrigin.x : currentOrigin.z;
@@ -316,11 +334,115 @@ bool MovableEntity::tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* mov
     return false;
 }
 
+void MovableEntity::teleport() {
+    auto tiles = this->intersectingTiles(this);
+    Tile* tile = this->currentTile(tiles);
+    if (!tile) return;
+
+
+    // Only teleport if the next tile is a teleport
+    if (!tile || tile->getTileType() != TileType::TELEPORT) return;
+
+    Tile* targetTile = nullptr;
+
+    float originOffsetX = 0;
+    float originOffsetZ = 0;
+
+    switch (moveDir) {
+    case MoveDir::FWD:
+        targetTile = tile->getTileUp();
+        originOffsetX = -0.01;
+        break;
+    case MoveDir::BWD:
+        targetTile = tile->getTileDown();
+        originOffsetX = 0.01;
+        break;
+    case MoveDir::LEFT:
+        targetTile = tile->getTileLeft();
+        originOffsetZ = 0.01;
+        break;
+    case MoveDir::RIGHT:
+        targetTile = tile->getTileRight();
+        originOffsetZ = -0.01;
+        break;
+    default:
+        return;
+    }
+
+    ASSERT_MSG(
+        targetTile && targetTile->getTileType() == TileType::TELEPORT,
+        "Teleport exit must be a teleport tile and must exist!"
+    );
+
+    Point3D teleportTarget = entityCenteredOrigin(targetTile);
+    teleportTarget.move(originOffsetX, 0, originOffsetZ);
+    this->setOrigin(teleportTarget);
+}
+
+Point3D MovableEntity::furthestPossibleEntityOriginPoint(MoveDir moveDir, Tile* currentTile) {
+    ASSERT_MSG(currentTile, "Tile must not be nullptr!");
+
+    Point3D origin = Point3D(0, 0, 0);
+
+    int row = currentTile->getTileRow();
+    int col = currentTile->getTileCol();
+
+    if (row == MapFactory::MAP_HEIGHT - 1 && moveDir == MoveDir::FWD) {
+        origin = entityCenteredOrigin(currentTile);
+        origin.move(0, 0, MapFactory::TILE_SIZE / 2.0f);
+        return origin;
+    }
+
+    if (col == MapFactory::MAP_WIDTH - 1 && moveDir == MoveDir::RIGHT) {
+        origin = entityCenteredOrigin(currentTile);
+        origin.move(MapFactory::TILE_SIZE / 2.0f, 0, 0);
+        return origin;
+    }
+
+    if (row == 0 && moveDir == MoveDir::BWD) {
+        origin = entityCenteredOrigin(currentTile);
+        origin.move(0, 0, -MapFactory::TILE_SIZE / 2.0f);
+        return origin;
+    }
+
+    if (col == 0 && moveDir == MoveDir::LEFT) {
+        origin = entityCenteredOrigin(currentTile);
+        origin.move(-MapFactory::TILE_SIZE / 2.0f, 0, 0);
+        return origin;
+    }
+
+    return origin;  // Tile exists and is within bounds
+}
+
+bool MovableEntity::headingOutOfMap(MoveDir moveDir, Tile* currentTile) {
+    ASSERT_MSG(currentTile, "Tile must not be nullptr!");
+
+    int row = currentTile->getTileRow();
+    int col = currentTile->getTileCol();
+
+    if (row == MapFactory::MAP_HEIGHT - 1 && moveDir == MoveDir::FWD) {
+        return true;
+    }
+
+    if (col == MapFactory::MAP_WIDTH - 1 && moveDir == MoveDir::RIGHT) {
+        return true;
+    }
+
+    if (row == 0 && moveDir == MoveDir::BWD) {
+        return true;
+    }
+
+    if (col == 0 && moveDir == MoveDir::LEFT) {
+        return true;
+    }
+    return false;
+}
 
 // === Tile Navigation & Positioning ===
 Tile* MovableEntity::currentTile(const std::vector<Tile*>& intersectingTiles) const {
     float _;
-    return closestTile(this, intersectingTiles, _);
+    Tile* closest = closestTile(this, intersectingTiles, _);
+    return closest;
 }
 
 Tile* MovableEntity::nextTile(MoveDir moveDir, Tile* currentTile) {
@@ -355,8 +477,8 @@ Tile* MovableEntity::nextTileInDirection(MoveDir moveDir, Tile* currentTile) {
 
     // Get the entity's current position and the positions of the current and next tiles
     Point3D entityDirection = this->getOrigin();
-    Point3D originCurrent = tileCenteredOrigin(currentTile);
-    Point3D originNext = tileCenteredOrigin(tileNext);
+    Point3D originCurrent = entityCenteredOrigin(currentTile);
+    Point3D originNext = entityCenteredOrigin(tileNext);
 
     // Get the values of the axis for the current and next tiles
     float currentAxisVal = originCurrent.getAxisValue(axis);
@@ -393,7 +515,6 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
 
-    bool hit = false;
     // Move toward the next closest tile; set canTurn if destination reached
     if (tryMoveToNextClosestTile(moveDir, this, axis, speed, inCenter, moved, true)) {
         return true;
@@ -402,7 +523,7 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
     return false;
 }
 
-Point3D MovableEntity::tileCenteredOrigin(const Tile* tile) const {
+Point3D MovableEntity::entityCenteredOrigin(const Tile* tile) const {
     Point3D tileAlignedOrigin = Point3D(tile->getOrigin());
     tileAlignedOrigin.move((MapFactory::TILE_SIZE - this->boundingBox.getSizeX()) / 2, 0, (MapFactory::TILE_SIZE - this->boundingBox.getSizeY()) / 2);
     return tileAlignedOrigin;
@@ -429,6 +550,7 @@ std::vector<Tile*> MovableEntity::intersectingTiles(const MovableEntity* movable
 }
 
 Tile* MovableEntity::closestTile(const MovableEntity* movableEntity, const std::vector<Tile*>& tiles, float& distance) {
+    if (tiles.empty()) { return nullptr; }
     Point3D entityOrigin = movableEntity->getOrigin();
 
     Tile* closestTile = nullptr;
@@ -447,4 +569,11 @@ Tile* MovableEntity::closestTile(const MovableEntity* movableEntity, const std::
         }
     }
     return closestTile;
+}
+
+float MovableEntity::clampMoveDistance(float moveDistance, float maxDistance) {
+    ASSERT_MSG(maxDistance > 0, "maxDistance must be a positive number!");
+
+    float clampedValue = std::min(std::abs(moveDistance), maxDistance);
+    return moveDistance < 0 ? -clampedValue : clampedValue;
 }

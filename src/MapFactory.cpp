@@ -4,6 +4,7 @@
 #include <sstream>    // For stringstream to parse lines
 #include <iostream>   // For error handling
 #include "Tile.h"
+#include "Macro.h"
 
 MapFactory::MapFactory() {
     // Initialize the grid with the specified dimensions, filled with EMPTY tiles
@@ -52,14 +53,53 @@ void MapFactory::setTileNeighbors() {
         for (int x = 0; x < MAP_WIDTH; ++x) {
             Tile& tile = grid[y][x];
 
-            // Set neighbors for each tile
-            if (x > 0) tile.setTileLeft(&grid[y][x - 1]);   // Set left neighbor
-            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][x + 1]);  // Set right neighbor
-            if (y > 0) tile.setTileUp(&grid[y - 1][x]);     // Set up neighbor
-            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[y + 1][x]); // Set down neighbor
+            // Set adjacent neighbors
+            if (x > 0) tile.setTileLeft(&grid[y][x - 1]);
+            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][x + 1]);
+            if (y > 0) tile.setTileUp(&grid[y - 1][x]);
+            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[y + 1][x]);
+        }
+    }
+
+    // Set horizontal teleport neighbors (left <-> right)
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        Tile& leftTile = grid[y][0];
+        Tile& rightTile = grid[y][MAP_WIDTH - 1];
+
+        if (leftTile.getTileType() == TileType::TELEPORT ||
+            rightTile.getTileType() == TileType::TELEPORT) {
+
+            ASSERT_MSG(
+                leftTile.getTileType() == TileType::TELEPORT &&
+                rightTile.getTileType() == TileType::TELEPORT,
+                "Teleport tiles must be paired on both left and right edges at row " + std::to_string(y)
+            );
+
+            leftTile.setTileLeft(&rightTile);
+            rightTile.setTileRight(&leftTile);
+        }
+    }
+
+    // Set vertical teleport neighbors (top <-> bottom)
+    for (int x = 0; x < MAP_WIDTH; ++x) {
+        Tile& topTile = grid[0][x];
+        Tile& bottomTile = grid[MAP_HEIGHT - 1][x];
+
+        if (topTile.getTileType() == TileType::TELEPORT ||
+            bottomTile.getTileType() == TileType::TELEPORT) {
+
+            ASSERT_MSG(
+                topTile.getTileType() == TileType::TELEPORT &&
+                bottomTile.getTileType() == TileType::TELEPORT,
+                "Teleport tiles must be paired on both top and bottom edges at column " + std::to_string(x)
+            );
+
+            topTile.setTileUp(&bottomTile);
+            bottomTile.setTileDown(&topTile);
         }
     }
 }
+
 
 int MapFactory::getTotalGridPellets() {
     int totalPellets = 0;
@@ -132,6 +172,10 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             Point3D bbMin = Point3D(0.0f, 0.0f, 0.0f);  // Min point of bounding box at origin
             Point3D bbMax = Point3D(TILE_SIZE, TILE_SIZE, TILE_SIZE);  // Max point offset by TILE_SIZE
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);
+
+            if (type == TileType::TELEPORT) {
+                ASSERT_MSG(row == 0 || col == 0 || row == MAP_HEIGHT - 1 || col == MAP_WIDTH - 1, "Teleports can be on the edge of the map only!");
+            }
 
             // Add the tile to the row
             tileRow.emplace_back(type, tileOrigin, tileBoundingBox, row, col);

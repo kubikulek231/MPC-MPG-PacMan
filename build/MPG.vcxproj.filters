@@ -72,6 +72,9 @@
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Ghost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="C:\Users\Kuba\projects\MPC-MPG-PacMan\include\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -36,10 +36,12 @@ void Player::render() {
 }
 
 void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs, int &totalCollectedPellets) {
-    this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
+    if (!this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs)) {
+    };
     // Collect pellets
     auto tiles = this->intersectingTiles(this);
-    if (map->collectPellet(currentTile(tiles))) {
+    auto tile = currentTile(tiles);
+    if (tile && map->collectPellet(tile)) {
         totalCollectedPellets++;
     }
 }

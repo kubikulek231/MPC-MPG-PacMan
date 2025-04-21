@@ -25,11 +25,8 @@ void GameLogic::initLevel() {
 void GameLogic::updateScore() {
 	Game& game = Game::getInstance();
 	Map& map = *game.getMap();
-	std::cout << "Total collected pellets: " << game.gameCollectedPellets << std::endl;
-	if (game.gameCollectedPellets % 50 == 0) {
-		game.gameCollectedPellets = game.gameCollectedPellets + 1;
-		std::cout << "GAME WON!" << std::endl;
-		std::cout << "Collected pellets: " << game.gameCollectedPellets << std::endl;
+	game.setTotalScore(game.gameCollectedPellets);
+	if (map.areAllPelletsCollected()) {
 		// Set new level
 		game.setCurrentLevel(game.getCurrentLevel() + 1);
 		game.initLevel();

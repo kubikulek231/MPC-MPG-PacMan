@@ -119,6 +119,7 @@ void Game::render() {
     game.getMap()->render(true);
     game.getPlayer()->render();
     game.renderScore();
+    game.renderLives();
 
     // Render ghosts
     for (Ghost* ghost : game.getGhosts()) {
@@ -140,13 +141,47 @@ void Game::reshape(int w, int h) {
 void Game::renderScore() {
     Game& game = Game::getInstance();
     Map* map = game.getMap();
+    Tile* tile = map->getTileAt(1, MapFactory::MAP_WIDTH / 2 - 3); // Get the target tile
+
+    Point3D textOrigin = tile->getOrigin(); // Get the 3D position of the tile
+
+    std::string scoreText = "Score: " + std::to_string(game.getTotalScore());
+
+    glPushMatrix();
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    // Move to the text's origin
+    glTranslatef(textOrigin.x, textOrigin.y, textOrigin.z + MapFactory::TILE_SIZE / 2);
+
+    // Single rotation to orient the text
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+
+    float scale = 0.008f;
+    glft2::render3D(game.gameFont, scoreText, scale);
+    glPopMatrix();
+}
+
+void Game::renderLives() {
+    Game& game = Game::getInstance();
+    Map* map = game.getMap();
     Tile* tile = map->getTileAt(MapFactory::MAP_HEIGHT - 1, 1); // Get the target tile
 
     Point3D textOrigin = tile->getOrigin(); // Get the 3D position of the tile
 
-    std::string scoreText = "Score: " + std::to_string(100);
+    std::string livesText = "Remaining lives: " + std::to_string(game.getPlayerLives());
 
-    // Call print3D with the text, the 3D position (adjusted for your needs),
-    // and a world scale for the font size
-    glft2::render3D(game.gameFont, textOrigin.x, textOrigin.y, textOrigin.z, scoreText, 0.001f);
+    glPushMatrix();
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    // Move to the text's origin
+    glTranslatef(textOrigin.x, textOrigin.y, textOrigin.z + MapFactory::TILE_SIZE / 2);
+
+    // Single rotation to orient the text
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+
+    float scale = 0.008f;
+    glft2::render3D(game.gameFont, livesText, scale);
+    glPopMatrix();
 }

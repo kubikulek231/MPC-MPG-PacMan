@@ -26,6 +26,7 @@ public:
     static void update(int value = 0);  // Update game logic
     static void render();  // Display the game scene
     static void renderScore();
+    static void renderLives();
 
     // GLUT Callbacks
     static void reshape(int w, int h);
@@ -49,6 +50,7 @@ public:
     float getBaseSpeed() const { return baseMoveSpeed; }
     int getPlayerLives() const { return playerLives; }
     int getCurrentLevel() const { return currentLevel; }
+    int getTotalScore() const { return totalScore; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -67,6 +69,7 @@ public:
     void setBaseSpeed(float speed) { baseMoveSpeed = speed; }
     void setPlayerLives(int lives) { playerLives = lives; }
     void setCurrentLevel(int level) { currentLevel = level; }
+    void setTotalScore(int score) { totalScore = score; }
 
     int gameCollectedPellets = 0;
 private:
@@ -98,6 +101,7 @@ private:
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
     int currentLevel;
+    int totalScore;
     glft2::font_data gameFont;
 };
 

@@ -1,0 +1,11 @@
+# Ignore VS files
+**/.vs/
+
+# Ignore build files
+out/
+
+# Ignore assets (lfs)
+assets/
+
+# Ignore deps (lfs)
+deps

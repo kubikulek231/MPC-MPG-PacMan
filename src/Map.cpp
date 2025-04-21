@@ -74,20 +74,20 @@ std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingB
 
 void Map::render(bool resetHighlighted, int resetTimerMs) {
     // Center marker
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glPushMatrix();
-    glutSolidSphere(0.15f, 16, 16); // Origin marker
-    glPopMatrix();
-    drawCenterAxes(2.0f);
+    //glColor3f(1.0f, 0.0f, 0.0f);
+    //glPushMatrix();
+    //glutSolidSphere(0.15f, 16, 16); // Origin marker
+    //glPopMatrix();
+    //drawCenterAxes(2.0f);
     if (resetHighlighted) {
         Map::scheduleHighlightReset(resetTimerMs);
     }
 
     for (const std::vector<Tile>& tileRow : grid) {        
         for (const Tile& tile : tileRow) {
-            tile.renderOrigin();
+            //tile.renderOrigin();
             tile.render();
-            renderTileCoordinates(&tile);
+            //renderTileCoordinates(&tile);
         }
     }
 }

@@ -25,5 +25,5 @@ namespace glft2 {
     void render2D(font_data const & ft_font, float x, float y,  
                std::string const & text);
 			   
-	void render3D(const font_data& ft_font, float x, float y, float z, const std::string& text, float scale);
+	void render3D(const font_data& ft_font, const std::string& text, float scale);
 }

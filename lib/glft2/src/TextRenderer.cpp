@@ -261,7 +261,6 @@ namespace glft2 {
     }
 
 	void render3D(const glft2::font_data& ft_font,
-		float x, float y, float z,
 		const std::string& text,
 		float scale)
 	{
@@ -276,9 +275,6 @@ namespace glft2 {
 		glPushAttrib(GL_LIST_BIT | GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-
-		// 1) position in world
-		glTranslatef(x, y, z);
 
 		// use pixel zoom to shrink bitmaps
 		glScalef(scale, scale, scale);

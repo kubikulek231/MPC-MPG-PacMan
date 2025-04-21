@@ -68,7 +68,7 @@ void Ghost::moveOnPath(float frameTimeMs) {
     bool inCenter = false;
     this->preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
     tile = currentTile(tiles);
-    if (inCenter && movePath.front()->isEqual(tile)) {
+    if ((inCenter || !moved) && movePath.front()->isEqual(tile)) {
         movePath.pop_front();
         teleport(moveDir);
     }

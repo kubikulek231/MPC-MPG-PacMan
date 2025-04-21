@@ -51,6 +51,8 @@ public:
     int getPlayerLives() const { return playerLives; }
     int getCurrentLevel() const { return currentLevel; }
     int getTotalScore() const { return totalScore; }
+    bool getDebug1Pressed() const { return debug1Pressed; }
+    bool getDebug2Pressed() const { return debug2Pressed; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -70,6 +72,8 @@ public:
     void setPlayerLives(int lives) { playerLives = lives; }
     void setCurrentLevel(int level) { currentLevel = level; }
     void setTotalScore(int score) { totalScore = score; }
+    void setDebug1Pressed(bool pressed) { debug1Pressed = pressed; }
+    void setDebug2Pressed(bool pressed) { debug2Pressed = pressed; }
 
     int gameCollectedPellets = 0;
 private:
@@ -103,6 +107,8 @@ private:
     int currentLevel;
     int totalScore;
     glft2::font_data gameFont;
+    bool debug1Pressed;
+    bool debug2Pressed;
 };
 
 #endif // GAME_H

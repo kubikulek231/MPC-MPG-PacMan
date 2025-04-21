@@ -61,6 +61,37 @@ void GameLogic::updateGhosts() {
 		// Move randomly if path is empty
 		ghost->moveOnRandomPath(lastFrameTimeMs);
 	}
+
+	// Debug
+	if (game.getDebug1Pressed()) {
+		game.setDebug1Pressed(false);
+		for (size_t i = 0; i < ghosts.size(); ++i) {
+			Map* map = game.getMap();
+			Ghost* ghost = ghosts[i];
+			Tile* tile = map->getTileAt(17, 1);
+			if (!ghost->isPathEmpty()) {
+				ghost->createPathToTile(tile);
+				continue;
+			}
+			// Move randomly if path is empty
+			ghost->moveOnRandomPath(lastFrameTimeMs);
+		}
+	}
+
+	if (game.getDebug2Pressed()) {
+		game.setDebug2Pressed(false);
+		for (size_t i = 0; i < ghosts.size(); ++i) {
+			Map* map = game.getMap();
+			Ghost* ghost = ghosts[i];
+			Tile* tile = map->getTileAt(17, 26);
+			if (!ghost->isPathEmpty()) {
+				ghost->createPathToTile(tile);
+				continue;
+			}
+			// Move randomly if path is empty
+			ghost->moveOnRandomPath(lastFrameTimeMs);
+		}
+	}
 }
 
 void GameLogic::updatePlayerLives() {

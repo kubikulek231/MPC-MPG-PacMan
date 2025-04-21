@@ -89,4 +89,10 @@ void GameControl::keyboard(unsigned char key, int x, int y) {
         game.setMoveDir(MoveDir::LEFT);
         game.setIsDirectionKeyPressed(true);
     }
+    if (key == 'x') {
+        game.setDebug1Pressed(true);
+    }
+    if (key == 'y') {
+        game.setDebug2Pressed(true);
+    }
 }

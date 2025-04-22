@@ -9,7 +9,7 @@ void GameMenu::render() {
     // Blue text
     glColor3ub(0, 0, 0xff);
 
-    glft2::render2D(game.getGameFont(), 20, 20, "START GAME");
+    glft2::render2D(game.getGameFont(), 20, 20, "START GAME", 0.1);
 
     glPopMatrix();
 

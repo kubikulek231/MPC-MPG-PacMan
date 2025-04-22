@@ -3,31 +3,29 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+
 namespace glft2 {
 
-    // This Holds All Of The Information Related To Any
-    // FreeType Font That We Want To Create. 
+    // Stores data for a font rendered with FreeType
     struct font_data {
-        float h;                      // Holds The Height Of The Font.
-        std::vector<GLuint> textures; // Holds The Texture Id's
-        GLuint list_base;             // Holds The First Display List Id
+        float h;                      // Font height
+        std::vector<GLuint> textures; // Texture IDs for glyphs
+        GLuint list_base;             // Start of display lists
+        float char_widths[128] = {};  // Cached character widths
 
-        // The Init Function Will Create A Font With
-        // The Height h From The File fname.
-        void init(const char * fname, unsigned int h);
+        // Load font from file at specified height
+        void init(const char* fname, unsigned int h);
 
-        float char_widths[128] = {};
-
-        // Free All The Resources Associated With The Font.
+        // Free GPU resources
         void clean();
     };
 
-    // The Flagship Function Of The Library - This Thing Will Print
-    // Out Text At Window Coordinates X, Y, Using The Font ft_font.
-    // The Current Modelview Matrix Will Also Be Applied To The Text.
-    void render2D(font_data const & ft_font, float x, float y,  
-               std::string const & text);
-			   
-	void render3D(const font_data& ft_font, const std::string& text, float scale);
-    void measureText(const glft2::font_data& ft_font, const std::string& text, float* out_width, float* out_height, float scale = 1.0f);
+    // Render 2D text at (x, y) with optional scale
+    void render2D(const font_data& ft_font, float x, float y, const std::string& text, float scale = 1.0f);
+
+    // Render 3D text at origin with optional scale (uses modelview)
+    void render3D(const font_data& ft_font, const std::string& text, float scale = 1.0f);
+
+    // Measure width and height of given text
+    void measureText(const font_data& ft_font, const std::string& text, float* out_width, float* out_height, float scale = 1.0f);
 }

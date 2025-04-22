@@ -43,7 +43,7 @@ int main(int argc, char **argv)
         // Blue text
         glColor3ub(0,0,0xff);
 
-        glfreetype::print(our_font, 20 /* xpos */, 20 /* ypos */, 
+        glfreetype::render2D(our_font, 20 /* xpos */, 20 /* ypos */, 
                           "The quick brown fox blah blah blah");
 
         glPopMatrix();

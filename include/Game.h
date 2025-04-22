@@ -53,6 +53,7 @@ public:
     int getTotalScore() const { return totalScore; }
     bool getDebug1Pressed() const { return debug1Pressed; }
     bool getDebug2Pressed() const { return debug2Pressed; }
+    glft2::font_data getGameFont() const { return gameFont; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }

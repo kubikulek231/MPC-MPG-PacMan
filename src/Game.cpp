@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "GameLogic.h"
+#include "GameMenu.h"
 #include "math.h"
 #include <sstream>     
 #include <string>      
@@ -120,6 +121,8 @@ void Game::render() {
     game.getPlayer()->render();
     game.renderScore();
     game.renderLives();
+
+    GameMenu::render();
 
     // Render ghosts
     for (Ghost* ghost : game.getGhosts()) {

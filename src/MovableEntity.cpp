@@ -521,10 +521,9 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
     // Get movement axis and adjust speed for current direction
     float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
-    bool _;
 
     if (headingOut) {
-        preciseMove(moveDir, frameTimeMs, _);
+        if (preciseMove(moveDir, frameTimeMs, moved));
         return true;
     }
 

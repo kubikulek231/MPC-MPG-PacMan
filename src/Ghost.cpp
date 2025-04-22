@@ -68,9 +68,24 @@ void Ghost::moveOnPath(float frameTimeMs) {
     bool inCenter = false;
     this->preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
     tile = currentTile(tiles);
-    if ((inCenter || !moved) && movePath.front()->isEqual(tile)) {
-        movePath.pop_front();
+
+    int pathSize = movePath.size();
+    bool isCurrentTeleport = tile->getTileType() == TileType::TELEPORT;
+    bool isNextTeleport = pathSize > 2 ? movePath.at(1)->getTileType() == TileType::TELEPORT : false;
+
+    if (isCurrentTeleport && isNextTeleport && moved) {
+        return;
+    }
+
+    if (isCurrentTeleport && isNextTeleport && !moved) {
         teleport(moveDir);
+        movePath.pop_front();
+        return;
+    }
+
+    if (inCenter && movePath.front()->isEqual(tile)) {
+        movePath.pop_front();
+        return;
     }
 }
 

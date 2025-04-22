@@ -26,6 +26,7 @@ void Game::init() {
 
     Game::initLevel();
     gameFont.init("assets/fonts/Roboto-Regular.ttf", 128);
+    menuFont.init("assets/fonts/Roboto-Regular.ttf", 72);
 }
 
 void Game::initLevel(int level) {

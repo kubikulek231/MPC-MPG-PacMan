@@ -1,60 +1,54 @@
-// Hacky test
-
 #include "glfreetype/TextRenderer.hpp"
 #include <GLFW/glfw3.h>
 
-int main(int argc, char **argv)
-{
+void GameMenu::render() {
+    Game& game = Game::getInstance();
+    glft2::font_data menuFont = game.getMenuFont();
 
-    GLFWwindow* window;
+    // Get current viewport dimensions
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    int screenWidth = viewport[2];
+    int screenHeight = viewport[3];
 
-    /* Initialize the library */
-    if (!glfwInit()) {
-        return -1;
-    }
+    glPushMatrix();
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    int windowWidth = 300;
-    int windowHeight = 40;
-    window = glfwCreateWindow(windowWidth, windowHeight, "glfreetype test", NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
+    glColor3ub(0, 0, 0xff);
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    float scale = 0.5f;
+    float titleScale = 0.7f;
+    float baseTextHeight;
+    float titleTextHeight;
 
-    // NEHE's font system
-    glfreetype::font_data our_font;
-    our_font.init("/Library/Fonts/Arial.ttf", 25 /* size */);
+    float playTextWidth, creditsTextWidth, exitTextWidth, titleTextWidth;
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window)) {
+    std::string gameName = "PacMan3D";
+    std::string playText = "Play";
+    std::string creditsText = "Credits";
+    std::string exitText = "Exit";
 
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Measure text
+    glft2::measureText(menuFont, gameName, &titleTextWidth, &titleTextHeight, titleScale);
+    glft2::measureText(menuFont, playText, &playTextWidth, &baseTextHeight, scale);
+    glft2::measureText(menuFont, creditsText, &creditsTextWidth, &baseTextHeight, scale);
+    glft2::measureText(menuFont, exitText, &exitTextWidth, &baseTextHeight, scale);
 
-        glClearColor(255.0, 255.0, 255.0, 0.0);
+    float screenWidthCenter = screenWidth / 2.0f;
+    float screenHeightCenter = screenHeight / 2.0f;
 
-        glPushMatrix();
-        glLoadIdentity();
+    float margin = baseTextHeight * 0.5f;
 
-        // Blue text
-        glColor3ub(0,0,0xff);
+    // Total height = title + 3 entries + 3 margins
+    float totalMenuHeight = titleTextHeight + 3 * baseTextHeight + 3 * margin;
 
-        glfreetype::render2D(our_font, 20 /* xpos */, 20 /* ypos */, 
-                          "The quick brown fox blah blah blah");
+    // Start Y position for top-center alignment
+    float startY = screenHeightCenter - totalMenuHeight / 2.0f;
 
-        glPopMatrix();
+    // Render in the correct order: Title -> Play -> Credits -> Exit
+    glft2::render2D(menuFont, screenWidthCenter - titleTextWidth / 2, startY, gameName, titleScale);
+    glft2::render2D(menuFont, screenWidthCenter - playTextWidth / 2, startY - (baseTextHeight + margin), playText, scale);
+    glft2::render2D(menuFont, screenWidthCenter - creditsTextWidth / 2, startY - 2 * (baseTextHeight + margin), creditsText, scale);
+    glft2::render2D(menuFont, screenWidthCenter - exitTextWidth / 2, startY - 3 * (baseTextHeight + margin), exitText, scale);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-    our_font.clean();
-    glfwTerminate();
-    return 0;
+    glPopMatrix();
 }

@@ -54,6 +54,7 @@ public:
     bool getDebug1Pressed() const { return debug1Pressed; }
     bool getDebug2Pressed() const { return debug2Pressed; }
     glft2::font_data getGameFont() const { return gameFont; }
+    glft2::font_data getMenuFont() const { return menuFont; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -108,6 +109,7 @@ private:
     int currentLevel;
     int totalScore;
     glft2::font_data gameFont;
+    glft2::font_data menuFont;
     bool debug1Pressed;
     bool debug2Pressed;
 };

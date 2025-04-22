@@ -36,6 +36,7 @@ public:
     void renderEmpty() const;
     void renderWall() const;
     void renderPellet() const;
+    void renderDoorOpen() const;
     void renderHighlight() const;
 
     // Getter and Setter for neighboring tiles

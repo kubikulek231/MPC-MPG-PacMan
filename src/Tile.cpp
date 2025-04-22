@@ -128,6 +128,25 @@ void Tile::renderPellet() const {
 	glPopMatrix();
 }
 
+void Tile::renderDoorOpen() const {
+	BoundingBox3D abb = this->getAbsoluteBoundingBox();
+	glColor3f(0.627f, 0.322f, 0.176f); // Normalized RGB (saddle brown-ish)
+
+	float centerX = (abb.min.x + abb.max.x) / 2.0f;
+	float centerY = (abb.min.y + abb.max.y) / 2.0f;
+	float centerZ = (abb.min.z + abb.max.z) / 2.0f;
+
+	float width = MapFactory::TILE_SIZE;
+	float height = MapFactory::TILE_SIZE;
+	float depth = MapFactory::TILE_SIZE / 8;
+
+	glPushMatrix();
+	glTranslatef(centerX, centerY, centerZ);
+	glScalef(width, height, depth); // scale unit cube into a brick
+	glutSolidCube(1.0f); // cube of size 1, scaled above
+	glPopMatrix();
+}
+
 void Tile::render() const {
 	if (highlight) {
 		renderHighlight();
@@ -143,7 +162,12 @@ void Tile::render() const {
 		break;
 	case TileType::EMPTY:
 	case TileType::GHOST_HOUSE:
+		renderEmpty();
+		break;
 	case TileType::DOOR_OPEN:
+		renderDoorOpen();
+		renderEmpty();
+		break;
 	case TileType::DOOR_CLOSED:
 	case TileType::TELEPORT:
 	case TileType::SPAWN_PLAYER:

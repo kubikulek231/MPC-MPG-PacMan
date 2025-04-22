@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
 namespace glft2 {
 
     // This Holds All Of The Information Related To Any
@@ -15,6 +16,8 @@ namespace glft2 {
         // The Height h From The File fname.
         void init(const char * fname, unsigned int h);
 
+        float char_widths[128] = {};
+
         // Free All The Resources Associated With The Font.
         void clean();
     };
@@ -26,4 +29,5 @@ namespace glft2 {
                std::string const & text);
 			   
 	void render3D(const font_data& ft_font, const std::string& text, float scale);
+    void measureText(const glft2::font_data& ft_font, const std::string& text, float* out_width, float* out_height, float scale = 1.0f);
 }

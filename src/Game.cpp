@@ -141,24 +141,29 @@ void Game::reshape(int w, int h) {
 void Game::renderScore() {
     Game& game = Game::getInstance();
     Map* map = game.getMap();
-    Tile* tile = map->getTileAt(1, MapFactory::MAP_WIDTH / 2 - 3); // Get the target tile
+    Tile* tile = map->getTileAt(1, 1); // Get the target tile
 
     Point3D textOrigin = tile->getOrigin(); // Get the 3D position of the tile
 
-    std::string scoreText = "Score: " + std::to_string(game.getTotalScore());
+    std::string scoreText = "Total score: " + std::to_string(game.getTotalScore());
 
     glPushMatrix();
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
+    float scale = 0.008f;
+    float textWidth;
+    float textHeight;
+    glft2::measureText(game.gameFont, scoreText, &textWidth, &textHeight, scale);
+
     // Move to the text's origin
-    glTranslatef(textOrigin.x, textOrigin.y, textOrigin.z + MapFactory::TILE_SIZE / 2);
+    glTranslatef(0 - textWidth / 2, textOrigin.y + 0.01, textOrigin.z + (1 * MapFactory::TILE_SIZE));
 
     // Single rotation to orient the text
     glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 
-    float scale = 0.008f;
     glft2::render3D(game.gameFont, scoreText, scale);
+
     glPopMatrix();
 }
 
@@ -176,12 +181,13 @@ void Game::renderLives() {
     glColor3f(1.0f, 1.0f, 1.0f);
 
     // Move to the text's origin
-    glTranslatef(textOrigin.x, textOrigin.y, textOrigin.z + MapFactory::TILE_SIZE / 2);
+    glTranslatef(textOrigin.x, textOrigin.y + 0.01, textOrigin.z + MapFactory::TILE_SIZE / 2);
 
     // Single rotation to orient the text
     glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 
     float scale = 0.008f;
     glft2::render3D(game.gameFont, livesText, scale);
+    
     glPopMatrix();
 }

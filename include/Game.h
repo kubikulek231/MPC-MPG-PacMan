@@ -8,6 +8,7 @@
 #include "MoveDir.h"
 #include "Ghost.h"
 #include "glft2/TextRenderer.hpp"
+#include "GameControl.h"
 
 // Singleton class
 class Game {
@@ -40,21 +41,17 @@ public:
     float getCameraDistance() const { return cameraDistance; }
     float getCameraAngleX() const { return cameraAngleX; }
     float getCameraAngleY() const { return cameraAngleY; }
-    float getCameraPosX() const { return cameraPosX; }
-    float getCameraPosZ() const { return cameraPosZ; }
-    bool getIsLeftMousePressed() const { return isLeftMousePressed; }
-    bool getIsMiddleMousePressed() const { return isMiddleMousePressed; }
+    float getCameraPosX() const { return cameraLookAtPosX; }
+    float getCameraPosZ() const { return cameraLookAtPosZ; }
     bool& getIsDirectionKeyPressed() { return isDirectionKeyPressed; }
-    int getLastMouseX() const { return lastMouseX; }
-    int getLastMouseY() const { return lastMouseY; }
     float getBaseSpeed() const { return baseMoveSpeed; }
     int getPlayerLives() const { return playerLives; }
     int getCurrentLevel() const { return currentLevel; }
     int getTotalScore() const { return totalScore; }
-    bool getDebug1Pressed() const { return debug1Pressed; }
-    bool getDebug2Pressed() const { return debug2Pressed; }
     glft2::font_data getGameFont() const { return gameFont; }
     glft2::font_data getMenuFont() const { return menuFont; }
+    float getCameraLookAtPosX() const { return cameraLookAtPosX; }
+    float getCameraLookAtPosZ() const { return cameraLookAtPosZ; }
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -63,19 +60,15 @@ public:
     void setCameraDistance(float distance) { cameraDistance = distance; }
     void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
     void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
-    void setCameraPosX(float posX) { cameraPosX = posX; }
-    void setCameraPosZ(float posY) { cameraPosZ = posY; }
-    void setIsLeftMousePressed(bool pressed) { isLeftMousePressed = pressed; }
-    void setIsMiddleMousePressed(bool pressed) { isMiddleMousePressed = pressed; }
+    void setCameraPosX(float posX) { cameraLookAtPosX = posX; }
+    void setCameraPosZ(float posY) { cameraLookAtPosZ = posY; }
     void setIsDirectionKeyPressed(bool changed) { isDirectionKeyPressed = changed; }
-    void setLastMouseX(int x) { lastMouseX = x; }
-    void setLastMouseY(int y) { lastMouseY = y; }
     void setBaseSpeed(float speed) { baseMoveSpeed = speed; }
     void setPlayerLives(int lives) { playerLives = lives; }
     void setCurrentLevel(int level) { currentLevel = level; }
     void setTotalScore(int score) { totalScore = score; }
-    void setDebug1Pressed(bool pressed) { debug1Pressed = pressed; }
-    void setDebug2Pressed(bool pressed) { debug2Pressed = pressed; }
+    void setCameraLookAtPosX(float posX) { cameraLookAtPosX = posX; }
+    void setCameraLookAtPosZ(float posZ) { cameraLookAtPosZ = posZ; }
 
     int gameCollectedPellets = 0;
 private:
@@ -95,14 +88,8 @@ private:
     bool isDirectionKeyPressed = true;
     float lastFrameTimeSeconds = 0.0f;
     float lastFrameTimeDeltaSeconds = 0.0f;
+
     float cameraDistance = 50.0f;
-    float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
-    float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)
-    float cameraPosX = 0.0f;
-    float cameraPosZ = 0.0f;
-    bool isLeftMousePressed = false; // To check if the left mouse button is pressed
-    bool isMiddleMousePressed = false;
-    int lastMouseX, lastMouseY;  // To track the last mouse position
     float baseMoveSpeed = 3.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
@@ -110,8 +97,14 @@ private:
     int totalScore;
     glft2::font_data gameFont;
     glft2::font_data menuFont;
-    bool debug1Pressed;
-    bool debug2Pressed;
+
+    float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
+    float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)
+    float cameraLookAtPosX = 0.0f;
+    float cameraLookAtPosZ = 0.0f;
+    float cameraPosX = 0.0f;
+    float cameraPosY = 0.0f;
+    float cameraPosZ = 0.0f;
 };
 
 #endif // GAME_H

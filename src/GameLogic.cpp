@@ -50,6 +50,8 @@ void GameLogic::updateGhosts() {
 	// Do not update ghost movement until player chooses moveDir
 	if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) { return; }
 
+	GameControl& gc = GameControl::getInstance();
+
 	// Render ghosts
 	auto& ghosts = game.getGhosts();
 	for (size_t i = 0; i < ghosts.size(); ++i) {
@@ -63,8 +65,8 @@ void GameLogic::updateGhosts() {
 	}
 
 	// Debug
-	if (game.getDebug1Pressed()) {
-		game.setDebug1Pressed(false);
+	if (gc.isKeyFlagPressedAndReleased('x')) {
+		gc.setKeyFlagPressedAndReleased('x', false);
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];
@@ -78,8 +80,8 @@ void GameLogic::updateGhosts() {
 		}
 	}
 
-	if (game.getDebug2Pressed()) {
-		game.setDebug2Pressed(false);
+	if (gc.isKeyFlagPressedAndReleased('y')) {
+		gc.setKeyFlagPressedAndReleased('y', false);
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];

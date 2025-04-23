@@ -10,6 +10,16 @@
 #include <string>      
 #include <vector>      
 
+#define PI 3.14159265358979323846f
+
+// Global wrapper functions to be passed to GLUT
+static void keyboardCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboard(tolower(key), x, y); }
+static void keyboardUpCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboardUp(tolower(key), x, y); }
+static void mouseButtonCallback(int button, int state, int x, int y) { GameControl::getInstance().mouseButton(button, state, x, y); }
+static void mouseMotionCallback(int x, int y) { 
+    GameControl::getInstance().mouseMotion(x, y); 
+}
+
 
 // Inits new game
 void Game::init() {
@@ -17,9 +27,10 @@ void Game::init() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Register mouse callback functions
-    glutMouseFunc(GameControl::mouseButton);
-    glutMotionFunc(GameControl::mouseMotion);
-    glutKeyboardFunc(GameControl::keyboard);
+    glutMouseFunc(mouseButtonCallback);
+    glutMotionFunc(mouseMotionCallback);
+    glutKeyboardFunc(keyboardCallback);
+    glutKeyboardUpFunc(keyboardUpCallback);
 
     currentLevel = 0;
     playerLives = 100;
@@ -83,6 +94,7 @@ void Game::initLevel(int level) {
 // Update positions, handle logic
 void Game::update(int value) {
     Game& game = Game::getInstance();
+
     float newFrameTimeSeconds = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
     // Update the frametime
     game.lastFrameTimeDeltaSeconds = newFrameTimeSeconds - game.lastFrameTimeSeconds;
@@ -92,6 +104,7 @@ void Game::update(int value) {
     GameLogic::updateGhosts();
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
+    GameControl::getInstance().update();
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -99,39 +112,44 @@ void Game::update(int value) {
     glutTimerFunc(8, Game::update, 0);
 }
 
-// Render the game
 void Game::render() {
     Game& game = Game::getInstance();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    float radY = game.cameraAngleY * 3.14159f / 180.0f;
-    float radX = game.cameraAngleX * 3.14159f / 180.0f;
+    float yawRad = game.getCameraAngleY() * PI / 180.0f;
+    float pitchRad = game.getCameraAngleX() * PI / 180.0f;
+    float distance = game.getCameraDistance();
 
-    float camX = game.cameraPosX + game.cameraDistance * sin(-radY) * cos(radX);
-    float camY = game.cameraDistance * sin(radX);
-    float camZ = game.cameraPosZ + game.cameraDistance * cos(radY) * cos(radX);
+    float camX = distance * cos(pitchRad) * sin(yawRad);
+    float camY = distance * sin(pitchRad);
+    float camZ = distance * cos(pitchRad) * cos(yawRad);
 
-    // Set the camera view
-    gluLookAt(camX, camY, camZ,  // Eye position (based on camera angles and zoom)
-        game.cameraPosX, 0.0, game.cameraPosZ,    // Look-at point (center of the map)
-        0.0, 1.0, 0.0);   // Up vector
+    gluLookAt(
+        game.getCameraLookAtPosX() + camX,
+        0 + camY,
+        game.getCameraLookAtPosZ() + camZ,
+        game.getCameraLookAtPosX(),
+        0,
+        game.getCameraLookAtPosZ(),
+        0, 1, 0
+    );
 
-    // Render map
+
+    // Render game elements
     game.getMap()->render(true);
     game.getPlayer()->render();
     game.renderScore();
     game.renderLives();
-
     GameMenu::render();
 
-    // Render ghosts
     for (Ghost* ghost : game.getGhosts()) {
         ghost->render();
     }
 
     glutSwapBuffers();
 }
+
 
 // Callback to trigger on glut window reshape
 void Game::reshape(int w, int h) {

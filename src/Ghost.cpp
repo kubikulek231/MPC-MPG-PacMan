@@ -268,38 +268,43 @@ Tile* Ghost::furthestTileTowardCorner(MapCorner corner) {
     int numRows = MapFactory::MAP_HEIGHT;
     int numCols = MapFactory::MAP_WIDTH;
 
+    // Precompute all walkable tiles for the given corner
+    std::vector<Tile*> candidateTiles;
     for (int r = 0; r < numRows; ++r) {
         for (int c = 0; c < numCols; ++c) {
             Tile* candidate = map->getTileAt(r, c);
-            if (!candidate || !candidate->isWalkable()) continue;
+            if (candidate && candidate->isWalkable()) {
+                // Filter based on direction to the corner
+                bool validTile = false;
+                switch (corner) {
+                case MapCorner::TOP_LEFT:
+                    validTile = (r <= startRow && c <= startCol);
+                    break;
+                case MapCorner::TOP_RIGHT:
+                    validTile = (r <= startRow && c >= startCol);
+                    break;
+                case MapCorner::BOTTOM_LEFT:
+                    validTile = (r >= startRow && c <= startCol);
+                    break;
+                case MapCorner::BOTTOM_RIGHT:
+                    validTile = (r >= startRow && c >= startCol);
+                    break;
+                }
 
-            // Filter based on direction to the corner
-            switch (corner) {
-            case MapCorner::TOP_LEFT:
-                if (r > startRow || c > startCol) continue;
-                break;
-            case MapCorner::TOP_RIGHT:
-                if (r > startRow || c < startCol) continue;
-                break;
-            case MapCorner::BOTTOM_LEFT:
-                if (r < startRow || c > startCol) continue;
-                break;
-            case MapCorner::BOTTOM_RIGHT:
-                if (r < startRow || c < startCol) continue;
-                break;
+                if (validTile) {
+                    candidateTiles.push_back(candidate);
+                }
             }
+        }
+    }
 
-            // Use geometric (Manhattan) distance
-            float distance = heuristicCost(startTile, candidate);
-
-            // Optional: only consider reachable ones
-            auto path = shortestPathToTile(candidate);
-            if (path.empty()) continue;
-
-            if (distance > maxDistance) {
-                maxDistance = distance;
-                bestTile = candidate;
-            }
+    // Iterate over filtered candidate tiles to find the furthest tile
+    for (Tile* candidate : candidateTiles) {
+        float distance = heuristicCost(startTile, candidate);
+        if (distance > maxDistance) {
+            // If this candidate tile is further, consider it as the best
+            maxDistance = distance;
+            bestTile = candidate;
         }
     }
 

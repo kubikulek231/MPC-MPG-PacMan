@@ -7,6 +7,7 @@
 
 class GameMenu {
 public:
+    static void init();
     static void render();
 };
 

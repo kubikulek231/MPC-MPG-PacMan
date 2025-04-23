@@ -2,6 +2,11 @@
 #include <glft2/TextRenderer.hpp>
 #include <GL/gl.h>
 
+void GameMenu::init() {
+
+}
+
+
 void GameMenu::render() {
     Game& game = Game::getInstance();
     glft2::font_data menuFont = game.getMenuFont();

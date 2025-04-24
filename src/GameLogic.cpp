@@ -65,8 +65,8 @@ void GameLogic::updateGhosts() {
 	}
 
 	// Debug
-	if (gc.isKeyFlagPressedAndReleased('x')) {
-		gc.setKeyFlagPressedAndReleased('x', false);
+	if (gc.isKeyFlagPressed('x')) {
+		gc.setKeyFlagPressed('x', false);
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];
@@ -80,8 +80,8 @@ void GameLogic::updateGhosts() {
 		}
 	}
 
-	if (gc.isKeyFlagPressedAndReleased('y')) {
-		gc.setKeyFlagPressedAndReleased('y', false);
+	if (gc.isKeyFlagPressed('y')) {
+		gc.setKeyFlagPressed('y', false);
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];

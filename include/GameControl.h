@@ -38,21 +38,10 @@ public:
     bool isButtonPressed(int key);
     bool isButtonReleased(int key);
 
-    bool isKeyFlagPressedAndReleased(unsigned char key);
     bool isKeyFlagPressed(unsigned char key);
-    bool isKeyFlagReleased(unsigned char key);
-
-    bool isButtonFlagPressedAndReleased(int key);
     bool isButtonFlagPressed(int key);
-    bool isButtonFlagReleased(int key);
-
-    void setKeyFlagPressedAndReleased(unsigned char key, bool setState);
     void setKeyFlagPressed(unsigned char key, bool setState);
-    void setKeyFlagReleased(unsigned char key, bool setState);
-
-    void setButtonFlagPressedAndReleased(int key, bool setState);
     void setButtonFlagPressed(int key, bool setState);
-    void setButtonFlagReleased(int key, bool setState);
 
 private:
     GameControl() = default;
@@ -60,27 +49,18 @@ private:
     GameControl& operator=(const GameControl&) = delete;
 
     std::unordered_map<unsigned char, bool> pressedKeys;
-    std::unordered_map<unsigned char, bool> releasedKeys;
-    std::unordered_map<unsigned char, bool> pressedAndReleasedKeys;
+    std::unordered_map<unsigned char, bool> lastPressedKeys;
 
     std::unordered_map<unsigned char, bool> pressedButtons;
-    std::unordered_map<unsigned char, bool> releasedButtons;
-    std::unordered_map<unsigned char, bool> pressedAndReleasedButtons;
+    std::unordered_map<unsigned char, bool> lastPressedButtons;
 
     std::unordered_map<unsigned char, bool> pressedFlagKeys;
-    std::unordered_map<unsigned char, bool> releasedFlagKeys;
-    std::unordered_map<unsigned char, bool> pressedAndReleasedFlagKeys;
-
     std::unordered_map<unsigned char, bool> pressedFlagButtons;
-    std::unordered_map<unsigned char, bool> releasedFlagButtons;
-    std::unordered_map<unsigned char, bool> pressedAndReleasedFlagButtons;
 
     float mouseX = 0;
     float mouseY = 0;
     float lastMouseX = 0;
     float lastMouseY = 0;
-    float mouseDeltaX = 0;
-    float mouseDeltaY = 0;
 };
 
 #endif

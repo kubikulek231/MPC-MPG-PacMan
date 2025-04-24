@@ -18,8 +18,8 @@ void GameControl::update() {
     bool leftPressed = gc.isButtonPressed(GLUT_LEFT_BUTTON);
 
     // Check if we're just starting interaction
-    bool rightJustPressed = gc.isButtonFlagPressedAndReleased(GLUT_RIGHT_BUTTON);
-    bool leftJustPressed = gc.isButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON);
+    bool rightJustPressed = gc.isButtonFlagPressed(GLUT_RIGHT_BUTTON);
+    bool leftJustPressed = gc.isButtonFlagPressed(GLUT_LEFT_BUTTON);
 
     if ((rightPressed && rightJustPressed) || (leftPressed && leftJustPressed)) {
         // Reset last mouse position to avoid jump on first movement
@@ -27,8 +27,8 @@ void GameControl::update() {
         gc.lastMouseY = gc.mouseY;
 
         // Clear the flag so it doesn't reset every frame
-        gc.setButtonFlagPressedAndReleased(GLUT_RIGHT_BUTTON, false);
-        gc.setButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON, false);
+        gc.setButtonFlagPressed(GLUT_RIGHT_BUTTON, false);
+        gc.setButtonFlagPressed(GLUT_LEFT_BUTTON, false);
     }
 
 
@@ -78,27 +78,15 @@ void GameControl::update() {
     }
 
     // ----- Zoom (scroll wheel) -----
-    if (gc.isButtonFlagPressedAndReleased(GLUT_WHEEL_UP)) {
-        gc.setButtonFlagPressedAndReleased(GLUT_WHEEL_UP, false);
+    if (gc.isButtonFlagPressed(GLUT_WHEEL_UP)) {
+        gc.setButtonFlagPressed(GLUT_WHEEL_UP, false);
         float zoomStep = 0.5f;
         game.setCameraDistance(std::clamp(game.getCameraDistance() - zoomStep, 5.0f, 100.0f));
     }
-    if (gc.isButtonFlagPressedAndReleased(GLUT_WHEEL_DOWN)) {
-        gc.setButtonFlagPressedAndReleased(GLUT_WHEEL_DOWN, false);
+    if (gc.isButtonFlagPressed(GLUT_WHEEL_DOWN)) {
+        gc.setButtonFlagPressed(GLUT_WHEEL_DOWN, false);
         float zoomStep = 0.5f;
         game.setCameraDistance(std::clamp(game.getCameraDistance() + zoomStep, 5.0f, 100.0f));
-    }
-
-    // Save last mouse position only after movement handled
-    if (interacting) {
-        gc.mouseDeltaX = dx;
-        gc.mouseDeltaY = dy;
-        gc.lastMouseX = gc.mouseX;
-        gc.lastMouseY = gc.mouseY;
-    }
-    else {
-        gc.mouseDeltaX = 0;
-        gc.mouseDeltaY = 0;
     }
 }
 
@@ -106,24 +94,18 @@ void GameControl::update() {
 void GameControl::keyboard(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = true;
-        pressedAndReleasedKeys[key] = false;
-        releasedKeys[key] = false;
+        lastPressedKeys[key] = false;
 
         pressedFlagKeys[key] = true;
-        pressedAndReleasedFlagKeys[key] = false;
-        releasedFlagKeys[key] = false;
     }
 }
 
 void GameControl::keyboardUp(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = false;
-        pressedAndReleasedKeys[key] = true;
-        releasedKeys[key] = true;
+        lastPressedKeys[key] = true;
 
         pressedFlagKeys[key] = false;
-        pressedAndReleasedFlagKeys[key] = true;
-        releasedFlagKeys[key] = true;
     }
 }
 
@@ -131,22 +113,16 @@ void GameControl::mouseButton(int button, int state, int x, int y) {
     if (trackedMouseButtons.find(button) != trackedMouseButtons.end()) {
         if (state == GLUT_DOWN) {
             pressedButtons[button] = true;
-            pressedAndReleasedButtons[button] = false;
-            releasedButtons[button] = false;
+            lastPressedButtons[button] = false;
 
             pressedFlagButtons[button] = true;
-            pressedAndReleasedFlagButtons[button] = false;
-            releasedFlagButtons[button] = false;
         }
         else if (state == GLUT_UP) {
             // Reset button state when released
             pressedButtons[button] = false;
-            pressedAndReleasedButtons[button] = true;
-            releasedButtons[button] = true;
+            lastPressedButtons[button] = true;
 
             pressedFlagButtons[button] = false;
-            pressedAndReleasedFlagButtons[button] = true;
-            releasedFlagButtons[button] = true;
         }
     }
 }
@@ -154,7 +130,6 @@ void GameControl::mouseButton(int button, int state, int x, int y) {
 
 void GameControl::mouseMotion(int x, int y) {
     GameControl& gc = GameControl::getInstance();
-
     gc.mouseX = x;
     gc.mouseY = y;
 }
@@ -165,11 +140,11 @@ bool GameControl::isKeyPressed(unsigned char key) {
 }
 
 bool GameControl::isKeyReleased(unsigned char key) {
-    return releasedKeys[key];
+    return lastPressedKeys[key];
 }
 
 bool GameControl::isKeyPressedAndReleased(unsigned char key) {
-    return pressedAndReleasedKeys[key];
+    return lastPressedKeys[key] && !pressedKeys[key];
 }
 
 bool GameControl::isButtonPressed(int key) {
@@ -177,58 +152,25 @@ bool GameControl::isButtonPressed(int key) {
 }
 
 bool GameControl::isButtonReleased(int key) {
-    return releasedButtons[key];
+    return lastPressedButtons[key];
 }
 
 bool GameControl::isButtonPressedAndReleased(int key) {
-    return pressedAndReleasedButtons[key];
+    return lastPressedButtons[key] && !pressedButtons[key];
 }
-
 
 bool GameControl::isKeyFlagPressed(unsigned char key) {
     return pressedFlagKeys[key];
-}
-
-bool GameControl::isKeyFlagReleased(unsigned char key) {
-    return releasedFlagKeys[key];
-}
-
-bool GameControl::isKeyFlagPressedAndReleased(unsigned char key) {
-    return pressedAndReleasedFlagKeys[key];
 }
 
 bool GameControl::isButtonFlagPressed(int key) {
     return pressedFlagButtons[key];
 }
 
-bool GameControl::isButtonFlagReleased(int key) {
-    return releasedFlagButtons[key];
-}
-
-bool GameControl::isButtonFlagPressedAndReleased(int key) {
-    return pressedAndReleasedFlagButtons[key];
-}
-
-void GameControl::setKeyFlagPressedAndReleased(unsigned char key, bool setState) {
-    pressedAndReleasedFlagKeys[key] = setState;
-}
-
 void GameControl::setKeyFlagPressed(unsigned char key, bool setState) {
     pressedFlagKeys[key] = setState;
 }
 
-void GameControl::setKeyFlagReleased(unsigned char key, bool setState) {
-    releasedFlagKeys[key] = setState;
-}
-
-void GameControl::setButtonFlagPressedAndReleased(int key, bool setState) {
-    pressedAndReleasedFlagButtons[key] = setState;
-}
-
 void GameControl::setButtonFlagPressed(int key, bool setState) {
     pressedFlagButtons[key] = setState;
-}
-
-void GameControl::setButtonFlagReleased(int key, bool setState) {
-    releasedFlagButtons[key] = setState;
 }

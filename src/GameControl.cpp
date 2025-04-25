@@ -1,96 +1,163 @@
-/* GameControl::update — WASD unchanged, camera orbit/pan/zoom without GLM */
 #include "gl_includes.h"
 #include "GameControl.h"
 #include "Game.h"
 #include "MoveDir.h"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
-#define PI 3.14159265358979323846f
-#define MOUSE_SENSITIVITY 0.005f  // tweak this as needed
-#define DEG_PER_PIXEL 0.15f // Try values between 0.05 and 0.3
+const CameraState GameControl::DEFAULT_CAMERA_STATE = {
+    0.0f, 45.0f, 50.0f,  // yaw, pitch, distance
+    0.0f, 0.0f, 0.0f    // lookAtX, lookAtY, lookAtZ
+};
+
+GameControl::GameControl() {
+    updateGluFromState();
+}
 
 void GameControl::update() {
-    GameControl& gc = GameControl::getInstance();
-    Game& game = Game::getInstance();
+    handleWasdMovement();
+    handleCameraOrbitting();
+    handleCameraLookAtMoving();
+    handleCameraZooming();
+}
 
-    bool rightPressed = gc.isButtonPressed(GLUT_RIGHT_BUTTON);
-    bool leftPressed = gc.isButtonPressed(GLUT_LEFT_BUTTON);
+void GameControl::handleWasdMovement() {
+    // WASD movement
+    if (isKeyFlagPressed('w')) { movementChanged = true; this->moveDir = MoveDir::FWD; }
+    if (isKeyFlagPressed('s')) { movementChanged = true; this->moveDir = MoveDir::BWD; }
+    if (isKeyFlagPressed('a')) { movementChanged = true; this->moveDir = MoveDir::LEFT; }
+    if (isKeyFlagPressed('d')) { movementChanged = true; this->moveDir = MoveDir::RIGHT; }
+}
 
-    // Check if we're just starting interaction
-    bool rightJustPressed = gc.isButtonFlagPressed(GLUT_RIGHT_BUTTON);
-    bool leftJustPressed = gc.isButtonFlagPressed(GLUT_LEFT_BUTTON);
+void GameControl::updateGluFromState() {
+    CameraGLU glu;
 
-    if ((rightPressed && rightJustPressed) || (leftPressed && leftJustPressed)) {
-        // Reset last mouse position to avoid jump on first movement
-        gc.lastMouseX = gc.mouseX;
-        gc.lastMouseY = gc.mouseY;
+    // Convert yaw and pitch to radians
+    float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
+    float pitchRad = cameraState.pitch * GameControl::DEG_TO_RAD;
 
-        // Clear the flag so it doesn't reset every frame
-        gc.setButtonFlagPressed(GLUT_RIGHT_BUTTON, false);
-        gc.setButtonFlagPressed(GLUT_LEFT_BUTTON, false);
-    }
+    // Spherical to Cartesian conversion (camera orbiting around target)
+    float camX = cameraState.distance * cosf(pitchRad) * sinf(yawRad);
+    float camY = cameraState.distance * sinf(pitchRad);
+    float camZ = cameraState.distance * cosf(pitchRad) * cosf(yawRad);
 
+    // Camera position is offset from the target
+    glu.posX = cameraState.lookAtX + camX;
+    glu.posY = cameraState.lookAtY + camY;
+    glu.posZ = cameraState.lookAtZ + camZ;
 
-    // ----- WASD movement remains unchanged -----
-    if (gc.isKeyFlagPressed('w')) { game.setIsDirectionKeyPressed(true); game.setMoveDir(MoveDir::FWD); }
-    if (gc.isKeyFlagPressed('s')) { game.setIsDirectionKeyPressed(true); game.setMoveDir(MoveDir::BWD); }
-    if (gc.isKeyFlagPressed('a')) { game.setIsDirectionKeyPressed(true); game.setMoveDir(MoveDir::LEFT); }
-    if (gc.isKeyFlagPressed('d')) { game.setIsDirectionKeyPressed(true); game.setMoveDir(MoveDir::RIGHT); }
+    // Look-at point is the target itself
+    glu.lookAtX = cameraState.lookAtX;
+    glu.lookAtY = cameraState.lookAtY;
+    glu.lookAtZ = cameraState.lookAtZ;
 
-    // Compute mouse delta only when a button is pressed
-    int dx = 0, dy = 0;
-    bool interacting = gc.isButtonPressed(GLUT_LEFT_BUTTON) || gc.isButtonPressed(GLUT_RIGHT_BUTTON);
-    if (interacting) {
-        dx = gc.mouseX - gc.lastMouseX;
-        dy = gc.mouseY - gc.lastMouseY;
-    }
+    // World up vector (you could improve this if you're near poles)
+    glu.upX = 0.0f;
+    glu.upY = 1.0f;
+    glu.upZ = 0.0f;
 
-    // ----- Camera Orbit (right-click) -----
-    if (gc.isButtonPressed(GLUT_RIGHT_BUTTON)) {
-        float deltaYaw = dx * DEG_PER_PIXEL;
-        float deltaPitch = -dy * DEG_PER_PIXEL;
+    cameraGlu = glu;
+}
 
-        float newPitch = game.getCameraAngleX() + deltaPitch;
-        newPitch = std::clamp(newPitch, -89.0f, 89.0f);
+void GameControl::updateStateFromGlu() {
+    // Vector from lookAt to camera position
+    float dx = cameraGlu.posX - cameraGlu.lookAtX;
+    float dy = cameraGlu.posY - cameraGlu.lookAtY;
+    float dz = cameraGlu.posZ - cameraGlu.lookAtZ;
 
-        game.setCameraAngleY(game.getCameraAngleY() + deltaYaw);
-        game.setCameraAngleX(newPitch);
-    }
+    // Calculate distance
+    float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
 
-    // ----- Camera Pan (left-click) -----
-    if (gc.isButtonPressed(GLUT_LEFT_BUTTON)) {
-        float distance = game.getCameraDistance();
-        float panSpeed = 0.01f * distance;
+    // Prevent division by zero
+    if (distance == 0.0f) return;
 
-        float yawRad = game.getCameraAngleY() * PI / 180.0f;
-        float rightX = cosf(yawRad);
-        float rightZ = -sinf(yawRad);
+    // Calculate pitch and yaw in radians
+    float pitchRad = std::asin(dy / distance);
+    float yawRad = std::atan2(dx, dz);
 
-        float moveX = -dx * panSpeed * rightX;
-        float moveZ = -dx * panSpeed * rightZ;
-        float moveY = dy * panSpeed; // vertical pan if desired
+    // Convert radians to degrees
+    float pitch = pitchRad * GameControl::DEG_TO_RAD;
+    float yaw = yawRad * GameControl::DEG_TO_RAD;
 
-        game.setCameraLookAtPosX(game.getCameraLookAtPosX() + moveX);
-        game.setCameraLookAtPosZ(game.getCameraLookAtPosZ() + moveZ);
-        // Optional Y pan:
-        // game.setCameraLookAtPosY(game.getCameraLookAtPosY() + moveY);
-    }
+    // Update cameraState
+    cameraState.pitch = pitch;
+    cameraState.yaw = yaw;
+    cameraState.distance = distance;
 
-    // ----- Zoom (scroll wheel) -----
-    if (gc.isButtonFlagPressed(GLUT_WHEEL_UP)) {
-        gc.setButtonFlagPressed(GLUT_WHEEL_UP, false);
-        float zoomStep = 0.5f;
-        game.setCameraDistance(std::clamp(game.getCameraDistance() - zoomStep, 5.0f, 100.0f));
-    }
-    if (gc.isButtonFlagPressed(GLUT_WHEEL_DOWN)) {
-        gc.setButtonFlagPressed(GLUT_WHEEL_DOWN, false);
-        float zoomStep = 0.5f;
-        game.setCameraDistance(std::clamp(game.getCameraDistance() + zoomStep, 5.0f, 100.0f));
-    }
+    cameraState.lookAtX = cameraGlu.lookAtX;
+    cameraState.lookAtY = cameraGlu.lookAtY;
+    cameraState.lookAtZ = cameraGlu.lookAtZ;
 }
 
 
+// Handles camera look at point moving
+void GameControl::handleCameraLookAtMoving() {
+    if (isButtonPressed(GLUT_LEFT_BUTTON)) {
+        if (!isLookAtMoving) {
+            resetMouseDelta();
+            isLookAtMoving = true;
+            return;
+        }
+
+        float sensitivity = 0.05f;
+        
+        // In state dimension
+        cameraGlu.lookAtX = cameraGlu.lookAtX - mouseXDelta * sensitivity;
+        cameraGlu.lookAtZ = cameraGlu.lookAtZ - mouseYDelta * sensitivity;
+        cameraGlu.posX = cameraGlu.posX - mouseXDelta * sensitivity;
+        cameraGlu.posZ = cameraGlu.posZ - mouseYDelta * sensitivity;
+        
+        // Update also the GLU struct
+        updateStateFromGlu();
+        resetMouseDelta();
+        return;
+    }
+    isLookAtMoving = false;
+}
+
+// Handles camera orbitting
+void GameControl::handleCameraOrbitting() {
+    if (isButtonPressed(GLUT_RIGHT_BUTTON)) {
+        if (!isOrbitting) {
+            isOrbitting = true;
+            resetMouseDelta();
+            return;
+        }
+        // Sensitivity multiplier (tweakable)
+        float sensitivity = 0.3f;
+
+        cameraState.yaw += mouseXDelta * sensitivity;
+        cameraState.pitch -= mouseYDelta * sensitivity;
+
+        // Clamp pitch to avoid flipping
+        updateGluFromState();
+        resetMouseDelta();
+        return;
+    }
+    isOrbitting = false;
+}
+
+
+// Handles camera zoom
+void GameControl::handleCameraZooming() {
+
+    if (isButtonFlagPressed(GLUT_WHEEL_UP)) {
+        resetButtonFlagPressed(GLUT_WHEEL_UP);
+        float zoomStep = 0.5f;
+        cameraState.distance = std::clamp(cameraState.distance + zoomStep, 5.0f, 100.0f);
+        updateGluFromState();
+    }
+
+    if (isButtonFlagPressed(GLUT_WHEEL_DOWN)) {
+        resetButtonFlagPressed(GLUT_WHEEL_DOWN);
+        float zoomStep = 0.5f;
+        cameraState.distance = std::clamp(cameraState.distance - zoomStep, 5.0f, 100.0f);
+        updateGluFromState();
+    }
+}
+
+// Glut callback for registering keyboard down events
 void GameControl::keyboard(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = true;
@@ -100,6 +167,7 @@ void GameControl::keyboard(unsigned char key, int x, int y) {
     }
 }
 
+// Glut callback for registering keyboard up events
 void GameControl::keyboardUp(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = false;
@@ -109,31 +177,48 @@ void GameControl::keyboardUp(unsigned char key, int x, int y) {
     }
 }
 
+// Glut callback for registering mouse button inputs
 void GameControl::mouseButton(int button, int state, int x, int y) {
-    if (trackedMouseButtons.find(button) != trackedMouseButtons.end()) {
-        if (state == GLUT_DOWN) {
-            pressedButtons[button] = true;
-            lastPressedButtons[button] = false;
+    if (trackedMouseButtons.find(button) == trackedMouseButtons.end()) { return; }
 
-            pressedFlagButtons[button] = true;
-        }
-        else if (state == GLUT_UP) {
-            // Reset button state when released
-            pressedButtons[button] = false;
-            lastPressedButtons[button] = true;
+    // Handle scroll wheel as one-time impulse
+    if (button == GLUT_WHEEL_UP || button == GLUT_WHEEL_DOWN) {
+        pressedFlagButtons[button] = true;
+        return;
+    }
 
-            pressedFlagButtons[button] = false;
-        }
+    if (state == GLUT_DOWN) {
+        pressedButtons[button] = true;
+        lastPressedButtons[button] = false;
+        pressedFlagButtons[button] = true;
+        return;
+    }
+
+    if (state == GLUT_UP) {
+        // Reset button state when released
+        pressedButtons[button] = false;
+        lastPressedButtons[button] = true;
+        pressedFlagButtons[button] = false;
+        return;
     }
 }
 
-
+// Glut callback for registering mouse position
 void GameControl::mouseMotion(int x, int y) {
-    GameControl& gc = GameControl::getInstance();
-    gc.mouseX = x;
-    gc.mouseY = y;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    mouseX = x;
+    mouseY = y;
+    mouseXDelta = mouseX - lastMouseX;
+    mouseYDelta = mouseY - lastMouseY;
 }
 
+void GameControl::resetMouseDelta() {
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    mouseXDelta = 0;
+    mouseYDelta = 0;
+}
 
 bool GameControl::isKeyPressed(unsigned char key) {
     return pressedKeys[key];
@@ -167,10 +252,10 @@ bool GameControl::isButtonFlagPressed(int key) {
     return pressedFlagButtons[key];
 }
 
-void GameControl::setKeyFlagPressed(unsigned char key, bool setState) {
-    pressedFlagKeys[key] = setState;
+void GameControl::resetKeyFlagPressed(unsigned char key) {
+    pressedFlagKeys[key] = false;
 }
 
-void GameControl::setButtonFlagPressed(int key, bool setState) {
-    pressedFlagButtons[key] = setState;
+void GameControl::resetButtonFlagPressed(int key) {
+    pressedFlagButtons[key] = false;
 }

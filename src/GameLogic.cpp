@@ -35,16 +35,18 @@ void GameLogic::updateScore() {
 
 void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
-	MoveDir& moveDir = *game.getMoveDir();
+	GameControl& gc = game.getGameControlInstance();
+	MoveDir moveDir = gc.getMoveDir();
 	Player& player = *game.getPlayer();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
-	player.move(moveDir, game.getIsDirectionKeyPressed(), lastFrameTimeMs);
+
+	player.move(moveDir, gc.getMovementChanged(), lastFrameTimeMs);
 	player.update(game.gameCollectedPellets);
 }
 
 void GameLogic::updateGhosts() {
 	Game& game = Game::getInstance();
-	MoveDir& moveDir = *game.getMoveDir();
+	MoveDir moveDir = game.getGameControlInstance().getMoveDir();
 	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
 
 	// Do not update ghost movement until player chooses moveDir
@@ -66,7 +68,7 @@ void GameLogic::updateGhosts() {
 
 	// Debug
 	if (gc.isKeyFlagPressed('x')) {
-		gc.setKeyFlagPressed('x', false);
+		gc.resetKeyFlagPressed('x');
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];
@@ -81,7 +83,7 @@ void GameLogic::updateGhosts() {
 	}
 
 	if (gc.isKeyFlagPressed('y')) {
-		gc.setKeyFlagPressed('y', false);
+		gc.resetKeyFlagPressed('y');
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];

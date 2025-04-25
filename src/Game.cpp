@@ -16,9 +16,7 @@
 static void keyboardCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboard(tolower(key), x, y); }
 static void keyboardUpCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboardUp(tolower(key), x, y); }
 static void mouseButtonCallback(int button, int state, int x, int y) { GameControl::getInstance().mouseButton(button, state, x, y); }
-static void mouseMotionCallback(int x, int y) { 
-    GameControl::getInstance().mouseMotion(x, y); 
-}
+static void mouseMotionCallback(int x, int y) { GameControl::getInstance().mouseMotion(x, y); }
 
 
 // Inits new game
@@ -28,6 +26,7 @@ void Game::init() {
 
     // Register mouse callback functions
     glutMouseFunc(mouseButtonCallback);
+    glutPassiveMotionFunc(mouseMotionCallback);
     glutMotionFunc(mouseMotionCallback);
     glutKeyboardFunc(keyboardCallback);
     glutKeyboardUpFunc(keyboardUpCallback);
@@ -104,7 +103,7 @@ void Game::update(int value) {
     GameLogic::updateGhosts();
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
-    GameControl::getInstance().update();
+    game.getGameControlInstance().update();
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -114,27 +113,22 @@ void Game::update(int value) {
 
 void Game::render() {
     Game& game = Game::getInstance();
+    GameControl& gc = GameControl::getInstance();
+    CameraGLU cam = gc.getCameraGLU();
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    float yawRad = game.getCameraAngleY() * PI / 180.0f;
-    float pitchRad = game.getCameraAngleX() * PI / 180.0f;
-    float distance = game.getCameraDistance();
-
-    float camX = distance * cos(pitchRad) * sin(yawRad);
-    float camY = distance * sin(pitchRad);
-    float camZ = distance * cos(pitchRad) * cos(yawRad);
-
     gluLookAt(
-        game.getCameraLookAtPosX() + camX,
-        0 + camY,
-        game.getCameraLookAtPosZ() + camZ,
-        game.getCameraLookAtPosX(),
-        0,
-        game.getCameraLookAtPosZ(),
-        0, 1, 0
+        cam.posX,       // Camera Position X
+        cam.posY,       // Camera Position Y
+        cam.posZ,       // Camera Position Z
+        cam.lookAtX,    // LookAt X
+        cam.lookAtY,    // LookAt Y
+        cam.lookAtZ,    // LookAt Z
+        cam.upX, cam.upY, cam.upZ         // Up Vector
     );
-
 
     // Render game elements
     game.getMap()->render(true);

@@ -7,8 +7,8 @@
 #include "MapFactory.h"
 #include "MoveDir.h"
 #include "Ghost.h"
-#include "glft2/TextRenderer.hpp"
 #include "GameControl.h"
+#include "glft2/TextRenderer.hpp"
 
 // Singleton class
 class Game {
@@ -35,40 +35,26 @@ public:
     // Getters
     Map* getMap() { return &map; }
     Player* getPlayer() { return &player; }
-    MoveDir* getMoveDir() { return &moveDir; }
     std::vector<Ghost*>& getGhosts() { return ghosts; }
     float getLastFrameTimeDeltaSeconds() const { return lastFrameTimeDeltaSeconds; }
-    float getCameraDistance() const { return cameraDistance; }
-    float getCameraAngleX() const { return cameraAngleX; }
-    float getCameraAngleY() const { return cameraAngleY; }
-    float getCameraPosX() const { return cameraLookAtPosX; }
-    float getCameraPosZ() const { return cameraLookAtPosZ; }
-    bool& getIsDirectionKeyPressed() { return isDirectionKeyPressed; }
     float getBaseSpeed() const { return baseMoveSpeed; }
     int getPlayerLives() const { return playerLives; }
     int getCurrentLevel() const { return currentLevel; }
     int getTotalScore() const { return totalScore; }
+
     glft2::font_data getGameFont() const { return gameFont; }
     glft2::font_data getMenuFont() const { return menuFont; }
-    float getCameraLookAtPosX() const { return cameraLookAtPosX; }
-    float getCameraLookAtPosZ() const { return cameraLookAtPosZ; }
+    
+    GameControl& getGameControlInstance() { return gameControl; }
+
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
     void setPlayer(Player newPlayer) { player = newPlayer; }
-    void setMoveDir(MoveDir newMoveDir) { moveDir = newMoveDir; }
-    void setCameraDistance(float distance) { cameraDistance = distance; }
-    void setCameraAngleX(float angleX) { cameraAngleX = angleX; }
-    void setCameraAngleY(float angleY) { cameraAngleY = angleY; }
-    void setCameraPosX(float posX) { cameraLookAtPosX = posX; }
-    void setCameraPosZ(float posY) { cameraLookAtPosZ = posY; }
-    void setIsDirectionKeyPressed(bool changed) { isDirectionKeyPressed = changed; }
     void setBaseSpeed(float speed) { baseMoveSpeed = speed; }
     void setPlayerLives(int lives) { playerLives = lives; }
     void setCurrentLevel(int level) { currentLevel = level; }
     void setTotalScore(int score) { totalScore = score; }
-    void setCameraLookAtPosX(float posX) { cameraLookAtPosX = posX; }
-    void setCameraLookAtPosZ(float posZ) { cameraLookAtPosZ = posZ; }
 
     int gameCollectedPellets = 0;
 private:
@@ -76,6 +62,8 @@ private:
     Game(const Game&) = delete;  // Prevent copy constructor
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
 
+    GameControl& gameControl = GameControl::getInstance();
+    
     MapFactory mapFactory;
     Map map;
     Player player;
@@ -85,11 +73,10 @@ private:
     Ghost clyde;
     std::vector<Ghost*> ghosts;
     MoveDir moveDir;
-    bool isDirectionKeyPressed = true;
+
     float lastFrameTimeSeconds = 0.0f;
     float lastFrameTimeDeltaSeconds = 0.0f;
 
-    float cameraDistance = 50.0f;
     float baseMoveSpeed = 3.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
@@ -97,14 +84,6 @@ private:
     int totalScore;
     glft2::font_data gameFont;
     glft2::font_data menuFont;
-
-    float cameraAngleX = 0.0f;  // Rotation around the X-axis (pitch)
-    float cameraAngleY = 0.0f;  // Rotation around the Y-axis (yaw)
-    float cameraLookAtPosX = 0.0f;
-    float cameraLookAtPosZ = 0.0f;
-    float cameraPosX = 0.0f;
-    float cameraPosY = 0.0f;
-    float cameraPosZ = 0.0f;
 };
 
 #endif // GAME_H

@@ -9,7 +9,7 @@
 #include "GameControl.h"
 
 const CameraState GameCamera::DEFAULT_CAMERA_STATE = {
-    0.0f, 45.0f, 50.0f,  // yaw, pitch, distance
+    0.0f, 75.0f, 35.0f,  // yaw, pitch, distance
     0.0f, 0.0f, 0.0f    // lookAtX, lookAtY, lookAtZ
 };
 
@@ -41,47 +41,75 @@ void GameCamera::update(float frametimeS) {
         setNewCameraTarget(target);
     }
 
-    // Todo: just slightly pan or adjust camera when player moves from one 
-    // part of a map to another
     if (cameraType == CameraType::InteractiveMapView) {
-        CameraState target = getCameraState();
-
-        // 1) get map bounds & player
+        // 1) figure out where the player is on the map (-1…+1)
+        Game* game = &Game::getInstance();
         Point3D pc = game->getPlayer()->getAbsoluteCenterPoint();
-        auto    cps = game->getMap()->getMapCornerPoints();
-        float   minX = cps.lowerLeft.x, maxX = cps.upperRight.x;
-        float   minZ = cps.lowerLeft.z, maxZ = cps.upperRight.z;
+        auto cps = game->getMap()->getMapCornerPoints();
+        float minX = cps.lowerLeft.x, maxX = cps.upperRight.x;
+        float minZ = cps.lowerLeft.z, maxZ = cps.upperRight.z;
+        float fracX = (pc.x - minX) / (maxX - minX);
+        float fracZ = (pc.z - minZ) / (maxZ - minZ);
+        float centerFracX = (fracX - 0.5f) * 2.0f;
+        float centerFracZ = (fracZ - 0.5f) * 2.0f;
 
-        // 2) compute map center & “radius” of half-diagonal
+        // 2) map center for lookAt
         float cx = (minX + maxX) * 0.5f;
         float cz = (minZ + maxZ) * 0.5f;
+
+        // 3) start from defaults
+        CameraState target = DEFAULT_CAMERA_STATE;
+        target.lookAtX = cx;
+        target.lookAtY = 0.0f;
+        target.lookAtZ = cz;
+
+        // centerFracZ (–1 at bottom -> +1 at top)
+        float dynamicPitch;
+        if (centerFracZ >= 0.0f) {
+            dynamicPitch = DEFAULT_CAMERA_STATE.pitch
+                + centerFracZ * MAX_PITCH_DELTA_UP;
+        }
+        else {
+            dynamicPitch = DEFAULT_CAMERA_STATE.pitch
+                + centerFracZ * MAX_PITCH_DELTA_DOWN;
+        }
+
+        // now clamp into the full range you allow:
+        // lowest possible: DEFAULT_PITCH – PITCH_DELTA_DOWN
+        // highest possible: DEFAULT_PITCH + PITCH_DELTA_UP
+        target.pitch = std::clamp(
+            dynamicPitch,
+            DEFAULT_CAMERA_STATE.pitch - MAX_PITCH_DELTA_DOWN,
+            DEFAULT_CAMERA_STATE.pitch + MAX_PITCH_DELTA_UP
+        );
+
+        // 5) dynamically compute distance so the entire map fits
         float hx = (maxX - minX) * 0.5f;
         float hz = (maxZ - minZ) * 0.5f;
         float mapRadius = std::sqrt(hx * hx + hz * hz);
 
-        // 3) figure out the camera distance needed to fit that radius
-        //    assume you know your vertical FOV (in degrees). e.g. 45°
-        const float fovYdeg = 45.0f;
-        float fovYrad = fovYdeg * GameCamera::DEG_TO_RAD;
-        // distance so that mapRadius spans half the vertical frustum:
-        target.distance = mapRadius / std::sin(fovYrad * 0.5f);
+        // get your window aspect
+        float screenW = static_cast<float>(glutGet(GLUT_WINDOW_WIDTH));
+        float screenH = static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT));
+        float aspect = screenW / screenH;
 
-        // 4) now clamp the player’s pos within an “inner window” so small moves
-        //    near the center don’t shift the view, but once they hit that border
-        //    the camera begins to pan.
-        const float panMarginX = hx * 0.5f;
-        const float panMarginZ = hz * 0.5f;
-        float lookX = std::clamp(pc.x, cx - panMarginX, cx + panMarginX);
-        float lookZ = std::clamp(pc.z, cz - panMarginZ, cz + panMarginZ);
-        target.lookAtX = lookX;
-        target.lookAtZ = lookZ;
-        target.lookAtY = pc.y;  // keep vertical centered on player
+        target.yaw = DEFAULT_CAMERA_STATE.yaw + centerFracX * MAX_YAW_DELTA;
 
-        // 5) optional: tilt yaw +/- a bit based on how far they are from center
-        float fracX = (lookX - cx) / panMarginX;  // in [-1,1]
-        const float maxYawNudge = 15.0f;         // degrees
-        target.yaw = GameCamera::DEFAULT_CAMERA_STATE.yaw + fracX * maxYawNudge;
+        // choose your vertical FOV (must match what you use in glPerspective)
+        constexpr float DEFAULT_FOV_Y_DEG = 60.0f;
+        const   float DEFAULT_FOV_Y_RAD = DEFAULT_FOV_Y_DEG * GameCamera::DEG_TO_RAD;
 
+        // what half-FOV is in X?
+        float halfFovY = DEFAULT_FOV_Y_RAD * 0.5f;
+        float halfFovX = atanf(tanf(halfFovY) * aspect);
+
+        // distance needed so a circle of radius mapRadius just fits:
+        float distY = mapRadius / sinf(halfFovY);
+        float distX = mapRadius / sinf(halfFovX);
+
+        target.distance = std::max(distX, distY);
+
+        // 6) hand off to your smoothing / lerp system
         setNewCameraTarget(target);
     }
 
@@ -127,7 +155,7 @@ void GameCamera::updateAutoCameraTransition(float frameTimeS) {
 
     updateGluFromState();
 
-    if (isAutoCameraAtTarget()) {
+    if (cameraState == autoCameraTarget) {
         autoCameraTargetReached = true;
         cameraState = autoCameraTarget;
         updateGluFromState();
@@ -143,8 +171,8 @@ void GameCamera::handleCameraPosMoving() {
     }
     if (isOrbitting) return;
 
-    autoCameraMoving = false;
     if (!isMovingPos) {
+        autoCameraMoving = false;
         gc.resetMouseDelta();
         isMovingPos = true;
         return;
@@ -190,14 +218,13 @@ void GameCamera::handleCameraOrbitting() {
     GameControl& gc = GameControl::getInstance();
     if (isMovingPos) { return; }
 
-    autoCameraOrbitting = false;
     if (gc.isButtonPressed(GLUT_RIGHT_BUTTON)) {
         if (!isOrbitting) {
             isOrbitting = true;
             gc.resetMouseDelta();
             return;
         }
-
+        autoCameraOrbitting = false;
         cameraState.yaw += gc.getMouseXDelta() * orbittingDegPerPixel;
         cameraState.pitch -= gc.getMouseYDelta() * orbittingDegPerPixel;
 
@@ -212,9 +239,9 @@ void GameCamera::handleCameraOrbitting() {
 // Handles camera zoom
 void GameCamera::handleCameraZooming() {
     GameControl& gc = GameControl::getInstance();
-    autoCameraZooming = false;
     if (gc.isButtonFlagPressed(GLUT_WHEEL_UP)) {
         gc.resetButtonFlagPressed(GLUT_WHEEL_UP);
+        autoCameraZooming = false;
         float zoomStep = 0.5f;
         cameraState.distance = cameraState.distance + zoomStep;
         updateGluFromState();
@@ -222,6 +249,7 @@ void GameCamera::handleCameraZooming() {
 
     if (gc.isButtonFlagPressed(GLUT_WHEEL_DOWN)) {
         gc.resetButtonFlagPressed(GLUT_WHEEL_DOWN);
+        autoCameraZooming = false;
         float zoomStep = 0.5f;
         cameraState.distance = cameraState.distance - zoomStep;
         updateGluFromState();
@@ -250,10 +278,17 @@ void GameCamera::updateGluFromState() {
     glu.lookAtY = cameraState.lookAtY;
     glu.lookAtZ = cameraState.lookAtZ;
 
-    // World up vector (you could improve this if you're near poles)
-    glu.upX = 0.0f;
-    glu.upY = 1.0f;
-    glu.upZ = 0.0f;
+    // if pitch > 90°, we are "upside down" so flip the up vector
+    if (cameraState.pitch > 90.0f && cameraState.pitch < 270.0f) {
+        glu.upX = 0.0f;
+        glu.upY = -1.0f;
+        glu.upZ = 0.0f;
+    }
+    else {
+        glu.upX = 0.0f;
+        glu.upY = 1.0f;
+        glu.upZ = 0.0f;
+    }
 
     cameraGlu = glu;
 }

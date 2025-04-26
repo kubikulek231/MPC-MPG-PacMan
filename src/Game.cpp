@@ -99,6 +99,12 @@ void Game::update(int value) {
     // Update the frametime
     game.lastFrameTimeDeltaS = newFrameTimeS - game.lastFrameTimeS;
     game.lastFrameTimeS = newFrameTimeS;
+    game.gameMenu.update();
+
+    if (game.gameState != GameState::Playing) { 
+        glutTimerFunc(8, Game::update, 0);
+        return; 
+    }
 
     GameLogic::updatePlayer();
     GameLogic::updateGhosts();

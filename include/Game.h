@@ -13,6 +13,12 @@
 #include "glft2/TextRenderer.hpp"
 #include "FadeTimer.h"
 
+enum class GameState {
+    MainMenu = 0,
+    Playing = 1,
+    Paused = 2
+};
+
 // Singleton class
 class Game {
 public:
@@ -59,6 +65,9 @@ public:
 
     void replenishCameraHintFadeTimer() { cameraHintFadeTimer.start(); }
 
+    GameState getGameState() const { return gameState; };
+    GameState setGameState(GameState newGameState) { gameState = newGameState; }
+
     int gameCollectedPellets = 0;
 private:
     Game() = default;
@@ -77,6 +86,8 @@ private:
     Ghost clyde;
     std::vector<Ghost*> ghosts;
     MoveDir moveDir;
+
+    GameState gameState;
 
     float lastFrameTimeS = 0.0f;
     float lastFrameTimeDeltaS = 0.0f;

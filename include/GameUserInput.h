@@ -14,7 +14,7 @@
 
 class GameUserInput {
 public:
-    std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y', 'c'};
+    std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y', 'c', '\r'};
     std::unordered_set<int> trackedMouseButtons = { GLUT_LEFT_BUTTON, 
                                                     GLUT_RIGHT_BUTTON, 
                                                     GLUT_MIDDLE_BUTTON, 

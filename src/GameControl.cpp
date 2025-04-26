@@ -21,7 +21,7 @@ void GameControl::update(float frametimeS) {
     handleCameraOrbitting();
     handleCameraPosMoving();
     handleCameraZooming();
-    if (!autoCamera) { return; }
+    if (!autoCameraMoving && !autoCameraOrbitting && !autoCameraZooming) { return; }
     if (autoCameraTargetReached) { return; }
     updateAutoCameraTransition(frametimeS);
 }
@@ -48,13 +48,23 @@ void GameControl::updateAutoCameraTransition(float frameTimeS) {
     float speedFactor = std::min(frameTimeNormalizedSpeed, MapFactory::TILE_SIZE / 2.0f);
     float easedSpeedFactor = easeInOut(speedFactor);
 
-    cameraState.yaw = lerp(cameraState.yaw, autoCameraTarget.yaw, easedSpeedFactor);
-    cameraState.pitch = lerp(cameraState.pitch, autoCameraTarget.pitch, easedSpeedFactor);
-    cameraState.distance = lerp(cameraState.distance, autoCameraTarget.distance, easedSpeedFactor);
+    // Only orbit (yaw, pitch) when autoCameraOrbitting
+    if (autoCameraOrbitting) {
+        cameraState.yaw = lerp(cameraState.yaw, autoCameraTarget.yaw, easedSpeedFactor);
+        cameraState.pitch = lerp(cameraState.pitch, autoCameraTarget.pitch, easedSpeedFactor);
+    }
 
-    cameraState.lookAtX = lerp(cameraState.lookAtX, autoCameraTarget.lookAtX, easedSpeedFactor);
-    cameraState.lookAtY = lerp(cameraState.lookAtY, autoCameraTarget.lookAtY, easedSpeedFactor);
-    cameraState.lookAtZ = lerp(cameraState.lookAtZ, autoCameraTarget.lookAtZ, easedSpeedFactor);
+    // Only zoom (distance) when autoCameraZooming
+    if (autoCameraZooming) {
+        cameraState.distance = lerp(cameraState.distance, autoCameraTarget.distance, easedSpeedFactor);
+    }
+
+    // Only move (lookAtX/Y/Z) when autoCameraMoving
+    if (autoCameraMoving) {
+        cameraState.lookAtX = lerp(cameraState.lookAtX, autoCameraTarget.lookAtX, easedSpeedFactor);
+        cameraState.lookAtY = lerp(cameraState.lookAtY, autoCameraTarget.lookAtY, easedSpeedFactor);
+        cameraState.lookAtZ = lerp(cameraState.lookAtZ, autoCameraTarget.lookAtZ, easedSpeedFactor);
+    }
 
     updateGluFromState();
 
@@ -65,11 +75,13 @@ void GameControl::updateAutoCameraTransition(float frameTimeS) {
     }
 }
 
+
 // Handles camera look at point moving
 void GameControl::handleCameraPosMoving() {
     if (isButtonPressed(GLUT_LEFT_BUTTON)) {
         if (isOrbitting) { return; }
 
+        autoCameraMoving = false;
         if (!isMovingPos) {
             resetMouseDelta();
             isMovingPos = true;
@@ -120,6 +132,7 @@ void GameControl::handleCameraPosMoving() {
 void GameControl::handleCameraOrbitting() {
     if (isMovingPos) { return; }
 
+    autoCameraOrbitting = false;
     if (isButtonPressed(GLUT_RIGHT_BUTTON)) {
         if (!isOrbitting) {
             isOrbitting = true;
@@ -141,6 +154,7 @@ void GameControl::handleCameraOrbitting() {
 // Handles camera zoom
 void GameControl::handleCameraZooming() {
 
+    autoCameraZooming = false;
     if (isButtonFlagPressed(GLUT_WHEEL_UP)) {
         resetButtonFlagPressed(GLUT_WHEEL_UP);
         float zoomStep = 0.5f;

@@ -69,8 +69,16 @@ public:
 
     MoveDir getMoveDir() const { return moveDir; }
 
-    void enableManualCamera() { autoCamera = false; }
-    void enableAutoCamera() { autoCamera = true; }
+    void enableManualCamera() { 
+        autoCameraMoving = false; 
+        autoCameraOrbitting = false;
+        autoCameraZooming = false;
+    }
+    void enableAutoCamera() { 
+        autoCameraMoving = true; 
+        autoCameraOrbitting = true;
+        autoCameraZooming = true;
+    }
 
     void setNewCameraTarget(CameraState targetState) {
         if (targetState == cameraState) { return; }
@@ -129,7 +137,9 @@ private:
 
     MoveDir moveDir = MoveDir::NONE;
 
-    bool autoCamera = false;
+    bool autoCameraMoving = false;
+    bool autoCameraZooming = false;
+    bool autoCameraOrbitting = false;
 
     // AutoCamera target
     bool autoCameraTargetReached = false;

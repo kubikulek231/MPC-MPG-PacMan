@@ -9,6 +9,7 @@
 #include "Ghost.h"
 #include "GameUserInput.h"
 #include "GameCamera.h"
+#include "GameMenu.h"
 #include "glft2/TextRenderer.hpp"
 #include "FadeTimer.h"
 
@@ -65,6 +66,7 @@ private:
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
 
     FadeTimer cameraHintFadeTimer = FadeTimer();
+    GameMenu gameMenu = GameMenu();
 
     MapFactory mapFactory;
     Map map;

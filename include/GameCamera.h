@@ -40,6 +40,7 @@ public:
     void update(float frametimeS);
     void setCameraMode(CameraMode cameraType);
     void setNextCameraMode();
+    std::string getCameraModeString() const;
 
     CameraGlu getCameraGLU() const { return cameraGlu; }
 private:

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include "GameUserInput.h"
+#include "GameControl.h"
 
 GameCamera::GameCamera() {
     setCameraMode(CameraMode::InteractiveMapView);
@@ -33,11 +34,24 @@ void GameCamera::setNextCameraMode() {
     }
 }
 
+std::string GameCamera::getCameraModeString() const {
+    switch (cameraMode) {
+    case CameraMode::Free:
+        return "Free Camera";
+    case CameraMode::InteractiveMapView:
+        return "Interactive Map View";
+    case CameraMode::FollowingPlayer:
+        return "Following Player";
+    }
+    return "Unknown";
+}
+
 void GameCamera::update(float frametimeS) {
     Game* game = &Game::getInstance();
 
     // Switch to free camera if user moved the camera pos
-    if (cameraMode == CameraMode::FollowingPlayer && !autoCameraMoving) {
+    if (cameraMode != CameraMode::Free && !autoCameraMoving) {
+        game->replenishCameraHintFadeTimer();
         cameraMode = CameraMode::Free;
     }
     

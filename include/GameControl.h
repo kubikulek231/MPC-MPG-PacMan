@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "CameraStruct.h"
 #include "MoveDir.h"
+#include "MapFactory.h"
 
 #define GLUT_WHEEL_DOWN 3
 #define GLUT_WHEEL_UP 4
@@ -17,7 +18,7 @@ public:
     static const CameraState DEFAULT_CAMERA_STATE;
     static constexpr float DEG_TO_RAD = PI / 180.0f;
     static constexpr float RAD_TO_DEG = 180.0f / PI;
-    static constexpr float DEFAULT_CAMERA_TRANSITION_SPEED = 5.0f;
+    static constexpr float DEFAULT_CAMERA_TRANSITION_SPEED = 7.0f;
 
     std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y' };
     std::unordered_set<int> trackedMouseButtons = { GLUT_LEFT_BUTTON, 
@@ -92,8 +93,8 @@ private:
     void handleCameraPosMoving();
     void handleCameraZooming();
 
-    float frametimeNormalizedTransitionSpeed(float frametimeMs) { return frametimeMs * DEFAULT_CAMERA_TRANSITION_SPEED; }
-    void updateAutoCameraTransition(float frameTimeMs);
+    float frametimeNormalizedTransitionSpeed(float frametimeS) { return frametimeS * DEFAULT_CAMERA_TRANSITION_SPEED * MapFactory::TILE_SIZE; }
+    void updateAutoCameraTransition(float frametimeS);
 
     void resetMouseDelta();
 

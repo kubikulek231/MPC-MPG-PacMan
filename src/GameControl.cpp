@@ -16,14 +16,14 @@ GameControl::GameControl() {
     updateGluFromState();
 }
 
-void GameControl::update(float frametimeMs) {
+void GameControl::update(float frametimeS) {
     handleWasdMovement();
     handleCameraOrbitting();
     handleCameraPosMoving();
     handleCameraZooming();
     if (!autoCamera) { return; }
     if (autoCameraTargetReached) { return; }
-    updateAutoCameraTransition(frametimeMs);
+    updateAutoCameraTransition(frametimeS);
 }
 
 void GameControl::handleWasdMovement() {
@@ -34,8 +34,8 @@ void GameControl::handleWasdMovement() {
     if (isKeyFlagPressed('d')) { movementChanged = true; this->moveDir = MoveDir::RIGHT; }
 }
 
-void GameControl::updateAutoCameraTransition(float frameTimeMs) {
-    float frameTimeNormalizedSpeed = frametimeNormalizedTransitionSpeed(frameTimeMs);
+void GameControl::updateAutoCameraTransition(float frameTimeS) {
+    float frameTimeNormalizedSpeed = frametimeNormalizedTransitionSpeed(frameTimeS);
 
     auto lerp = [](float a, float b, float t) {
         return a + (b - a) * t;

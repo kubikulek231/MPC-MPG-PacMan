@@ -103,7 +103,7 @@ void Game::update(int value) {
     GameLogic::updateGhosts();
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
-    game.getGameControlInstance().update(newFrameTimeS);
+    game.getGameControlInstance().update(game.lastFrameTimeDeltaS);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();

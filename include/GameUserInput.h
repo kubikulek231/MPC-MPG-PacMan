@@ -14,7 +14,7 @@
 
 class GameUserInput {
 public:
-    std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y' };
+    std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y', 'c'};
     std::unordered_set<int> trackedMouseButtons = { GLUT_LEFT_BUTTON, 
                                                     GLUT_RIGHT_BUTTON, 
                                                     GLUT_MIDDLE_BUTTON, 
@@ -26,26 +26,28 @@ public:
         return instance;
     }
 
-    void update();
-
     void mouseButton(int button, int state, int x, int y);
     void mouseMotion(int x, int y);
     void keyboard(unsigned char key, int x, int y);
     void keyboardUp(unsigned char key, int x, int y);
 
-    bool isKeyPressedAndReleased(unsigned char key);
-    bool isKeyPressed(unsigned char key);
-    bool isKeyReleased(unsigned char key);
+    bool isKeyPressed(unsigned char key) const;
+    bool isKeyReleased(unsigned char key) const;
 
-    bool isButtonPressedAndReleased(int key);
-    bool isButtonPressed(int key);
-    bool isButtonReleased(int key);
+    bool isButtonPressed(int key) const;
+    bool isButtonReleased(int key) const;
 
-    bool isKeyFlagPressed(unsigned char key);
-    bool isButtonFlagPressed(int key);
+    bool isKeyFlagPressed(unsigned char key) const;
+    bool isButtonFlagPressed(int key) const;
 
     void resetKeyFlagPressed(unsigned char key);
     void resetButtonFlagPressed(int key);
+
+    bool isKeyFlagPressedAndReleased(unsigned char key) const;
+    bool isButtonFlagPressedAndReleased(int key) const;
+
+    void resetKeyFlagPressedAndReleased(unsigned char key);
+    void resetButtonFlagPressedAndReleased(int key);
 
     bool& getMovementChanged() { return movementChanged; }
     bool resetMovementChanged() { movementChanged = false; }
@@ -74,6 +76,9 @@ private:
 
     std::unordered_map<unsigned char, bool> pressedFlagKeys;
     std::unordered_map<unsigned char, bool> pressedFlagButtons;
+
+    std::unordered_map<unsigned char, bool> pressedAndReleasedFlagKeys;
+    std::unordered_map<unsigned char, bool> pressedAndReleasedFlagButtons;
 
     float mouseX = 0;
     float mouseY = 0;

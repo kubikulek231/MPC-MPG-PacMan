@@ -10,6 +10,7 @@
 #include "GameUserInput.h"
 #include "GameCamera.h"
 #include "glft2/TextRenderer.hpp"
+#include "FadeTimer.h"
 
 // Singleton class
 class Game {
@@ -29,6 +30,7 @@ public:
     static void render();  // Display the game scene
     static void renderScore();
     static void renderLives();
+    static void renderCameraInfo();
 
     // GLUT Callbacks
     static void reshape(int w, int h);
@@ -54,11 +56,15 @@ public:
     void setCurrentLevel(int level) { currentLevel = level; }
     void setTotalScore(int score) { totalScore = score; }
 
+    void replenishCameraHintFadeTimer() { cameraHintFadeTimer.start(); }
+
     int gameCollectedPellets = 0;
 private:
     Game() = default;
     Game(const Game&) = delete;  // Prevent copy constructor
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
+
+    FadeTimer cameraHintFadeTimer = FadeTimer();
 
     MapFactory mapFactory;
     Map map;

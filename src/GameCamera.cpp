@@ -13,25 +13,39 @@ GameCamera::GameCamera() {
     updateGluFromState();
 }
 
-void GameCamera::setCameraMode(CameraMode cameraType) {
-    this->cameraType = cameraType;
-    if (cameraType == CameraMode::FollowingPlayer || 
-        cameraType == CameraMode::InteractiveMapView) { enableAutoCamera(); }
+void GameCamera::setCameraMode(CameraMode cameraMode) {
+    this->cameraMode = cameraMode;
+    if (cameraMode == CameraMode::FollowingPlayer || 
+        cameraMode == CameraMode::InteractiveMapView) { enableAutoCamera(); }
+}
+
+void GameCamera::setNextCameraMode() {
+    switch (cameraMode) {
+    case CameraMode::Free:
+        setCameraMode(CameraMode::InteractiveMapView);
+        break;
+    case CameraMode::InteractiveMapView:
+        setCameraMode(CameraMode::FollowingPlayer);
+        break;
+    case CameraMode::FollowingPlayer:
+        setCameraMode(CameraMode::Free);
+        break;
+    }
 }
 
 void GameCamera::update(float frametimeS) {
     Game* game = &Game::getInstance();
 
     // Switch to free camera if user moved the camera pos
-    if (cameraType == CameraMode::FollowingPlayer && !autoCameraMoving) {
-        cameraType = CameraMode::Free;
+    if (cameraMode == CameraMode::FollowingPlayer && !autoCameraMoving) {
+        cameraMode = CameraMode::Free;
     }
     
-    if (cameraType == CameraMode::FollowingPlayer) {
+    if (cameraMode == CameraMode::FollowingPlayer) {
         updateFollowingPlayerTarget();
     }
 
-    if (cameraType == CameraMode::InteractiveMapView) {
+    if (cameraMode == CameraMode::InteractiveMapView) {
         updateInteractiveMapViewTarget();
     }
 

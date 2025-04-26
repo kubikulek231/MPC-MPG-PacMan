@@ -21,6 +21,7 @@ private:
     GameControl(const GameControl&) = delete;
     GameControl& operator=(const GameControl&) = delete;
     void handleWasdMovement();
+    void changeCameraMode();
 };
 
 #endif

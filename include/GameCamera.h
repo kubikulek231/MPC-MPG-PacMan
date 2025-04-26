@@ -39,6 +39,7 @@ public:
 
     void update(float frametimeS);
     void setCameraMode(CameraMode cameraType);
+    void setNextCameraMode();
 
     CameraGlu getCameraGLU() const { return cameraGlu; }
 private:
@@ -80,7 +81,7 @@ private:
     CameraState cameraState = DEFAULT_CAMERA_STATE;
     CameraGlu cameraGlu;
 
-    CameraMode cameraType = CameraMode::Free;
+    CameraMode cameraMode = CameraMode::Free;
 
     float movingPosSensitivity = DEFAULT_MOUSE_SENSITIVITY;
     float orbittingDegPerPixel = DEFAULT_ORBITTING_DEG_PER_PIXEL;

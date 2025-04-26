@@ -143,6 +143,7 @@ void Game::render() {
     game.getPlayer()->render();
     game.renderScore();
     game.renderLives();
+    game.renderCameraInfo();
     GameMenu::render();
 
     for (Ghost* ghost : game.getGhosts()) { ghost->render(); }
@@ -212,4 +213,45 @@ void Game::renderLives() {
     glft2::render3D(game.gameFont, livesText, scale);
     
     glPopMatrix();
+}
+
+void Game::renderCameraInfo() {
+    Game& game = Game::getInstance();
+    
+    // start the timer once
+    static bool started = false;
+    if (!started) {
+        game.cameraHintFadeTimer.configure(0, 10000, 1000);       // fade-in=0, hold=10s, fade-out=1s
+        game.cameraHintFadeTimer.start();
+        started = true;
+    }
+
+    // advance and fetch alpha
+    game.cameraHintFadeTimer.update(std::chrono::steady_clock::now());
+    float alpha = game.cameraHintFadeTimer.getAlpha();
+    if (alpha <= 0.0f) return;  // fully faded out
+
+    glft2::font_data menuFont = game.getMenuFont();
+
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    float screenW = float(vp[2]), screenH = float(vp[3]);
+
+    const std::string camLabel = "Camera";
+    const float camScale = 0.3f;
+    float camW, camH;
+    glft2::measureText(menuFont, camLabel, &camW, &camH, camScale);
+
+    float marginX = screenW * 0.05f;
+    float marginY = screenH * 0.05f;
+    float x = screenW - camW - marginX;
+    float y = marginY;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(1.0f, 1.0f, 1.0f, alpha);
+    glPushMatrix();
+    glft2::render2D(menuFont, x, y, camLabel, camScale);
+    glPopMatrix();
+    glDisable(GL_BLEND);
 }

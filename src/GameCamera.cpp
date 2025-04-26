@@ -8,109 +8,31 @@
 #include <iostream>
 #include "GameControl.h"
 
-const CameraState GameCamera::DEFAULT_CAMERA_STATE = {
-    0.0f, 75.0f, 35.0f,  // yaw, pitch, distance
-    0.0f, 0.0f, 0.0f    // lookAtX, lookAtY, lookAtZ
-};
-
 GameCamera::GameCamera() {
-    setCameraType(CameraType::InteractiveMapView);
+    setCameraMode(CameraMode::InteractiveMapView);
     updateGluFromState();
 }
 
-void GameCamera::setCameraType(CameraType cameraType) {
+void GameCamera::setCameraMode(CameraMode cameraType) {
     this->cameraType = cameraType;
-    if (cameraType == CameraType::FollowingPlayer || 
-        cameraType == CameraType::InteractiveMapView) { enableAutoCamera(); }
+    if (cameraType == CameraMode::FollowingPlayer || 
+        cameraType == CameraMode::InteractiveMapView) { enableAutoCamera(); }
 }
 
 void GameCamera::update(float frametimeS) {
     Game* game = &Game::getInstance();
 
     // Switch to free camera if user moved the camera pos
-    if (cameraType == CameraType::FollowingPlayer && !autoCameraMoving) {
-        cameraType = CameraType::Free;
+    if (cameraType == CameraMode::FollowingPlayer && !autoCameraMoving) {
+        cameraType = CameraMode::Free;
     }
     
-    if (cameraType == CameraType::FollowingPlayer) {
-        CameraState target = getCameraState();
-        Point3D playerCenter = game->getPlayer()->getAbsoluteCenterPoint();
-        target.lookAtX = playerCenter.x;
-        target.lookAtY = playerCenter.y;
-        target.lookAtZ = playerCenter.z;
-        setNewCameraTarget(target);
+    if (cameraType == CameraMode::FollowingPlayer) {
+        updateFollowingPlayerTarget();
     }
 
-    if (cameraType == CameraType::InteractiveMapView) {
-        // 1) figure out where the player is on the map (-1…+1)
-        Game* game = &Game::getInstance();
-        Point3D pc = game->getPlayer()->getAbsoluteCenterPoint();
-        auto cps = game->getMap()->getMapCornerPoints();
-        float minX = cps.lowerLeft.x, maxX = cps.upperRight.x;
-        float minZ = cps.lowerLeft.z, maxZ = cps.upperRight.z;
-        float fracX = (pc.x - minX) / (maxX - minX);
-        float fracZ = (pc.z - minZ) / (maxZ - minZ);
-        float centerFracX = (fracX - 0.5f) * 2.0f;
-        float centerFracZ = (fracZ - 0.5f) * 2.0f;
-
-        // 2) map center for lookAt
-        float cx = (minX + maxX) * 0.5f;
-        float cz = (minZ + maxZ) * 0.5f;
-
-        // 3) start from defaults
-        CameraState target = DEFAULT_CAMERA_STATE;
-        target.lookAtX = cx;
-        target.lookAtY = 0.0f;
-        target.lookAtZ = cz;
-
-        // centerFracZ (–1 at bottom -> +1 at top)
-        float dynamicPitch;
-        if (centerFracZ >= 0.0f) {
-            dynamicPitch = DEFAULT_CAMERA_STATE.pitch
-                + centerFracZ * MAX_PITCH_DELTA_UP;
-        }
-        else {
-            dynamicPitch = DEFAULT_CAMERA_STATE.pitch
-                + centerFracZ * MAX_PITCH_DELTA_DOWN;
-        }
-
-        // now clamp into the full range you allow:
-        // lowest possible: DEFAULT_PITCH – PITCH_DELTA_DOWN
-        // highest possible: DEFAULT_PITCH + PITCH_DELTA_UP
-        target.pitch = std::clamp(
-            dynamicPitch,
-            DEFAULT_CAMERA_STATE.pitch - MAX_PITCH_DELTA_DOWN,
-            DEFAULT_CAMERA_STATE.pitch + MAX_PITCH_DELTA_UP
-        );
-
-        // 5) dynamically compute distance so the entire map fits
-        float hx = (maxX - minX) * 0.5f;
-        float hz = (maxZ - minZ) * 0.5f;
-        float mapRadius = std::sqrt(hx * hx + hz * hz);
-
-        // get your window aspect
-        float screenW = static_cast<float>(glutGet(GLUT_WINDOW_WIDTH));
-        float screenH = static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT));
-        float aspect = screenW / screenH;
-
-        target.yaw = DEFAULT_CAMERA_STATE.yaw + centerFracX * MAX_YAW_DELTA;
-
-        // choose your vertical FOV (must match what you use in glPerspective)
-        constexpr float DEFAULT_FOV_Y_DEG = 60.0f;
-        const   float DEFAULT_FOV_Y_RAD = DEFAULT_FOV_Y_DEG * GameCamera::DEG_TO_RAD;
-
-        // what half-FOV is in X?
-        float halfFovY = DEFAULT_FOV_Y_RAD * 0.5f;
-        float halfFovX = atanf(tanf(halfFovY) * aspect);
-
-        // distance needed so a circle of radius mapRadius just fits:
-        float distY = mapRadius / sinf(halfFovY);
-        float distX = mapRadius / sinf(halfFovX);
-
-        target.distance = std::max(distX, distY);
-
-        // 6) hand off to your smoothing / lerp system
-        setNewCameraTarget(target);
+    if (cameraType == CameraMode::InteractiveMapView) {
+        updateInteractiveMapViewTarget();
     }
 
     handleCameraOrbitting();
@@ -119,6 +41,80 @@ void GameCamera::update(float frametimeS) {
     if (!autoCameraMoving && !autoCameraOrbitting && !autoCameraZooming) { return; }
     if (autoCameraTargetReached) { return; }
     updateAutoCameraTransition(frametimeS);
+}
+
+void GameCamera::updateFollowingPlayerTarget() {
+    Game* game = &Game::getInstance();
+    CameraState target = getCameraState();
+    Point3D playerCenter = game->getPlayer()->getAbsoluteCenterPoint();
+    target.lookAtX = playerCenter.x;
+    target.lookAtY = playerCenter.y;
+    target.lookAtZ = playerCenter.z;
+    setNewCameraTarget(target);
+}
+
+
+// Static helper functions for InteractiveMapView adjustments
+float GameCamera::computeInteractiveYaw(float centerFracX) {
+    constexpr float baseYaw = GameCamera::DEFAULT_CAMERA_STATE.yaw;
+    constexpr float maxDelta = GameCamera::MAX_YAW_DELTA;
+    return baseYaw + centerFracX * maxDelta;
+}
+
+float GameCamera::computeInteractivePitch(float centerFracZ) {
+    const float basePitch = GameCamera::DEFAULT_CAMERA_STATE.pitch;
+    if (centerFracZ >= 0.0f) {
+        return basePitch + centerFracZ * GameCamera::MAX_PITCH_DELTA_UP;
+    }
+    else {
+        return basePitch + centerFracZ * GameCamera::MAX_PITCH_DELTA_DOWN;
+    }
+}
+
+void GameCamera::updateInteractiveMapViewTarget() {
+    // Compute player-relative fractions
+    Game* game = &Game::getInstance();
+    Point3D pc = game->getPlayer()->getAbsoluteCenterPoint();
+    auto cps = game->getMap()->getMapCornerPoints();
+    float minX = cps.lowerLeft.x, maxX = cps.upperRight.x;
+    float minZ = cps.lowerLeft.z, maxZ = cps.upperRight.z;
+    float fracX = (pc.x - minX) / (maxX - minX);
+    float fracZ = (pc.z - minZ) / (maxZ - minZ);
+    float centerFracX = (fracX - 0.5f) * 2.0f;
+    float centerFracZ = (fracZ - 0.5f) * 2.0f;
+
+    // Map center for lookAt
+    float cx = (minX + maxX) * 0.5f;
+    float cz = (minZ + maxZ) * 0.5f;
+
+    // Build target
+    CameraState target = DEFAULT_CAMERA_STATE;
+    target.lookAtX = cx;
+    target.lookAtY = 0.0f;
+    target.lookAtZ = cz;
+
+    // Apply yaw & pitch via static helpers
+    target.yaw = computeInteractiveYaw(centerFracX);
+    float rawPitch = computeInteractivePitch(centerFracZ);
+    target.pitch = std::clamp(rawPitch,
+        DEFAULT_CAMERA_STATE.pitch - MAX_PITCH_DELTA_DOWN,
+        DEFAULT_CAMERA_STATE.pitch + MAX_PITCH_DELTA_UP);
+
+    // Compute distance to fit entire map
+    float hx = (maxX - minX) * 0.5f;
+    float hz = (maxZ - minZ) * 0.5f;
+    float mapRadius = std::sqrt(hx * hx + hz * hz);
+
+    float aspect = static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) /
+        static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT));
+    constexpr float FOVY_DEG = 60.0f;
+    float fovY_rad = FOVY_DEG * DEG_TO_RAD * 0.5f;
+    float fovX_rad = atanf(tanf(fovY_rad) * aspect);
+    float distY = mapRadius / sinf(fovY_rad);
+    float distX = mapRadius / sinf(fovX_rad);
+    target.distance = std::max(distX, distY);
+
+    setNewCameraTarget(target);
 }
 
 void GameCamera::updateAutoCameraTransition(float frameTimeS) {
@@ -172,7 +168,7 @@ void GameCamera::handleCameraPosMoving() {
     if (isOrbitting) return;
 
     if (!isMovingPos) {
-        autoCameraMoving = false;
+        enableManualCamera();
         gc.resetMouseDelta();
         isMovingPos = true;
         return;

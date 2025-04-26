@@ -7,7 +7,7 @@
 #include "Game.h"
 #include "Map.h"
 
-enum class CameraType {
+enum class CameraMode {
     Free = 0,
     InteractiveMapView = 1,
     FollowingPlayer = 2
@@ -18,7 +18,10 @@ public:
     static constexpr float PI = 3.14159265358979323846f;
     static constexpr float DEFAULT_MOUSE_SENSITIVITY = 0.08f;
     static constexpr float DEFAULT_ORBITTING_DEG_PER_PIXEL = 0.2f;
-    static const CameraState DEFAULT_CAMERA_STATE;
+    static constexpr CameraState DEFAULT_CAMERA_STATE = {
+        0.0f, 75.0f, 35.0f,  // yaw, pitch, distance
+        0.0f, 0.0f, 0.0f    // lookAtX, lookAtY, lookAtZ
+    };
     static constexpr float DEG_TO_RAD = PI / 180.0f;
     static constexpr float RAD_TO_DEG = 180.0f / PI;
     static constexpr float DEFAULT_CAMERA_TRANSITION_SPEED = 7.0f;
@@ -34,10 +37,16 @@ public:
     }
 
     void update(float frametimeS);
-    void setCameraType(CameraType cameraType);
+    void setCameraMode(CameraMode cameraType);
 
     CameraGlu getCameraGLU() const { return cameraGlu; }
 private:
+    void updateInteractiveMapViewTarget();
+    void updateFollowingPlayerTarget();
+
+    static float computeInteractivePitch(float centerFracZ);
+    static float computeInteractiveYaw(float centerFracX);
+
     void setCameraState(CameraState newCameraState) { cameraState = newCameraState; }
     CameraState getCameraState() const { return cameraState; }
 
@@ -70,7 +79,7 @@ private:
     CameraState cameraState = DEFAULT_CAMERA_STATE;
     CameraGlu cameraGlu;
 
-    CameraType cameraType = CameraType::Free;
+    CameraMode cameraType = CameraMode::Free;
 
     float movingPosSensitivity = DEFAULT_MOUSE_SENSITIVITY;
     float orbittingDegPerPixel = DEFAULT_ORBITTING_DEG_PER_PIXEL;

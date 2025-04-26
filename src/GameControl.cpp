@@ -1,6 +1,5 @@
 #include "GameControl.h"
 
-
 void GameControl::update() {
     handleWasdMovement();
 }

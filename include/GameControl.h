@@ -6,11 +6,7 @@
 #include "CameraModels.h"
 #include "MoveDir.h"
 #include "MapFactory.h"
-#include "GameControl.h"
 #include "GameCamera.h"
-
-#define GLUT_WHEEL_DOWN 3
-#define GLUT_WHEEL_UP 4
 
 class GameControl {
 public:

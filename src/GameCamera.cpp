@@ -57,17 +57,17 @@ void GameCamera::updateFollowingPlayerTarget() {
 // Static helper functions for InteractiveMapView adjustments
 float GameCamera::computeInteractiveYaw(float centerFracX) {
     constexpr float baseYaw = GameCamera::DEFAULT_CAMERA_STATE.yaw;
-    constexpr float maxDelta = GameCamera::MAX_YAW_DELTA;
+    constexpr float maxDelta = GameCamera::IMV_MAX_YAW_DELTA;
     return baseYaw + centerFracX * maxDelta;
 }
 
 float GameCamera::computeInteractivePitch(float centerFracZ) {
     const float basePitch = GameCamera::DEFAULT_CAMERA_STATE.pitch;
     if (centerFracZ >= 0.0f) {
-        return basePitch + centerFracZ * GameCamera::MAX_PITCH_DELTA_UP;
+        return basePitch + centerFracZ * GameCamera::IMV_MAX_PITCH_DELTA_UP;
     }
     else {
-        return basePitch + centerFracZ * GameCamera::MAX_PITCH_DELTA_DOWN;
+        return basePitch + centerFracZ * GameCamera::IMV_MAX_PITCH_DELTA_DOWN;
     }
 }
 
@@ -97,8 +97,8 @@ void GameCamera::updateInteractiveMapViewTarget() {
     target.yaw = computeInteractiveYaw(centerFracX);
     float rawPitch = computeInteractivePitch(centerFracZ);
     target.pitch = std::clamp(rawPitch,
-        DEFAULT_CAMERA_STATE.pitch - MAX_PITCH_DELTA_DOWN,
-        DEFAULT_CAMERA_STATE.pitch + MAX_PITCH_DELTA_UP);
+        DEFAULT_CAMERA_STATE.pitch - IMV_MAX_PITCH_DELTA_DOWN,
+        DEFAULT_CAMERA_STATE.pitch + IMV_MAX_PITCH_DELTA_UP);
 
     // Compute distance to fit entire map
     float hx = (maxX - minX) * 0.5f;
@@ -113,6 +113,8 @@ void GameCamera::updateInteractiveMapViewTarget() {
     float distY = mapRadius / sinf(fovY_rad);
     float distX = mapRadius / sinf(fovX_rad);
     target.distance = std::max(distX, distY);
+
+    target.lookAtZ = target.lookAtZ + IMV_Z_OFFSET;
 
     setNewCameraTarget(target);
 }

@@ -25,9 +25,10 @@ public:
     static constexpr float DEG_TO_RAD = PI / 180.0f;
     static constexpr float RAD_TO_DEG = 180.0f / PI;
     static constexpr float DEFAULT_CAMERA_TRANSITION_SPEED = 7.0f;
-    static constexpr float MAX_PITCH_DELTA_UP = 15.0f;
-    static constexpr float MAX_PITCH_DELTA_DOWN = 8.0f;
-    static constexpr float MAX_YAW_DELTA = 5.0f;
+    static constexpr float IMV_MAX_PITCH_DELTA_UP = 15.0f;
+    static constexpr float IMV_MAX_PITCH_DELTA_DOWN = 8.0f;
+    static constexpr float IMV_MAX_YAW_DELTA = 5.0f;
+    static constexpr float IMV_Z_OFFSET = 1.0f;
 
     GameCamera();
 

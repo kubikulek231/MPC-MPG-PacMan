@@ -8,6 +8,7 @@
 #include "DirChangeRequest.h"
 #include "MoveDir.h"
 #include <vector>
+#include "GameCamera.h"
 
 class Game; // Forward declaration to avoid circular dependency
 

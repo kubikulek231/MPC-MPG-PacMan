@@ -8,6 +8,7 @@
 #include "MoveDir.h"
 #include "Ghost.h"
 #include "GameControl.h"
+#include "GameCamera.h"
 #include "glft2/TextRenderer.hpp"
 
 // Singleton class
@@ -44,9 +45,6 @@ public:
 
     glft2::font_data getGameFont() const { return gameFont; }
     glft2::font_data getMenuFont() const { return menuFont; }
-    
-    GameControl& getGameControlInstance() { return gameControl; }
-
 
     // Setters
     void setMap(Map newMap) { map = newMap; }
@@ -62,8 +60,6 @@ private:
     Game(const Game&) = delete;  // Prevent copy constructor
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
 
-    GameControl& gameControl = GameControl::getInstance();
-    
     MapFactory mapFactory;
     Map map;
     Player player;

@@ -5,6 +5,8 @@
 #include "DirChangeRequest.h"
 #include "MoveDir.h"
 #include "Macro.h"
+#include "GameCamera.h"
+#include "GameControl.h"
 
 void GameLogic::initLevel() {
 	// Create ghosts path to move them into corners
@@ -35,7 +37,7 @@ void GameLogic::updateScore() {
 
 void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
-	GameControl& gc = game.getGameControlInstance();
+	GameControl& gc = GameControl::getInstance();
 	MoveDir moveDir = gc.getMoveDir();
 	Player& player = *game.getPlayer();
 	float lastframetimeS = game.getLastFrameTimeDeltaSeconds();
@@ -46,7 +48,7 @@ void GameLogic::updatePlayer() {
 
 void GameLogic::updateGhosts() {
 	Game& game = Game::getInstance();
-	MoveDir moveDir = game.getGameControlInstance().getMoveDir();
+	MoveDir moveDir = GameControl::getInstance().getMoveDir();
 	float lastFrametimeS = game.getLastFrameTimeDeltaSeconds();
 
 	// Do not update ghost movement until player chooses moveDir
@@ -69,14 +71,8 @@ void GameLogic::updateGhosts() {
 	// Debug
 	if (gc.isKeyFlagPressed('x')) {
 		gc.resetKeyFlagPressed('x');
-		CameraState target = gc.getCameraState();
-		Point3D targetTilePoint3D = game.getMap()->getTileAt(0, 0)->getOrigin();
-		target.lookAtX = targetTilePoint3D.x;
-		target.lookAtY = targetTilePoint3D.y;
-		target.lookAtZ = targetTilePoint3D.z;
-		gc.setNewCameraTarget(target);
-		gc.enableAutoCamera();
-
+		GameCamera& gcam = GameCamera::getInstance();
+		gcam.setCameraType(CameraType::FollowingPlayer);
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];

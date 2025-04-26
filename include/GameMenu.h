@@ -4,6 +4,7 @@
 #include "gl_includes.h"
 #include "MoveDir.h"
 #include "Game.h"
+#include "GameCamera.h"
 
 class GameMenu {
 public:

@@ -71,7 +71,7 @@ file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h")
 
 # Add executable
-add_executable(MPG-PacMan ${SOURCES} ${HEADERS}    "include/CameraStruct.h")
+add_executable(MPG-PacMan ${SOURCES} ${HEADERS}    "include/CameraModels.h" "include/GameCamera.h" "src/GameCamera.cpp")
 
 # Link Freeglut, glft2_lib to the main program
 target_link_libraries(MPG-PacMan glft2_lib "${GLUT_LIB_DIR}/freeglut.lib")

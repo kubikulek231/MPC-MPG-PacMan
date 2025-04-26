@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "GameLogic.h"
+#include "GameCamera.h"
 #include "GameMenu.h"
 #include "math.h"
 #include <sstream>     
@@ -103,7 +104,15 @@ void Game::update(int value) {
     GameLogic::updateGhosts();
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
-    game.getGameControlInstance().update(game.lastFrameTimeDeltaS);
+    
+    GameControl& gcon = GameControl::getInstance();
+    GameCamera& gcam = GameCamera::getInstance();
+
+    // Update user inputs
+    gcon.update();
+
+    // Update camera position
+    gcam.update(game.lastFrameTimeDeltaS);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -113,9 +122,8 @@ void Game::update(int value) {
 
 void Game::render() {
     Game& game = Game::getInstance();
-    GameControl& gc = GameControl::getInstance();
-    CameraGlu cam = gc.getCameraGLU();
-
+    GameCamera& gcam = GameCamera::getInstance();
+    CameraGlu cam = gcam.getCameraGLU();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();

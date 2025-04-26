@@ -49,7 +49,9 @@ public:
 
     bool& getMovementChanged() { return movementChanged; }
     bool resetMovementChanged() { movementChanged = false; }
+    void setMovementChanged() { movementChanged = true; }
 
+    void setMoveDir(MoveDir moveDir) { this->moveDir = moveDir; }
     MoveDir getMoveDir() const { return moveDir; }
     void resetMouseDelta();
 
@@ -63,7 +65,6 @@ private:
     GameUserInput() = default;
     GameUserInput(const GameUserInput&) = delete;
     GameUserInput& operator=(const GameUserInput&) = delete;
-    void handleWasdMovement();
 
     std::unordered_map<unsigned char, bool> pressedKeys;
     std::unordered_map<unsigned char, bool> lastPressedKeys;

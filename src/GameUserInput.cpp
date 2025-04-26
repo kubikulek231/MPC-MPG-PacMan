@@ -7,18 +7,6 @@
 #include <cmath>
 #include <iostream>
 
-void GameUserInput::update() {
-    handleWasdMovement();
-}
-
-void GameUserInput::handleWasdMovement() {
-    // WASD movement
-    if (isKeyFlagPressed('w')) { movementChanged = true; this->moveDir = MoveDir::FWD; }
-    if (isKeyFlagPressed('s')) { movementChanged = true; this->moveDir = MoveDir::BWD; }
-    if (isKeyFlagPressed('a')) { movementChanged = true; this->moveDir = MoveDir::LEFT; }
-    if (isKeyFlagPressed('d')) { movementChanged = true; this->moveDir = MoveDir::RIGHT; }
-}
-
 // Glut callback for registering keyboard down events
 void GameUserInput::keyboard(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {

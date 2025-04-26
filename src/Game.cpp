@@ -2,7 +2,7 @@
 #include <iostream>
 #include "MapFactory.h"
 #include "Game.h"
-#include "GameUserInput.h"
+#include "GameControl.h"
 #include "GameLogic.h"
 #include "GameCamera.h"
 #include "GameMenu.h"
@@ -105,13 +105,13 @@ void Game::update(int value) {
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
     
-    GameUserInput& gcon = GameUserInput::getInstance();
+    GameControl& gcon = GameControl::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
 
-    // Update user inputs
+    // Update user input based logic
     gcon.update();
 
-    // Update camera position
+    // Update user input camera based logic
     gcam.update(game.lastFrameTimeDeltaS);
 
     // Trigger the display update by calling this to schedule a render

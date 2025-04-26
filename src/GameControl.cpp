@@ -75,58 +75,55 @@ void GameControl::updateAutoCameraTransition(float frameTimeS) {
     }
 }
 
-
-// Handles camera look at point moving
+// Handles camera look-at point moving
 void GameControl::handleCameraPosMoving() {
-    if (isButtonPressed(GLUT_LEFT_BUTTON)) {
-        if (isOrbitting) { return; }
-
-        autoCameraMoving = false;
-        if (!isMovingPos) {
-            resetMouseDelta();
-            isMovingPos = true;
-            return;
-        }
-
-        // Get yaw in radians
-        float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
-
-        // Rotate mouse deltas into world space
-        float deltaX = (mouseXDelta * cosf(yawRad) - mouseYDelta * sinf(yawRad)) * movingPosSensitivity;
-        float deltaZ = (mouseXDelta * sinf(yawRad) + mouseYDelta * cosf(yawRad)) * movingPosSensitivity;
-
-        // Calculate new tentative lookAt position
-        float newLookAtX = cameraGlu.lookAtX - deltaX;
-        float newLookAtZ = cameraGlu.lookAtZ - deltaZ;
-
-        // Get map corner points
-        Map* map = Game::getInstance().getMap();
-        MapCornerPoints cornerPoints = map->getMapCornerPoints();
-
-        // Check if the new lookAt is within bounds
-        bool inBounds = (
-            newLookAtX >= cornerPoints.lowerLeft.x &&
-            newLookAtX <= cornerPoints.lowerRight.x &&
-            newLookAtZ >= cornerPoints.lowerLeft.z &&
-            newLookAtZ <= cornerPoints.upperLeft.z
-            );
-
-        // Only apply if within bounds
-        if (inBounds) {
-            cameraGlu.lookAtX = newLookAtX;
-            cameraGlu.lookAtZ = newLookAtZ;
-            cameraGlu.posX -= deltaX;
-            cameraGlu.posZ -= deltaZ;
-
-            updateStateFromGlu();
-        }
-
-        resetMouseDelta();
+    if (!isButtonPressed(GLUT_LEFT_BUTTON)) {
+        isMovingPos = false;
         return;
     }
-    isMovingPos = false;
-}
+    if (isOrbitting) return;
 
+    autoCameraMoving = false;
+    if (!isMovingPos) {
+        resetMouseDelta();
+        isMovingPos = true;
+        return;
+    }
+
+    float dx = mouseXDelta * movingPosSensitivity;
+    float dy = -mouseYDelta * movingPosSensitivity;
+
+    float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
+    float c = cosf(yawRad), s = sinf(yawRad);
+    float fwdX = -s;
+    float fwdZ = -c;
+    float rightX = c;
+    float rightZ = -s;
+
+    float panX = rightX * dx + fwdX * dy;
+    float panZ = rightZ * dx + fwdZ * dy;
+
+    float newLAx = cameraGlu.lookAtX + panX;
+    float newLAz = cameraGlu.lookAtZ + panZ;
+    float newPx = cameraGlu.posX + panX;
+    float newPz = cameraGlu.posZ + panZ;
+
+    Map* map = Game::getInstance().getMap();
+    auto b = map->getMapCornerPoints();
+    bool inBounds =
+        newLAx >= b.lowerLeft.x && newLAx <= b.lowerRight.x &&
+        newLAz >= b.lowerLeft.z && newLAz <= b.upperLeft.z;
+
+    if (inBounds) {
+        cameraGlu.lookAtX = newLAx;
+        cameraGlu.lookAtZ = newLAz;
+        cameraGlu.posX = newPx;
+        cameraGlu.posZ = newPz;
+        updateStateFromGlu();
+    }
+
+    resetMouseDelta();
+}
 
 // Handles camera orbitting
 void GameControl::handleCameraOrbitting() {

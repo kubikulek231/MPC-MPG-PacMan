@@ -36,7 +36,7 @@ public:
     Map* getMap() { return &map; }
     Player* getPlayer() { return &player; }
     std::vector<Ghost*>& getGhosts() { return ghosts; }
-    float getLastFrameTimeDeltaSeconds() const { return lastFrameTimeDeltaSeconds; }
+    float getLastFrameTimeDeltaSeconds() const { return lastFrameTimeDeltaS; }
     float getBaseSpeed() const { return baseMoveSpeed; }
     int getPlayerLives() const { return playerLives; }
     int getCurrentLevel() const { return currentLevel; }
@@ -74,10 +74,10 @@ private:
     std::vector<Ghost*> ghosts;
     MoveDir moveDir;
 
-    float lastFrameTimeSeconds = 0.0f;
-    float lastFrameTimeDeltaSeconds = 0.0f;
+    float lastFrameTimeS = 0.0f;
+    float lastFrameTimeDeltaS = 0.0f;
 
-    float baseMoveSpeed = 3.5f;
+    float baseMoveSpeed = 4.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
     int currentLevel;

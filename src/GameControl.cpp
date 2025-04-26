@@ -2,6 +2,7 @@
 #include "GameControl.h"
 #include "Game.h"
 #include "MoveDir.h"
+#include "MapFactory.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -15,11 +16,14 @@ GameControl::GameControl() {
     updateGluFromState();
 }
 
-void GameControl::update() {
+void GameControl::update(float frametimeMs) {
     handleWasdMovement();
     handleCameraOrbitting();
-    handleCameraLookAtMoving();
+    handleCameraPosMoving();
     handleCameraZooming();
+    if (!autoCamera) { return; }
+    if (autoCameraTargetReached) { return; }
+    updateAutoCameraTransition(frametimeMs);
 }
 
 void GameControl::handleWasdMovement() {
@@ -30,107 +34,102 @@ void GameControl::handleWasdMovement() {
     if (isKeyFlagPressed('d')) { movementChanged = true; this->moveDir = MoveDir::RIGHT; }
 }
 
-void GameControl::updateGluFromState() {
-    CameraGLU glu;
+void GameControl::updateAutoCameraTransition(float frameTimeMs) {
+    float frameTimeNormalizedSpeed = frametimeNormalizedTransitionSpeed(frameTimeMs);
 
-    // Convert yaw and pitch to radians
-    float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
-    float pitchRad = cameraState.pitch * GameControl::DEG_TO_RAD;
+    auto lerp = [](float a, float b, float t) {
+        return a + (b - a) * t;
+        };
 
-    // Spherical to Cartesian conversion (camera orbiting around target)
-    float camX = cameraState.distance * cosf(pitchRad) * sinf(yawRad);
-    float camY = cameraState.distance * sinf(pitchRad);
-    float camZ = cameraState.distance * cosf(pitchRad) * cosf(yawRad);
+    auto easeInOut = [](float t) {
+        return t * t * (3 - 2 * t); // smoothstep
+        };
 
-    // Camera position is offset from the target
-    glu.posX = cameraState.lookAtX + camX;
-    glu.posY = cameraState.lookAtY + camY;
-    glu.posZ = cameraState.lookAtZ + camZ;
+    float speedFactor = std::min(frameTimeNormalizedSpeed, MapFactory::TILE_SIZE / 2.0f);
+    float easedSpeedFactor = easeInOut(speedFactor);
 
-    // Look-at point is the target itself
-    glu.lookAtX = cameraState.lookAtX;
-    glu.lookAtY = cameraState.lookAtY;
-    glu.lookAtZ = cameraState.lookAtZ;
+    cameraState.yaw = lerp(cameraState.yaw, autoCameraTarget.yaw, easedSpeedFactor);
+    cameraState.pitch = lerp(cameraState.pitch, autoCameraTarget.pitch, easedSpeedFactor);
+    cameraState.distance = lerp(cameraState.distance, autoCameraTarget.distance, easedSpeedFactor);
 
-    // World up vector (you could improve this if you're near poles)
-    glu.upX = 0.0f;
-    glu.upY = 1.0f;
-    glu.upZ = 0.0f;
+    cameraState.lookAtX = lerp(cameraState.lookAtX, autoCameraTarget.lookAtX, easedSpeedFactor);
+    cameraState.lookAtY = lerp(cameraState.lookAtY, autoCameraTarget.lookAtY, easedSpeedFactor);
+    cameraState.lookAtZ = lerp(cameraState.lookAtZ, autoCameraTarget.lookAtZ, easedSpeedFactor);
 
-    cameraGlu = glu;
+    updateGluFromState();
+
+    if (isAutoCameraAtTarget()) {
+        autoCameraTargetReached = true;
+        cameraState = autoCameraTarget;
+        updateGluFromState();
+    }
 }
-
-void GameControl::updateStateFromGlu() {
-    // Vector from lookAt to camera position
-    float dx = cameraGlu.posX - cameraGlu.lookAtX;
-    float dy = cameraGlu.posY - cameraGlu.lookAtY;
-    float dz = cameraGlu.posZ - cameraGlu.lookAtZ;
-
-    // Calculate distance
-    float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
-
-    // Prevent division by zero
-    if (distance == 0.0f) return;
-
-    // Calculate pitch and yaw in radians
-    float pitchRad = std::asin(dy / distance);
-    float yawRad = std::atan2(dx, dz);
-
-    // Convert radians to degrees
-    float pitch = pitchRad * GameControl::DEG_TO_RAD;
-    float yaw = yawRad * GameControl::DEG_TO_RAD;
-
-    // Update cameraState
-    cameraState.pitch = pitch;
-    cameraState.yaw = yaw;
-    cameraState.distance = distance;
-
-    cameraState.lookAtX = cameraGlu.lookAtX;
-    cameraState.lookAtY = cameraGlu.lookAtY;
-    cameraState.lookAtZ = cameraGlu.lookAtZ;
-}
-
 
 // Handles camera look at point moving
-void GameControl::handleCameraLookAtMoving() {
+void GameControl::handleCameraPosMoving() {
     if (isButtonPressed(GLUT_LEFT_BUTTON)) {
-        if (!isLookAtMoving) {
+        if (isOrbitting) { return; }
+
+        if (!isMovingPos) {
             resetMouseDelta();
-            isLookAtMoving = true;
+            isMovingPos = true;
             return;
         }
 
-        float sensitivity = 0.05f;
-        
-        // In state dimension
-        cameraGlu.lookAtX = cameraGlu.lookAtX - mouseXDelta * sensitivity;
-        cameraGlu.lookAtZ = cameraGlu.lookAtZ - mouseYDelta * sensitivity;
-        cameraGlu.posX = cameraGlu.posX - mouseXDelta * sensitivity;
-        cameraGlu.posZ = cameraGlu.posZ - mouseYDelta * sensitivity;
-        
-        // Update also the GLU struct
-        updateStateFromGlu();
+        // Get yaw in radians
+        float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
+
+        // Rotate mouse deltas into world space
+        float deltaX = (mouseXDelta * cosf(yawRad) - mouseYDelta * sinf(yawRad)) * movingPosSensitivity;
+        float deltaZ = (mouseXDelta * sinf(yawRad) + mouseYDelta * cosf(yawRad)) * movingPosSensitivity;
+
+        // Calculate new tentative lookAt position
+        float newLookAtX = cameraGlu.lookAtX - deltaX;
+        float newLookAtZ = cameraGlu.lookAtZ - deltaZ;
+
+        // Get map corner points
+        Map* map = Game::getInstance().getMap();
+        MapCornerPoints cornerPoints = map->getMapCornerPoints();
+
+        // Check if the new lookAt is within bounds
+        bool inBounds = (
+            newLookAtX >= cornerPoints.lowerLeft.x &&
+            newLookAtX <= cornerPoints.lowerRight.x &&
+            newLookAtZ >= cornerPoints.lowerLeft.z &&
+            newLookAtZ <= cornerPoints.upperLeft.z
+            );
+
+        // Only apply if within bounds
+        if (inBounds) {
+            cameraGlu.lookAtX = newLookAtX;
+            cameraGlu.lookAtZ = newLookAtZ;
+            cameraGlu.posX -= deltaX;
+            cameraGlu.posZ -= deltaZ;
+
+            updateStateFromGlu();
+        }
+
         resetMouseDelta();
         return;
     }
-    isLookAtMoving = false;
+    isMovingPos = false;
 }
+
 
 // Handles camera orbitting
 void GameControl::handleCameraOrbitting() {
+    if (isMovingPos) { return; }
+
     if (isButtonPressed(GLUT_RIGHT_BUTTON)) {
         if (!isOrbitting) {
             isOrbitting = true;
             resetMouseDelta();
             return;
         }
-        // Sensitivity multiplier (tweakable)
-        float sensitivity = 0.3f;
 
-        cameraState.yaw += mouseXDelta * sensitivity;
-        cameraState.pitch -= mouseYDelta * sensitivity;
+        cameraState.yaw += mouseXDelta * orbittingDegPerPixel;
+        cameraState.pitch -= mouseYDelta * orbittingDegPerPixel;
 
-        // Clamp pitch to avoid flipping
         updateGluFromState();
         resetMouseDelta();
         return;
@@ -145,14 +144,14 @@ void GameControl::handleCameraZooming() {
     if (isButtonFlagPressed(GLUT_WHEEL_UP)) {
         resetButtonFlagPressed(GLUT_WHEEL_UP);
         float zoomStep = 0.5f;
-        cameraState.distance = std::clamp(cameraState.distance + zoomStep, 5.0f, 100.0f);
+        cameraState.distance = cameraState.distance + zoomStep;
         updateGluFromState();
     }
 
     if (isButtonFlagPressed(GLUT_WHEEL_DOWN)) {
         resetButtonFlagPressed(GLUT_WHEEL_DOWN);
         float zoomStep = 0.5f;
-        cameraState.distance = std::clamp(cameraState.distance - zoomStep, 5.0f, 100.0f);
+        cameraState.distance = cameraState.distance - zoomStep;
         updateGluFromState();
     }
 }
@@ -202,6 +201,67 @@ void GameControl::mouseButton(int button, int state, int x, int y) {
         return;
     }
 }
+
+void GameControl::updateGluFromState() {
+    CameraGlu glu;
+
+    // Convert yaw and pitch to radians
+    float yawRad = cameraState.yaw * GameControl::DEG_TO_RAD;
+    float pitchRad = cameraState.pitch * GameControl::DEG_TO_RAD;
+
+    // Spherical to Cartesian conversion (camera orbiting around target)
+    float camX = cameraState.distance * cosf(pitchRad) * sinf(yawRad);
+    float camY = cameraState.distance * sinf(pitchRad);
+    float camZ = cameraState.distance * cosf(pitchRad) * cosf(yawRad);
+
+    // Camera position is offset from the target
+    glu.posX = cameraState.lookAtX + camX;
+    glu.posY = cameraState.lookAtY + camY;
+    glu.posZ = cameraState.lookAtZ + camZ;
+
+    // Look-at point is the target itself
+    glu.lookAtX = cameraState.lookAtX;
+    glu.lookAtY = cameraState.lookAtY;
+    glu.lookAtZ = cameraState.lookAtZ;
+
+    // World up vector (you could improve this if you're near poles)
+    glu.upX = 0.0f;
+    glu.upY = 1.0f;
+    glu.upZ = 0.0f;
+
+    cameraGlu = glu;
+}
+
+void GameControl::updateStateFromGlu() {
+    // Vector from lookAt to camera position
+    float dx = cameraGlu.posX - cameraGlu.lookAtX;
+    float dy = cameraGlu.posY - cameraGlu.lookAtY;
+    float dz = cameraGlu.posZ - cameraGlu.lookAtZ;
+
+    // Calculate distance
+    float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+    // Prevent division by zero
+    if (distance == 0.0f) return;
+
+    // Calculate pitch and yaw in radians
+    float pitchRad = std::asin(dy / distance);
+    float yawRad = std::atan2(dx, dz);
+
+    // Convert radians to degrees
+    float pitch = pitchRad * GameControl::RAD_TO_DEG;
+    float yaw = yawRad * GameControl::RAD_TO_DEG;
+
+    // Update cameraState
+    cameraState.pitch = pitch;
+    cameraState.yaw = yaw;
+    cameraState.distance = distance;
+
+    cameraState.lookAtX = cameraGlu.lookAtX;
+    cameraState.lookAtY = cameraGlu.lookAtY;
+    cameraState.lookAtZ = cameraGlu.lookAtZ;
+}
+
 
 // Glut callback for registering mouse position
 void GameControl::mouseMotion(int x, int y) {

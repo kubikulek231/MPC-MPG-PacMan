@@ -94,16 +94,16 @@ void Game::initLevel(int level) {
 void Game::update(int value) {
     Game& game = Game::getInstance();
 
-    float newFrameTimeSeconds = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
+    float newFrameTimeS = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
     // Update the frametime
-    game.lastFrameTimeDeltaSeconds = newFrameTimeSeconds - game.lastFrameTimeSeconds;
-    game.lastFrameTimeSeconds = newFrameTimeSeconds;
+    game.lastFrameTimeDeltaS = newFrameTimeS - game.lastFrameTimeS;
+    game.lastFrameTimeS = newFrameTimeS;
 
     GameLogic::updatePlayer();
     GameLogic::updateGhosts();
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
-    game.getGameControlInstance().update();
+    game.getGameControlInstance().update(newFrameTimeS);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -114,7 +114,7 @@ void Game::update(int value) {
 void Game::render() {
     Game& game = Game::getInstance();
     GameControl& gc = GameControl::getInstance();
-    CameraGLU cam = gc.getCameraGLU();
+    CameraGlu cam = gc.getCameraGLU();
 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,9 +137,7 @@ void Game::render() {
     game.renderLives();
     GameMenu::render();
 
-    for (Ghost* ghost : game.getGhosts()) {
-        ghost->render();
-    }
+    for (Ghost* ghost : game.getGhosts()) { ghost->render(); }
 
     glutSwapBuffers();
 }

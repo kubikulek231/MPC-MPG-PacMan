@@ -34,7 +34,7 @@ public:
     MovableEntity(const MovableEntity& other);
 
     // === Movement Interface ===
-    bool move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs);
+    bool move(MoveDir requestedMoveDir, bool& isNewRequest, float frametimeS);
     void setMoveSpeed(float speed);
     float getMoveSpeed() const;
     void setDirChangeRequestExpireAfterMs(uint64_t expireAfter) { this->dirChangeRequestExpireAfterMs = expireAfter; }
@@ -55,7 +55,7 @@ protected:
     MoveDir getRequestedDir();
 
     // === Frame-based Speed Calculation ===
-    float frametimeNormalizedSpeed(float frameTimeMs) const;
+    float frametimeNormalizedSpeed(float frametimeS) const;
 
     // === Low-Level Movement Helpers ===
     void move(float dx, float dy, float dz);
@@ -70,9 +70,9 @@ protected:
     float speedMltprForDirection(MoveDir moveDir);
 
     // === Movement Logic ===
-    bool preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved);
-    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
-    bool preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles);
+    bool preciseMove(MoveDir moveDir, float frametimeS, bool &moved);
+    bool preciseMoveUntilCanTurn(MoveDir actualMoveDir, float frametimeS, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles = {});
+    bool preciseMoveToNextTile(MoveDir moveDir, float frametimeS, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles);
     bool tryMoveToNextClosestTile(MoveDir moveDir, MovableEntity* movableEntity, char axis, float maxMoveDistance, bool& hit, bool& moved, bool proceedToNextTile = false);
     void teleport(MoveDir moveDir);
     Point3D furthestPossibleEntityOriginPoint(MoveDir moveDir, Tile* currentTile);

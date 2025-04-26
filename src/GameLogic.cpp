@@ -38,16 +38,16 @@ void GameLogic::updatePlayer() {
 	GameControl& gc = game.getGameControlInstance();
 	MoveDir moveDir = gc.getMoveDir();
 	Player& player = *game.getPlayer();
-	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
+	float lastframetimeS = game.getLastFrameTimeDeltaSeconds();
 
-	player.move(moveDir, gc.getMovementChanged(), lastFrameTimeMs);
+	player.move(moveDir, gc.getMovementChanged(), lastframetimeS);
 	player.update(game.gameCollectedPellets);
 }
 
 void GameLogic::updateGhosts() {
 	Game& game = Game::getInstance();
 	MoveDir moveDir = game.getGameControlInstance().getMoveDir();
-	float lastFrameTimeMs = game.getLastFrameTimeDeltaSeconds() * 1000.0f;
+	float lastFrametimeS = game.getLastFrameTimeDeltaSeconds();
 
 	// Do not update ghost movement until player chooses moveDir
 	if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) { return; }
@@ -59,16 +59,24 @@ void GameLogic::updateGhosts() {
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
 		if (!ghost->isPathEmpty()) {
-			ghost->moveOnPath(lastFrameTimeMs);
+			ghost->moveOnPath(lastFrametimeS);
 			continue;
 		}
 		// Move randomly if path is empty
-		ghost->moveOnRandomPath(lastFrameTimeMs);
+		ghost->moveOnRandomPath(lastFrametimeS);
 	}
 
 	// Debug
 	if (gc.isKeyFlagPressed('x')) {
 		gc.resetKeyFlagPressed('x');
+		CameraState target = gc.getCameraState();
+		Point3D targetTilePoint3D = game.getMap()->getTileAt(0, 0)->getOrigin();
+		target.lookAtX = targetTilePoint3D.x;
+		target.lookAtY = targetTilePoint3D.y;
+		target.lookAtZ = targetTilePoint3D.z;
+		gc.setNewCameraTarget(target);
+		gc.enableAutoCamera();
+
 		for (size_t i = 0; i < ghosts.size(); ++i) {
 			Map* map = game.getMap();
 			Ghost* ghost = ghosts[i];
@@ -78,7 +86,7 @@ void GameLogic::updateGhosts() {
 				continue;
 			}
 			// Move randomly if path is empty
-			ghost->moveOnRandomPath(lastFrameTimeMs);
+			ghost->moveOnRandomPath(lastFrametimeS);
 		}
 	}
 
@@ -93,7 +101,7 @@ void GameLogic::updateGhosts() {
 				continue;
 			}
 			// Move randomly if path is empty
-			ghost->moveOnRandomPath(lastFrameTimeMs);
+			ghost->moveOnRandomPath(lastFrametimeS);
 		}
 	}
 }

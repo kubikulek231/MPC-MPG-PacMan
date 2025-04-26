@@ -7,6 +7,12 @@
 #include "Game.h"
 #include <random>
 
+const std::vector<MapCorner> Map::corners = {
+                                                MapCorner::TOP_LEFT,
+                                                MapCorner::TOP_RIGHT,
+                                                MapCorner::BOTTOM_LEFT,
+                                                MapCorner::BOTTOM_RIGHT
+                                            };
 
 Map::Map() {
 }
@@ -17,6 +23,10 @@ Map::Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellet
     this->width = (this->height > 0) ? mapGrid[0].size() : 0;  // Number of columns (checking if the grid is not empty)
     this->tileSize = tileSize;
     this->totalPellets = totalPellets;
+    mapCornerPoints.lowerLeft = Point3D(-MapFactory::MAP_WIDTH / 2.0f, MapFactory::MAP_Y, -MapFactory::MAP_HEIGHT / 2.0f);
+    mapCornerPoints.lowerRight = Point3D(MapFactory::MAP_WIDTH / 2.0f, MapFactory::MAP_Y, -MapFactory::MAP_HEIGHT / 2.0f);
+    mapCornerPoints.upperLeft = Point3D(-MapFactory::MAP_WIDTH / 2.0f, MapFactory::MAP_Y, MapFactory::MAP_HEIGHT / 2.0f);
+    mapCornerPoints.upperRight = Point3D(MapFactory::MAP_WIDTH / 2.0f, MapFactory::MAP_Y, MapFactory::MAP_HEIGHT / 2.0f);
 }
 
 Tile* Map::getTileWithPoint3D(Point3D point) {

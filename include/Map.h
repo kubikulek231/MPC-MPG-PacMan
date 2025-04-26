@@ -8,6 +8,13 @@
 #include "BoundingBox3D.h"
 #include "Map.h"
 
+struct MapCornerPoints {
+    Point3D lowerLeft = Point3D();
+    Point3D upperLeft = Point3D();
+    Point3D lowerRight = Point3D();
+    Point3D upperRight = Point3D();
+};
+
 enum class MapCorner {
     TOP_LEFT,
     TOP_RIGHT,
@@ -17,6 +24,7 @@ enum class MapCorner {
 
 class Map {
 public:
+    static const std::vector<MapCorner> corners;
     Map();
     Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellets);
     void render(bool resetHighlighted = false, int resetTimerMs = 5000);  // Draws the map
@@ -26,12 +34,6 @@ public:
     void resetHighlightedTiles();
     void scheduleHighlightReset(int delay);
     Tile* getRandomTile();
-    std::vector<MapCorner> corners = {
-        MapCorner::TOP_LEFT,
-        MapCorner::TOP_RIGHT,
-        MapCorner::BOTTOM_LEFT,
-        MapCorner::BOTTOM_RIGHT
-    };
     bool areAllPelletsCollected() const;
     bool collectPellet(Tile* tile);
     Tile* getPlayerSpawn();
@@ -39,6 +41,7 @@ public:
     Tile* getPinkySpawn();
     Tile* getInkySpawn();
     Tile* getClydeSpawn();
+    MapCornerPoints getMapCornerPoints() const { return mapCornerPoints; }
 private:
     Tile* getFirstTileOfType(TileType type);
     int totalPellets;
@@ -51,6 +54,7 @@ private:
     void renderTileCoordinates(const Tile* tile);
     void drawCenterAxes(float length = 2.0f);
     int mapCollectedPellets = 0;
+    MapCornerPoints mapCornerPoints;
 };
 
 #endif // MAP_H

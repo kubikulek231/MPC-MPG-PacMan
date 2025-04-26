@@ -37,7 +37,7 @@ MovableEntity::MovableEntity(const MovableEntity& other) : Entity(other) {
 
 
 // === Movement Interface ===
-bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
+bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float frametimeS) {
     if (moveDir == MoveDir::NONE || moveDir == MoveDir::UNDEFINED) {
         // Set initial moveDir
         if (requestedMoveDir != MoveDir::NONE && requestedMoveDir != MoveDir::UNDEFINED) {
@@ -68,7 +68,7 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
 
     if (requestedMoveDir == moveDir) {
         MovableEntity::clearDirChangeRequest();
-        MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+        MovableEntity::preciseMove(moveDir, frametimeS, moved);
         return moved;
     }
 
@@ -80,10 +80,10 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         // Change the direction right away if request is the same axis
         if (axisForDirection(requestedDir) == axisForDirection(moveDir)) {
             moveDir = requestedDir;
-            MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+            MovableEntity::preciseMove(moveDir, frametimeS, moved);
             return moved;
         }
-        if (preciseMoveUntilCanTurn(requestedDir, frameTimeMs, canTurn, moved, intersectingTiles)) {
+        if (preciseMoveUntilCanTurn(requestedDir, frametimeS, canTurn, moved, intersectingTiles)) {
             if (canTurn) {
                 moveDir = requestedDir;
                 MovableEntity::clearDirChangeRequest();
@@ -92,7 +92,7 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
         }
     }
     // If every attempt fails, keep moving in the same direction
-    MovableEntity::preciseMove(moveDir, frameTimeMs, moved);
+    MovableEntity::preciseMove(moveDir, frametimeS, moved);
     return moved;
 }
 
@@ -121,8 +121,8 @@ MoveDir MovableEntity::getRequestedDir() {
 }
 
 // === Frame-based Speed Calculation ===
-float MovableEntity::frametimeNormalizedSpeed(float frametimeMs) const {
-    float normalizedSpeed = speed * frametimeMs / 1000.0f;
+float MovableEntity::frametimeNormalizedSpeed(float frametimeS) const {
+    float normalizedSpeed = speed * frametimeS;
     return std::min(normalizedSpeed, MAX_NORMALIZED_SPEED);
 }
 
@@ -170,14 +170,14 @@ float MovableEntity::speedMltprForDirection(MoveDir moveDir) {
 
 
 // === Movement Logic ===
-bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved) {
+bool MovableEntity::preciseMove(MoveDir moveDir, float frametimeS, bool &moved) {
     moved = false;
 
     auto initialTiles = intersectingTiles(this);
     auto initialTile = currentTile(initialTiles);
 
     MovableEntity entityCopy = MovableEntity(*this);
-    float fullSpeed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
+    float fullSpeed = frametimeNormalizedSpeed(frametimeS) * speedMltprForDirection(moveDir);
     char moveAxis = axisForDirection(moveDir);
 
     bool headingOut = headingOutOfMap(moveDir, initialTile);
@@ -217,7 +217,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved)
     float distanceToMove = targetAxisValue - entityCopyAxisValue;
 
     // Clamp the distanceToMove to fullSpeed (move at fullSpeed max)
-    distanceToMove = clampMoveDistance(distanceToMove, frametimeNormalizedSpeed(frameTimeMs));
+    distanceToMove = clampMoveDistance(distanceToMove, frametimeNormalizedSpeed(frametimeS));
     
     // Move the copy
     entityCopy.moveAxis(moveAxis, distanceToMove);
@@ -236,7 +236,7 @@ bool MovableEntity::preciseMove(MoveDir moveDir, float frameTimeMs, bool &moved)
 // where a turn to the requested direction is possible.
 // Returns true if movement occurs; false otherwise.
 // Sets 'canTurn' to true if the entity reaches a precise location where turning is possible.
-bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frameTimeMs, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles) {
+bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float frametimeS, bool& canTurn, bool& moved, const std::vector<Tile*>& intersectingTiles) {
     moved = false;
     // Determine the current tile the entity is on
     Tile* tileCurrent = currentTile(intersectingTiles);
@@ -257,7 +257,7 @@ bool MovableEntity::preciseMoveUntilCanTurn(MoveDir requestedMoveDir, float fram
     }
 
     // Get movement axis and adjust speed for current direction
-    float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
+    float speed = frametimeNormalizedSpeed(frametimeS) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
 
     bool inCenter = false;
@@ -501,7 +501,7 @@ Tile* MovableEntity::nextTileInDirection(MoveDir moveDir, Tile* currentTile) {
     return currentTile;
 }
 
-bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles) {
+bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frametimeS, bool& moved, bool& inCenter, const std::vector<Tile*>& intersectingTiles) {
     moved = false;
     inCenter = false;
 
@@ -519,11 +519,11 @@ bool MovableEntity::preciseMoveToNextTile(MoveDir moveDir, float frameTimeMs, bo
     }
 
     // Get movement axis and adjust speed for current direction
-    float speed = frametimeNormalizedSpeed(frameTimeMs) * speedMltprForDirection(moveDir);
+    float speed = frametimeNormalizedSpeed(frametimeS) * speedMltprForDirection(moveDir);
     char axis = axisForDirection(moveDir);
 
     if (headingOut) {
-        if (preciseMove(moveDir, frameTimeMs, moved));
+        if (preciseMove(moveDir, frametimeS, moved));
         return true;
     }
 

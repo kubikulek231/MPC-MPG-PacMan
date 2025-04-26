@@ -7,7 +7,7 @@
 #include "MapFactory.h"
 #include "MoveDir.h"
 #include "Ghost.h"
-#include "GameControl.h"
+#include "GameUserInput.h"
 #include "GameCamera.h"
 #include "glft2/TextRenderer.hpp"
 

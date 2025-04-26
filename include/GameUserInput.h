@@ -1,18 +1,18 @@
-#ifndef GAMECONTROL_H
-#define GAMECONTROL_H
+#ifndef GameUserInput_H
+#define GameUserInput_H
 #include "gl_includes.h"
 #include <unordered_set>
 #include <unordered_map>
 #include "CameraModels.h"
 #include "MoveDir.h"
 #include "MapFactory.h"
-#include "GameControl.h"
+#include "GameUserInput.h"
 #include "GameCamera.h"
 
 #define GLUT_WHEEL_DOWN 3
 #define GLUT_WHEEL_UP 4
 
-class GameControl {
+class GameUserInput {
 public:
     std::unordered_set<unsigned char> trackedKeyboardKeys = { 'w', 'a', 's', 'd', 'x', 'y' };
     std::unordered_set<int> trackedMouseButtons = { GLUT_LEFT_BUTTON, 
@@ -21,8 +21,8 @@ public:
                                                     GLUT_WHEEL_DOWN,
                                                     GLUT_WHEEL_UP };
 
-    static GameControl& getInstance() {
-        static GameControl instance;
+    static GameUserInput& getInstance() {
+        static GameUserInput instance;
         return instance;
     }
 
@@ -60,9 +60,9 @@ public:
     float getMouseYDelta() const { return mouseYDelta; }
 
 private:
-    GameControl() = default;
-    GameControl(const GameControl&) = delete;
-    GameControl& operator=(const GameControl&) = delete;
+    GameUserInput() = default;
+    GameUserInput(const GameUserInput&) = delete;
+    GameUserInput& operator=(const GameUserInput&) = delete;
     void handleWasdMovement();
 
     std::unordered_map<unsigned char, bool> pressedKeys;

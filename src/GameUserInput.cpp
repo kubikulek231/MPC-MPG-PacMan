@@ -1,5 +1,5 @@
 #include "gl_includes.h"
-#include "GameControl.h"
+#include "GameUserInput.h"
 #include "Game.h"
 #include "MoveDir.h"
 #include "MapFactory.h"
@@ -7,11 +7,11 @@
 #include <cmath>
 #include <iostream>
 
-void GameControl::update() {
+void GameUserInput::update() {
     handleWasdMovement();
 }
 
-void GameControl::handleWasdMovement() {
+void GameUserInput::handleWasdMovement() {
     // WASD movement
     if (isKeyFlagPressed('w')) { movementChanged = true; this->moveDir = MoveDir::FWD; }
     if (isKeyFlagPressed('s')) { movementChanged = true; this->moveDir = MoveDir::BWD; }
@@ -20,7 +20,7 @@ void GameControl::handleWasdMovement() {
 }
 
 // Glut callback for registering keyboard down events
-void GameControl::keyboard(unsigned char key, int x, int y) {
+void GameUserInput::keyboard(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = true;
         lastPressedKeys[key] = false;
@@ -30,7 +30,7 @@ void GameControl::keyboard(unsigned char key, int x, int y) {
 }
 
 // Glut callback for registering keyboard up events
-void GameControl::keyboardUp(unsigned char key, int x, int y) {
+void GameUserInput::keyboardUp(unsigned char key, int x, int y) {
     if (trackedKeyboardKeys.find(key) != trackedKeyboardKeys.end()) {
         pressedKeys[key] = false;
         lastPressedKeys[key] = true;
@@ -40,7 +40,7 @@ void GameControl::keyboardUp(unsigned char key, int x, int y) {
 }
 
 // Glut callback for registering mouse button inputs
-void GameControl::mouseButton(int button, int state, int x, int y) {
+void GameUserInput::mouseButton(int button, int state, int x, int y) {
     if (trackedMouseButtons.find(button) == trackedMouseButtons.end()) { return; }
 
     // Handle scroll wheel as one-time impulse
@@ -66,7 +66,7 @@ void GameControl::mouseButton(int button, int state, int x, int y) {
 }
 
 // Glut callback for registering mouse position
-void GameControl::mouseMotion(int x, int y) {
+void GameUserInput::mouseMotion(int x, int y) {
     lastMouseX = mouseX;
     lastMouseY = mouseY;
     mouseX = x;
@@ -75,49 +75,49 @@ void GameControl::mouseMotion(int x, int y) {
     mouseYDelta = mouseY - lastMouseY;
 }
 
-void GameControl::resetMouseDelta() {
+void GameUserInput::resetMouseDelta() {
     lastMouseX = mouseX;
     lastMouseY = mouseY;
     mouseXDelta = 0;
     mouseYDelta = 0;
 }
 
-bool GameControl::isKeyPressed(unsigned char key) {
+bool GameUserInput::isKeyPressed(unsigned char key) {
     return pressedKeys[key];
 }
 
-bool GameControl::isKeyReleased(unsigned char key) {
+bool GameUserInput::isKeyReleased(unsigned char key) {
     return lastPressedKeys[key];
 }
 
-bool GameControl::isKeyPressedAndReleased(unsigned char key) {
+bool GameUserInput::isKeyPressedAndReleased(unsigned char key) {
     return lastPressedKeys[key] && !pressedKeys[key];
 }
 
-bool GameControl::isButtonPressed(int key) {
+bool GameUserInput::isButtonPressed(int key) {
     return pressedButtons[key];
 }
 
-bool GameControl::isButtonReleased(int key) {
+bool GameUserInput::isButtonReleased(int key) {
     return lastPressedButtons[key];
 }
 
-bool GameControl::isButtonPressedAndReleased(int key) {
+bool GameUserInput::isButtonPressedAndReleased(int key) {
     return lastPressedButtons[key] && !pressedButtons[key];
 }
 
-bool GameControl::isKeyFlagPressed(unsigned char key) {
+bool GameUserInput::isKeyFlagPressed(unsigned char key) {
     return pressedFlagKeys[key];
 }
 
-bool GameControl::isButtonFlagPressed(int key) {
+bool GameUserInput::isButtonFlagPressed(int key) {
     return pressedFlagButtons[key];
 }
 
-void GameControl::resetKeyFlagPressed(unsigned char key) {
+void GameUserInput::resetKeyFlagPressed(unsigned char key) {
     pressedFlagKeys[key] = false;
 }
 
-void GameControl::resetButtonFlagPressed(int key) {
+void GameUserInput::resetButtonFlagPressed(int key) {
     pressedFlagButtons[key] = false;
 }

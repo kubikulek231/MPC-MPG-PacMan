@@ -2,7 +2,7 @@
 #include <iostream>
 #include "MapFactory.h"
 #include "Game.h"
-#include "GameControl.h"
+#include "GameUserInput.h"
 #include "GameLogic.h"
 #include "GameCamera.h"
 #include "GameMenu.h"
@@ -14,10 +14,10 @@
 #define PI 3.14159265358979323846f
 
 // Global wrapper functions to be passed to GLUT
-static void keyboardCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboard(tolower(key), x, y); }
-static void keyboardUpCallback(unsigned char key, int x, int y) { GameControl::getInstance().keyboardUp(tolower(key), x, y); }
-static void mouseButtonCallback(int button, int state, int x, int y) { GameControl::getInstance().mouseButton(button, state, x, y); }
-static void mouseMotionCallback(int x, int y) { GameControl::getInstance().mouseMotion(x, y); }
+static void keyboardCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboard(tolower(key), x, y); }
+static void keyboardUpCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboardUp(tolower(key), x, y); }
+static void mouseButtonCallback(int button, int state, int x, int y) { GameUserInput::getInstance().mouseButton(button, state, x, y); }
+static void mouseMotionCallback(int x, int y) { GameUserInput::getInstance().mouseMotion(x, y); }
 
 
 // Inits new game
@@ -105,7 +105,7 @@ void Game::update(int value) {
     GameLogic::updateScore();
     GameLogic::updatePlayerLives();
     
-    GameControl& gcon = GameControl::getInstance();
+    GameUserInput& gcon = GameUserInput::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
 
     // Update user inputs

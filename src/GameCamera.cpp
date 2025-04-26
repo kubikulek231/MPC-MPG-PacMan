@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include "GameControl.h"
+#include "GameUserInput.h"
 
 GameCamera::GameCamera() {
     setCameraMode(CameraMode::InteractiveMapView);
@@ -160,7 +160,7 @@ void GameCamera::updateAutoCameraTransition(float frameTimeS) {
 
 // Handles camera look-at point moving
 void GameCamera::handleCameraPosMoving() {
-    GameControl& gc = GameControl::getInstance();
+    GameUserInput& gc = GameUserInput::getInstance();
     if (!gc.isButtonPressed(GLUT_LEFT_BUTTON)) {
         isMovingPos = false;
         return;
@@ -211,7 +211,7 @@ void GameCamera::handleCameraPosMoving() {
 
 // Handles camera orbitting
 void GameCamera::handleCameraOrbitting() {
-    GameControl& gc = GameControl::getInstance();
+    GameUserInput& gc = GameUserInput::getInstance();
     if (isMovingPos) { return; }
 
     if (gc.isButtonPressed(GLUT_RIGHT_BUTTON)) {
@@ -234,7 +234,7 @@ void GameCamera::handleCameraOrbitting() {
 
 // Handles camera zoom
 void GameCamera::handleCameraZooming() {
-    GameControl& gc = GameControl::getInstance();
+    GameUserInput& gc = GameUserInput::getInstance();
     if (gc.isButtonFlagPressed(GLUT_WHEEL_UP)) {
         gc.resetButtonFlagPressed(GLUT_WHEEL_UP);
         autoCameraZooming = false;

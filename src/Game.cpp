@@ -33,14 +33,14 @@ void Game::init() {
     glutKeyboardUpFunc(keyboardUpCallback);
 
     currentLevel = 0;
-    playerLives = 100;
-
+    playerLives = 3;
 
     gameFont.init("assets/fonts/Roboto-Regular.ttf", 128);
     menuFont.init("assets/fonts/Roboto-Regular.ttf", 72);
     Game::initLevel();
     Game& game = getInstance();
     glft2::font_data font = game.getMenuFont();
+    // Preload main menu
     game.gameMenu.initMainMenu();
 }
 
@@ -94,31 +94,55 @@ void Game::initLevel(int level) {
     GameLogic::initLevel();
 }
 
-// Update positions, handle logic
+// First interface to handle game logic
 void Game::update(int value) {
     Game& game = Game::getInstance();
+    GameCamera& gcam = GameCamera::getInstance();
 
     float newFrameTimeS = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
+    
     // Update the frametime
     game.lastFrameTimeDeltaS = newFrameTimeS - game.lastFrameTimeS;
     game.lastFrameTimeS = newFrameTimeS;
-    game.gameMenu.update();
 
-    if (game.gameState != GameState::Playing) { 
+    // HANDLE GAME LOGIC
+    // Update the game logic and control only if playing
+    if (game.gameState == GameState::Playing) { 
+        // Unlock the user camera movement
+        gcam.setLockUserUpdate(false);
+
         GameLogic::updatePlayer();
         GameLogic::updateGhosts();
         GameLogic::updateScore();
         GameLogic::updatePlayerLives();
 
         GameControl& gcon = GameControl::getInstance();
-        GameCamera& gcam = GameCamera::getInstance();
 
         // Update user input based logic
         gcon.update();
-
-        // Update user input camera based logic
-        gcam.update(game.lastFrameTimeDeltaS);
     }
+
+    // HANDLE MENU LOGIC
+    if (game.gameState != GameState::Playing) {
+        // Lock user camera updates when not in game
+        gcam.setLockUserUpdate(true);
+        // Render the menu only when not playing
+        game.gameMenu.update();
+        std::string enteredItem = game.gameMenu.getEnteredMenuItemString();
+        if (enteredItem == "Play") {
+            game.gameState = GameState::Playing;
+        }
+        if (enteredItem == "Sandbox") {
+            game.playerLives = 9999;
+            game.gameState = GameState::Playing;
+        }
+        if (enteredItem == "Exit") {
+            exit(0);
+        }
+    }
+
+    // Always update the camera
+    gcam.update(game.lastFrameTimeDeltaS);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
@@ -146,12 +170,17 @@ void Game::render() {
     // Render game elements
     game.getMap()->render(true);
     game.getPlayer()->render();
-    game.renderScore();
-    game.renderLives();
-    game.renderCameraInfo();
-    game.gameMenu.render();
-
     for (Ghost* ghost : game.getGhosts()) { ghost->render(); }
+
+    if (game.gameState == GameState::Playing) {
+        game.renderScore();
+        game.renderLives();
+        game.renderCameraInfo();
+    }
+    
+    if (game.gameState != GameState::Playing) {
+        game.gameMenu.render();
+    }
 
     glutSwapBuffers();
 }

@@ -14,7 +14,7 @@ std::string GameMenu::getEnteredMenuItemString() {
     for (const auto& entry : entries) {
         if (entry.isEntered()) { return entry.getText(); }
     }
-    return nullptr;
+    return std::string("");
 }
 
 void GameMenu::initMainMenu() {
@@ -97,16 +97,14 @@ void GameMenu::update() {
     GameUserInput& guin = GameUserInput::getInstance();
     int mouseY = guin.getMouseY();
     int mouseX = guin.getMouseX();
+    bool isEntered = guin.isButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON);
 
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
     mouseY = vp[3] - mouseY;
 
-    std::cout << "mouseY: " << mouseY << std::endl;
-    std::cout << "mouseX: " << mouseX << std::endl;
-
     for (int i = 0; i < (int)entries.size(); ++i) {
-        entries[i].update(mouseX, mouseY, false);
+        entries[i].update(mouseX, mouseY, isEntered);
     }
 }
 

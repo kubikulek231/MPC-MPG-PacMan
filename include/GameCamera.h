@@ -43,7 +43,10 @@ public:
     std::string getCameraModeString() const;
 
     CameraGlu getCameraGLU() const { return cameraGlu; }
+    void setLockUserUpdate(bool lock) { lockUserUpdate = lock; }
 private:
+    bool lockUserUpdate = false;
+
     void updateInteractiveMapViewTarget();
     void updateFollowingPlayerTarget();
 
@@ -89,7 +92,6 @@ private:
 
     bool isOrbitting = false;
     bool isMovingPos = false;
-
 
     bool autoCameraMoving = false;
     bool autoCameraZooming = false;

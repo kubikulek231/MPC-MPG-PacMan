@@ -54,7 +54,7 @@ void GameCamera::update(float frametimeS) {
         game->replenishCameraHintFadeTimer();
         cameraMode = CameraMode::Free;
     }
-    
+
     if (cameraMode == CameraMode::FollowingPlayer) {
         updateFollowingPlayerTarget();
     }
@@ -62,10 +62,11 @@ void GameCamera::update(float frametimeS) {
     if (cameraMode == CameraMode::InteractiveMapView) {
         updateInteractiveMapViewTarget();
     }
-
-    handleCameraOrbitting();
-    handleCameraPosMoving();
-    handleCameraZooming();
+    if (!lockUserUpdate) {
+        handleCameraOrbitting();
+        handleCameraPosMoving();
+        handleCameraZooming();
+    }
     if (!autoCameraMoving && !autoCameraOrbitting && !autoCameraZooming) { return; }
     if (autoCameraTargetReached) { return; }
     updateAutoCameraTransition(frametimeS);

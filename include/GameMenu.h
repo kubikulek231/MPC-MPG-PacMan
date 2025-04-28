@@ -17,11 +17,13 @@ public:
     // Initialize pause menu entries
     void initPauseMenu();
     
+    std::string getEnteredMenuItemString();
     void update();
     void setEntries(const std::vector<MenuItem>& items);
     void render();
 
 private:
+    void renderMenuBackground();
     int selectedId = -1;
     std::vector<MenuItem> entries;
     std::shared_ptr<glft2::font_data> font_ptr;

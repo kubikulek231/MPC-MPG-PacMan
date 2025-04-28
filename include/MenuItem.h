@@ -59,6 +59,7 @@ public:
     void setY(float newY) { y = newY; }
     void setWidth(float newWidth) { width = newWidth; }
     void setHeight(float newHeight) { height = newHeight; }
+    void setText(std::string txt) { this->text = txt; }
     void setSelectable(bool value) { 
         selected = false;
         entered = false;

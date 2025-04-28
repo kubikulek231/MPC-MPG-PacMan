@@ -120,6 +120,12 @@ void Game::update(int value) {
 
         // Update user input based logic
         gcon.update();
+
+        if (game.getPlayerLives() < 0) {
+            game.gameState = GameState::GameOver;
+            game.gameMenu.initGameOverMenu();
+            game.gameMenu.setUserScore(game.getTotalScore());
+        }
     }
 
     // HANDLE MENU LOGIC

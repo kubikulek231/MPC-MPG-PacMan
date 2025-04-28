@@ -16,6 +16,10 @@ public:
     void initMainMenu();
     // Initialize pause menu entries
     void initPauseMenu();
+    // Initialize pause menu entries
+    void initGameOverMenu();
+
+    void setUserScore(int score);
     
     std::string getEnteredMenuItemString();
     void update();

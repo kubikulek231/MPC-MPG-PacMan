@@ -17,6 +17,16 @@ std::string GameMenu::getEnteredMenuItemString() {
     return std::string("");
 }
 
+void GameMenu::setUserScore(int score) {
+    for (auto& entry : entries) {
+        if (entry.getText() == "Your score: 9999") {
+            entry.setText("Your score: " + score);
+            return;
+        }
+    }
+    return;;
+}
+
 void GameMenu::initMainMenu() {
     Game& game = Game::getInstance();
     glft2::font_data font = game.getMenuFont();
@@ -83,6 +93,43 @@ void GameMenu::initPauseMenu() {
 
     // Add the menu items to the entries
     setEntries({ play, exit });
+}
+
+void GameMenu::initGameOverMenu() {
+    Game& game = Game::getInstance();
+    glft2::font_data font = game.getMenuFont();
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    float screenW = float(vp[2]);
+    float screenH = float(vp[3]);
+    float centerX = screenW * 0.5f;
+    float centerY = screenH * 0.5f;
+    float textScale = 0.5f;
+
+    // Get base item width and height (for the longest text)
+    float maxTextW, maxTextH;
+    glft2::measureText(font, "Exit to Main Menu", &maxTextW, &maxTextH, textScale);
+
+    float itemPadding = 2.0f;
+    float itemGap = 3.0f;
+
+    float itemW = maxTextW + itemPadding * 2.0f;
+    float itemH = maxTextH + itemPadding * 2.0f;
+
+    float firstItemX = centerX - itemW / 2.0f;
+
+    // Store the font pointer
+    font_ptr = std::make_shared<glft2::font_data>(font);
+
+    MenuItem gameOverTitle = MenuItem(font_ptr, "Game Over!", firstItemX, 0, itemW, itemH, textScale);
+    gameOverTitle.setSelectable(false);
+    MenuItem score = MenuItem(font_ptr, "Your score: 9999", firstItemX, 0, itemW, itemH, textScale);
+    score.setSelectable(false);
+    MenuItem exitToMenu = MenuItem(font_ptr, "Exit to Main Menu", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
+    MenuItem exit = MenuItem(font_ptr, "Exit", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
+
+    // Add the menu items to the entries
+    setEntries({ gameOverTitle, score, exitToMenu, exit });
 }
 
 void GameMenu::setEntries(const std::vector<MenuItem>& items) {

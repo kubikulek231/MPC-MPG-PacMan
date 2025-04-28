@@ -35,15 +35,18 @@ void Game::init() {
     currentLevel = 0;
     playerLives = 100;
 
-    Game::initLevel();
+
     gameFont.init("assets/fonts/Roboto-Regular.ttf", 128);
     menuFont.init("assets/fonts/Roboto-Regular.ttf", 72);
+    Game::initLevel();
+    Game& game = getInstance();
+    glft2::font_data font = game.getMenuFont();
+    game.gameMenu.initMainMenu();
 }
 
 void Game::initLevel(int level) {
     Game& game = getInstance();
     game.moveDir = MoveDir::NONE;
-
     if (level < 0) { level = getCurrentLevel(); }
     mapFactory = MapFactory();
     map = mapFactory.createMap();
@@ -102,27 +105,23 @@ void Game::update(int value) {
     game.gameMenu.update();
 
     if (game.gameState != GameState::Playing) { 
-        glutTimerFunc(8, Game::update, 0);
-        return; 
+        GameLogic::updatePlayer();
+        GameLogic::updateGhosts();
+        GameLogic::updateScore();
+        GameLogic::updatePlayerLives();
+
+        GameControl& gcon = GameControl::getInstance();
+        GameCamera& gcam = GameCamera::getInstance();
+
+        // Update user input based logic
+        gcon.update();
+
+        // Update user input camera based logic
+        gcam.update(game.lastFrameTimeDeltaS);
     }
-
-    GameLogic::updatePlayer();
-    GameLogic::updateGhosts();
-    GameLogic::updateScore();
-    GameLogic::updatePlayerLives();
-    
-    GameControl& gcon = GameControl::getInstance();
-    GameCamera& gcam = GameCamera::getInstance();
-
-    // Update user input based logic
-    gcon.update();
-
-    // Update user input camera based logic
-    gcam.update(game.lastFrameTimeDeltaS);
 
     // Trigger the display update by calling this to schedule a render
     glutPostRedisplay();
-
     glutTimerFunc(8, Game::update, 0);
 }
 
@@ -160,10 +159,25 @@ void Game::render() {
 
 // Callback to trigger on glut window reshape
 void Game::reshape(int w, int h) {
+    const int MIN_W = 800;
+    const int MIN_H = 600;
+
+    // Enforce minimum window size
+    if (w < MIN_W || h < MIN_H) {
+        glutReshapeWindow(
+            std::max(w, MIN_W),
+            std::max(h, MIN_H)
+        );
+        return;
+    }
+
+    // Normal viewport/projection setup
     glViewport(0, 0, w, h);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (float)w / (float)h, 0.1, 100.0);
+    gluPerspective(45.0, float(w) / float(h), 0.1, 100.0);
+
     glMatrixMode(GL_MODELVIEW);
 }
 

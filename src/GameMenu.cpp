@@ -1,69 +1,82 @@
-#include "GameMenu.h"
-#include "Game.h"
+#include "gl_includes.h"
+#include "MoveDir.h"
+#include <string>
+#include <vector>
+#include <iostream>
+#include "Game.h"        // Make sure Game is included first
+#include "MenuItem.h"    // Now MenuItem is properly defined
 #include <glft2/TextRenderer.hpp>
-#include <GL/gl.h>
 
 GameMenu::GameMenu() {
-    initMainMenu();
 }
 
 void GameMenu::initMainMenu() {
-    setEntries({ "Play", "Sandbox", "Exit" });
+    Game& game = Game::getInstance();
+    glft2::font_data font = game.getMenuFont();
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    float screenW = float(vp[2]);
+    float screenH = float(vp[3]);
+    float centerX = screenW * 0.5f;
+    float centerY = screenH * 0.5f;
+    float textScale = 0.5f;
+
+    // Get base item width and height (for the longest text)
+    float maxTextW, maxTextH;
+    glft2::measureText(font, "Exit to Main Menu", &maxTextW, &maxTextH, textScale);
+
+    float itemPadding = 2.0f;
+    float itemGap = 3.0f;
+
+    // Calculate width and height of the menu items
+    float itemW = maxTextW + itemPadding * 2.0f;
+    float itemH = maxTextH + itemPadding * 2.0f;
+
+    // Calculate the starting X for the first menu item to center it horizontally
+    float firstItemX = centerX - itemW / 2.0f;
+
+    // Calculate the total height of all the menu items plus the gaps
+    float totalHeight = entries.size() * (itemH + itemGap) - itemGap;  // Total height of all items
+    float firstItemY = centerY - totalHeight / 2.0f;  // Starting Y to center the menu vertically
+
+    // Store the font pointer
+    font_ptr = std::make_shared<glft2::font_data>(font);
+
+    MenuItem play = MenuItem(font_ptr, "XD", firstItemX, firstItemY, itemW, itemH, textScale);
+    MenuItem sandbox = MenuItem(font_ptr, "Sandbox", firstItemX, firstItemY + itemH + itemGap, itemW, itemH, textScale);
+    MenuItem exit = MenuItem(font_ptr, "Exit", firstItemX, firstItemY + 2 * (itemH + itemGap), itemW, itemH, textScale);
+
+    // Add the menu items to the entries
+    setEntries({ play, sandbox, exit});
 }
+
 
 void GameMenu::initPauseMenu() {
-    setEntries({ "Resume", "Restart", "Exit to Main Menu" });
+    //setEntries({ "Resume", "Restart", "Exit to Main Menu" });
 }
 
-void GameMenu::setEntries(const std::vector<std::string>& items) {
+void GameMenu::setEntries(const std::vector<MenuItem>& items) {
     entries.clear();
     for (const auto& txt : items) {
         entries.emplace_back(txt);
     }
-    if (!entries.empty()) {
-        entries[0].selected = true;
-    }
 }
 
-void GameMenu::setSelectedIndex(int idx) {
-    if (idx < 0 || idx >= (int)entries.size()) return;
-    for (int i = 0; i < (int)entries.size(); ++i) {
-        entries[i].selected = (i == idx);
-    }
-}
-
+// Handle selecting of items
 void GameMenu::update() {
     GameUserInput& guin = GameUserInput::getInstance();
     int mouseY = guin.getMouseY();
     int mouseX = guin.getMouseX();
-    for (int i = 0; i < (int)entries.size(); ++i) {
-        auto& entry = entries[i];
-        if (entry.intersects(mouseX, mouseY)) {
-            setSelectedIndex(i);  // Select the entry under the mouse
-            break;
-        }
-    }
-}
 
-void GameMenu::selectNext() {
-    for (int i = 0; i < (int)entries.size(); ++i) {
-        if (entries[i].selected) {
-            entries[i].selected = false;
-            int nextIndex = (i + 1) % entries.size();  // Wrap around if at the end
-            entries[nextIndex].selected = true;
-            break;
-        }
-    }
-}
+    GLint vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    mouseY = vp[3] - mouseY;
 
-void GameMenu::selectPrev() {
+    std::cout << "mouseY: " << mouseY << std::endl;
+    std::cout << "mouseX: " << mouseX << std::endl;
+
     for (int i = 0; i < (int)entries.size(); ++i) {
-        if (entries[i].selected) {
-            entries[i].selected = false;
-            int prevIndex = (i - 1 + entries.size()) % entries.size();  // Wrap around if at the beginning
-            entries[prevIndex].selected = true;
-            break;
-        }
+        entries[i].update(mouseX, mouseY, false);
     }
 }
 
@@ -84,41 +97,30 @@ void GameMenu::render() {
     glft2::measureText(font, title, &titleW, &titleH, titleScale);
 
     float itemScale = 0.5f;
-    float selScale = 0.6f;
-    float dummyW, itemH;
-    if (!entries.empty()) {
-        glft2::measureText(font, entries[0].text, &dummyW, &itemH, itemScale);
-    }
+
+    // Get entry height
+    float _, itemH;
+    glft2::measureText(font, "XYHEIGHT", &_, &itemH, itemScale);
+
     float margin = itemH * 0.5f;
     float lineH = itemH + margin;
 
     float totalH = titleH + margin + entries.size() * lineH;
     float startY = centerY + totalH * 0.5f;
 
+    // Render title
     glPushMatrix();
     glColor3ub(0, 0, 255);
+    
     glft2::render2D(font, centerX - titleW * 0.5f, startY, title, titleScale);
 
-    for (int i = 0; i < (int)entries.size(); ++i) {
-        auto& e = entries[i];
-        float scale = e.selected ? selScale : itemScale;
-        float w, h;
-        glft2::measureText(font, e.text, &w, &h, scale);
-
-        float x = centerX - w * 0.5f;
-        float y = startY - titleH - margin - i * lineH;
-
-        // Store bounding box for mouse interaction
-        e.x = x;
-        e.y = y;
-        e.width = w;
-        e.height = h;
-
-        if (e.selected) glColor3ub(255, 255, 255);
-        else            glColor3ub(0, 0, 255);
-
-        glft2::render2D(font, x, y, e.text, scale);
-    }
-
     glPopMatrix();
+
+    float currentY = startY;
+    for (int i = 0; i < (int)entries.size(); ++i) {
+        currentY = currentY - itemH - margin;
+        float currentX = centerX - entries[i].getWidth() / 2;
+        entries[i].updateXY(currentX, currentY);
+        entries[i].render();
+    }
 }

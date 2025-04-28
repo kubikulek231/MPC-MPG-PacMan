@@ -218,6 +218,7 @@ namespace glft2 {
     }
 
     void render2D(const font_data& ft_font, float x, float y, std::string const& text, float scale) {
+        glPixelZoom(1.0f, 1.0f);
 
         pushScreenCoordinateMatrix();
 

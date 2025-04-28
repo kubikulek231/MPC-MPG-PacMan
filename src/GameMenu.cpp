@@ -91,6 +91,40 @@ void GameMenu::render() {
     float centerX = screenW * 0.5f;
     float centerY = screenH * 0.5f;
 
+    // Setup orthographic projection 
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();               // save 3D projection
+    glLoadIdentity();
+    // note: origin bottom-left; if you want top-left, swap the last two args
+    glOrtho(0.0, screenW,
+        0.0, screenH,
+        -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();             // save 3D modelview
+    glLoadIdentity();
+
+    // Draw semi-transparent overlay
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+    glBegin(GL_QUADS);
+    glVertex2f(0.0f, 0.0f);
+    glVertex2f(screenW, 0.0f);
+    glVertex2f(screenW, screenH);
+    glVertex2f(0.0f, screenH);
+    glEnd();
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+    glPopMatrix();              // restore 3D modelview
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();                // restore 3D projection
+    glMatrixMode(GL_MODELVIEW);   // back to modelview for the rest
+
     std::string title = "PacMan3D";
     float titleScale = 0.7f;
     float titleW, titleH;
@@ -110,7 +144,7 @@ void GameMenu::render() {
 
     // Render title
     glPushMatrix();
-    glColor3ub(0, 0, 255);
+    glColor3ub(255, 255, 0);
     
     glft2::render2D(font, centerX - titleW * 0.5f, startY, title, titleScale);
 

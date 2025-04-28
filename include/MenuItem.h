@@ -30,7 +30,7 @@ private:
     float textHeight = 0.0f;
 
     GLubyte textColorRGB[3] = { 255, 255, 255 };
-    GLubyte selectedTextColorRGB[3] = { 0, 0, 0 };
+    GLubyte selectedTextColorRGB[3] = { 180, 240, 255 };
     GLubyte backgroundColorRGBA[4] = { 255, 0, 0, 255 };
 
     bool selectable = true;

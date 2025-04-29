@@ -6,7 +6,7 @@
 #include "MoveDir.h"
 #include "Macro.h"
 #include "GameCamera.h"
-#include "GameUserInput.h"
+#include "GameControl.h"
 
 void GameLogic::initLevel() {
 	// Create ghosts path to move them into corners
@@ -37,7 +37,7 @@ void GameLogic::updateScore() {
 
 void GameLogic::updatePlayer() {
 	Game &game = Game::getInstance();
-	GameUserInput& gc = GameUserInput::getInstance();
+	GameControl& gc = GameControl::getInstance();
 	MoveDir moveDir = gc.getMoveDir();
 	Player& player = *game.getPlayer();
 	float lastframetimeS = game.getLastFrameTimeDeltaSeconds();
@@ -48,7 +48,7 @@ void GameLogic::updatePlayer() {
 
 void GameLogic::updateGhosts() {
 	Game& game = Game::getInstance();
-	MoveDir moveDir = GameUserInput::getInstance().getMoveDir();
+	MoveDir moveDir = GameControl::getInstance().getMoveDir();
 	float lastFrametimeS = game.getLastFrameTimeDeltaSeconds();
 
 	// Do not update ghost movement until player chooses moveDir

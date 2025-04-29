@@ -49,12 +49,6 @@ public:
     void resetKeyFlagPressedAndReleased(unsigned char key);
     void resetButtonFlagPressedAndReleased(int key);
 
-    bool& getMovementChanged() { return movementChanged; }
-    bool resetMovementChanged() { movementChanged = false; }
-    void setMovementChanged() { movementChanged = true; }
-
-    void setMoveDir(MoveDir moveDir) { this->moveDir = moveDir; }
-    MoveDir getMoveDir() const { return moveDir; }
     void resetMouseDelta();
 
     float getMouseX() const { return mouseX; }
@@ -88,9 +82,6 @@ private:
 
     float mouseXDelta = 0;
     float mouseYDelta = 0;
-
-    bool movementChanged = false;
-    MoveDir moveDir = MoveDir::NONE;
 };
 
 #endif

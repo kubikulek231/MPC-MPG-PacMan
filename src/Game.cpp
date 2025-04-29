@@ -50,6 +50,11 @@ void Game::initLevel(int level) {
     if (level < 0) { level = getCurrentLevel(); }
     mapFactory = MapFactory();
     map = mapFactory.createMap();
+    GameControl& gc = GameControl::getInstance();
+    // Press and release movement key to start the level
+    gc.enableWasdAfterFullPressCycle();
+    // Reset moveDir
+    gc.setMoveDir(MoveDir::NONE);
 
     Point3D playerSpawnOrigin = map.getPlayerSpawn()->getOrigin();
     Point3D blinkySpawnOrigin = map.getBlinkySpawn()->getOrigin();

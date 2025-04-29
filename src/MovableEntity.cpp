@@ -120,6 +120,14 @@ MoveDir MovableEntity::getRequestedDir() {
     return dirChangeRequest->getRequestedMoveDir();
 }
 
+MoveDir MovableEntity::getOppositeMoveDir(MoveDir moveDir) {
+    if (moveDir == MoveDir::LEFT) { return MoveDir::RIGHT; }
+    if (moveDir == MoveDir::RIGHT) { return MoveDir::LEFT; }
+    if (moveDir == MoveDir::FWD) { return MoveDir::BWD; }
+    if (moveDir == MoveDir::BWD) { return MoveDir::FWD; }
+    return moveDir;
+}
+
 // === Frame-based Speed Calculation ===
 float MovableEntity::frametimeNormalizedSpeed(float frametimeS) const {
     float normalizedSpeed = speed * frametimeS;
@@ -356,19 +364,15 @@ void MovableEntity::teleport(MoveDir moveDir) {
     switch (moveDir) {
     case MoveDir::FWD:
         targetTile = tile->getTileUp();
-        originOffsetZ = -0.01;
         break;
     case MoveDir::BWD:
         targetTile = tile->getTileDown();
-        originOffsetZ = +0.01;
         break;
     case MoveDir::LEFT:
         targetTile = tile->getTileLeft();
-        originOffsetX = +0.3;
         break;
     case MoveDir::RIGHT:
         targetTile = tile->getTileRight();
-        originOffsetX = -0.3;
         break;
     default:
         return;
@@ -378,10 +382,12 @@ void MovableEntity::teleport(MoveDir moveDir) {
         targetTile && targetTile->getTileType() == TileType::TELEPORT,
         "Teleport exit must be a teleport tile and must exist!"
     );
-
-    Point3D teleportTarget = entityCenteredOrigin(targetTile);
-    teleportTarget.move(originOffsetX, 0, originOffsetZ);
-    this->setOrigin(teleportTarget);
+    MoveDir oppositeMoveDir = getOppositeMoveDir(moveDir);
+    Point3D oppositeTeleportPoint = furthestPossibleEntityOriginPoint(oppositeMoveDir, targetTile);
+    float teleportedAxisValue = oppositeTeleportPoint.getAxisValue(movingAxis);
+    Point3D teleportedEntityOrigin = Point3D(oppositeTeleportPoint);
+    teleportedEntityOrigin.setAxisValue(movingAxis, teleportedAxisValue);
+    this->setOrigin(teleportedEntityOrigin);
 }
 
 Point3D MovableEntity::furthestPossibleEntityOriginPoint(MoveDir moveDir, Tile* currentTile) {

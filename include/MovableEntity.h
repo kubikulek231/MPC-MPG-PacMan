@@ -53,6 +53,7 @@ protected:
     void createDirChangeRequest(MoveDir moveDir, float expireAfterMs, bool expire = true);
     void clearDirChangeRequest();
     MoveDir getRequestedDir();
+    MoveDir getOppositeMoveDir(MoveDir moveDir);
 
     // === Frame-based Speed Calculation ===
     float frametimeNormalizedSpeed(float frametimeS) const;

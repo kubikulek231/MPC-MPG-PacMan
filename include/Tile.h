@@ -19,6 +19,7 @@ enum class TileType {
     SPAWN_BLINKY = 10,
     SPAWN_PINKY = 11,
     SPAWN_CLYDE = 12,
+    EMPTY_UNWALKABLE = 13,
 };
 
 class Tile : public Entity {

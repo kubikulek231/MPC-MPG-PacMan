@@ -21,7 +21,7 @@ bool Tile::collectPellet() {
 }
 
 bool Tile::isWalkable() const {
-	if (tileType == TileType::DOOR_CLOSED || tileType == TileType::WALL) return false;
+	if (tileType == TileType::DOOR_CLOSED || tileType == TileType::WALL || tileType == TileType::EMPTY_UNWALKABLE) return false;
 	return true;
 }
 

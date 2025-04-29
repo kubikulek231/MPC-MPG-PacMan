@@ -72,6 +72,14 @@ void Ghost::moveOnPath(float frameTimeMs) {
     bool inCenter = false;
     this->preciseMoveToNextTile(moveDir, frameTimeMs, moved, inCenter, tiles);
 
+    // Check for pending tile path change
+    // Only generate new path and switch to it if in center
+    if (tileToSwitchPathTo != nullptr && inCenter) {
+        movePath.clear();
+        createPathToTile(tileToSwitchPathTo);
+        tileToSwitchPathTo = nullptr;
+    }
+
     int pathSize = movePath.size();
     bool isStandingOnTeleport = tile->getTileType() == TileType::TELEPORT;
     bool isCurrentInPathTeleport = pathSize > 0 ? movePath.front()->getTileType() == TileType::TELEPORT : false;
@@ -100,6 +108,10 @@ void Ghost::createPathToTile(Tile* tile) {
     auto tiles = this->intersectingTiles(this);
     auto entityTile = currentTile(tiles);
     if (movePath.size() > 0 && movePath.front() == entityTile) { movePath.pop_front(); }
+}
+
+void Ghost::createAndSetPathToTileWhenPossible(Tile* tile) {
+    tileToSwitchPathTo = tile;
 }
 
 void Ghost::randomMove(float frameTimeMs) {

@@ -31,13 +31,15 @@ private:
     float colorG = 1.0f;
     float colorB = 0.0f;
     std::string name = "";
+    void createPathToTile(Tile* tile);
+    Tile* tileToSwitchPathTo = nullptr;
 public:
     Ghost();
     Ghost(const Ghost& other);
     Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std::string name);
     void render();
-    void createPathToTile(Tile* tile);
     void moveOnPath(float frameTimeMs);
+    void createAndSetPathToTileWhenPossible(Tile* tile);
     void randomMove(float frameTimeMs);
     void moveOnRandomPath(float frameTimeMs);
     void setColor(float r, float g, float b) {

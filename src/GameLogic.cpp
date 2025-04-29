@@ -18,7 +18,7 @@ void GameLogic::initLevel() {
 			MapCorner corner = game.getMap()->corners[i % game.getMap()->corners.size()];
 			Tile* targetTile = ghost->furthestTileTowardCorner(corner);
 			if (targetTile) {
-				ghost->createPathToTile(targetTile);
+				ghost->createAndSetPathToTileWhenPossible(targetTile);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ void GameLogic::updateGhosts() {
 			Ghost* ghost = ghosts[i];
 			Tile* tile = map->getTileAt(17, 1);
 			if (!ghost->isPathEmpty()) {
-				ghost->createPathToTile(tile);
+				ghost->createAndSetPathToTileWhenPossible(tile);
 				continue;
 			}
 			// Move randomly if path is empty
@@ -91,7 +91,7 @@ void GameLogic::updateGhosts() {
 			Ghost* ghost = ghosts[i];
 			Tile* tile = map->getTileAt(17, 26);
 			if (!ghost->isPathEmpty()) {
-				ghost->createPathToTile(tile);
+				ghost->createAndSetPathToTileWhenPossible(tile);
 				continue;
 			}
 			// Move randomly if path is empty

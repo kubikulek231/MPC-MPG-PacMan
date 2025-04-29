@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <GL/glut.h>
 #include <chrono>
+#include <iostream>
 
 using namespace std::chrono;
 
@@ -25,6 +26,7 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
                 Player::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE,
                 Player::DEFAULT_DIR_CHANGE_REQUEST_EXPIRE_AFTER_MS) {
 
+    this->lastOrigin = this->origin;
     this->blinkDurationMs = DEFAULT_BLINK_DURATION_MS;
     this->invincibleEndTimeAfterMs = DEFAULT_INVINCIBLE_EXPIRE_AFTER_MS;
 }
@@ -49,6 +51,10 @@ void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeM
     // Handle movement and teleportation
     this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
     this->teleport(moveDir);
+
+    //float newDistance = this->origin.distanceTo2D(this->lastOrigin);
+    //if (speedoMeter.update(newDistance, 20)) { std::cout << "Move distance: " << speedoMeter.getAverage() << std::endl; }
+    //this->lastOrigin = this->origin;
 }
 
 void Player::update(int& totalCollectedPellets) {

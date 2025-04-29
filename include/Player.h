@@ -4,6 +4,7 @@
 #include "gl_includes.h"
 #include "MovableEntity.h"
 #include <chrono>
+#include "SpeedoMeter.h"
 
 class Player : public MovableEntity {
 private:
@@ -15,6 +16,9 @@ private:
     float playerBodyColorRed = 1.0f;
     float playerBodyColorGreen = 1.0f;
     float playerBodyColorBlue = 0.0f;
+
+    Point3D lastOrigin;
+    SpeedoMeter speedoMeter = SpeedoMeter(20);
 
     uint64_t blinkDurationMs;
     uint64_t invincibleEndTimeAfterMs;

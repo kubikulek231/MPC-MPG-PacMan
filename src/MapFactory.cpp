@@ -157,6 +157,7 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             case 'p': type = TileType::SPAWN_PINKY; break;
             case 'c': type = TileType::SPAWN_CLYDE; break;
             case 'i': type = TileType::SPAWN_INKY; break;
+            case 'g': type = TileType::GHOST_HOUSE; break;
             default:
                 std::cerr << "Invalid character '" << tileChar << "' at row "
                     << row << ", column " << col << std::endl;

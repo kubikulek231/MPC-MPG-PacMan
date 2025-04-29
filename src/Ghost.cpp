@@ -44,6 +44,10 @@ void Ghost::moveOnPath(float frameTimeMs) {
     std::vector<Tile*> tiles = intersectingTiles(this);
     Tile* tile = currentTile(tiles);
 
+    if (this->name == "blinky") {
+        std::cout << "";
+    }
+
     if (!tile || movePath.empty()) {
         moveDir = MoveDir::NONE;
         return;
@@ -254,9 +258,6 @@ std::deque<Tile*> Ghost::reconstructPath(std::unordered_map<Tile*, Tile*> cameFr
 }
 
 Tile* Ghost::furthestTileTowardCorner(MapCorner corner) {
-    Tile* bestTile = nullptr;
-    float maxDistance = -1.0f;
-
     auto currentTiles = intersectingTiles(this);
     Tile* startTile = currentTile(currentTiles);
     if (!startTile) return nullptr;
@@ -267,45 +268,41 @@ Tile* Ghost::furthestTileTowardCorner(MapCorner corner) {
     int numRows = MapFactory::MAP_HEIGHT;
     int numCols = MapFactory::MAP_WIDTH;
 
-    // Precompute all walkable tiles for the given corner
-    std::vector<Tile*> candidateTiles;
-    for (int r = 0; r < numRows; ++r) {
-        for (int c = 0; c < numCols; ++c) {
-            Tile* candidate = map->getTileAt(r, c);
-            if (candidate && candidate->isWalkable()) {
-                // Filter based on direction to the corner
-                bool validTile = false;
-                switch (corner) {
-                case MapCorner::TOP_LEFT:
-                    validTile = (r <= startRow && c <= startCol);
-                    break;
-                case MapCorner::TOP_RIGHT:
-                    validTile = (r <= startRow && c >= startCol);
-                    break;
-                case MapCorner::BOTTOM_LEFT:
-                    validTile = (r >= startRow && c <= startCol);
-                    break;
-                case MapCorner::BOTTOM_RIGHT:
-                    validTile = (r >= startRow && c >= startCol);
-                    break;
-                }
+    // Define corner bounds
+    int rowStart = (corner == MapCorner::TOP_LEFT || corner == MapCorner::TOP_RIGHT) ? 0 : startRow;
+    int rowEnd = (corner == MapCorner::TOP_LEFT || corner == MapCorner::TOP_RIGHT) ? startRow : numRows;
 
-                if (validTile) {
-                    candidateTiles.push_back(candidate);
-                }
-            }
+    int colStart = (corner == MapCorner::TOP_LEFT || corner == MapCorner::BOTTOM_LEFT) ? 0 : startCol;
+    int colEnd = (corner == MapCorner::TOP_LEFT || corner == MapCorner::BOTTOM_LEFT) ? startCol : numCols;
+
+    struct Candidate {
+        Tile* tile;
+        float distance;
+    };
+    std::vector<Candidate> candidates;
+
+    // Gather all valid walkable tiles within the direction range
+    for (int r = rowStart; r < rowEnd; ++r) {
+        for (int c = colStart; c < colEnd; ++c) {
+            Tile* tile = map->getTileAt(r, c);
+            if (!tile || !tile->isWalkable()) continue;
+
+            float distance = heuristicCost(startTile, tile);
+            candidates.push_back({ tile, distance });
         }
     }
 
-    // Iterate over filtered candidate tiles to find the furthest tile
-    for (Tile* candidate : candidateTiles) {
-        float distance = heuristicCost(startTile, candidate);
-        if (distance > maxDistance) {
-            // If this candidate tile is further, consider it as the best
-            maxDistance = distance;
-            bestTile = candidate;
+    // Sort by descending distance
+    std::sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) {
+        return a.distance > b.distance;
+        });
+
+    // Return the first reachable candidate
+    for (const Candidate& c : candidates) {
+        if (!shortestPathToTile(c.tile).empty()) {
+            return c.tile;
         }
     }
 
-    return bestTile;
+    return nullptr;
 }

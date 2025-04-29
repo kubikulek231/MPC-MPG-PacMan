@@ -74,13 +74,16 @@ void Ghost::moveOnPath(float frameTimeMs) {
 
     int pathSize = movePath.size();
     bool isStandingOnTeleport = tile->getTileType() == TileType::TELEPORT;
-    bool isNextInPathTeleport = pathSize > 0 ? movePath.front()->getTileType() == TileType::TELEPORT : false;
+    bool isCurrentInPathTeleport = pathSize > 0 ? movePath.front()->getTileType() == TileType::TELEPORT : false;
+    bool isNexttInPathTeleport = pathSize > 1 ? movePath.at(1)->getTileType() == TileType::TELEPORT : false;
+    bool nextTileToBeHitIsTeleport = nextTileInDirection(moveDir, tile)->getTileType() == TileType::TELEPORT;
 
-    if (isStandingOnTeleport && isNextInPathTeleport && moved) {
+    // Just move if we want to teleport but are not quite in the spot yet
+    if (isCurrentInPathTeleport && isNexttInPathTeleport && moved) {
         return;
     }
 
-    if (isStandingOnTeleport && isNextInPathTeleport && !moved) {
+    if (isStandingOnTeleport && isCurrentInPathTeleport && !moved) {
         teleport(moveDir);
         movePath.pop_front();
         return;

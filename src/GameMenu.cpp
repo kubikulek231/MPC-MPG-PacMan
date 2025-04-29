@@ -12,19 +12,23 @@ GameMenu::GameMenu() {
 
 std::string GameMenu::getEnteredMenuItemString() {
     for (const auto& entry : entries) {
-        if (entry.isEntered()) { return entry.getText(); }
+        if (entry.isEntered()) { 
+            return entry.getText(); 
+        }
     }
     return std::string("");
 }
 
 void GameMenu::setUserScore(int score) {
     for (auto& entry : entries) {
-        if (entry.getText() == "Your score: 9999") {
-            entry.setText("Your score: " + score);
+        // Compare against the text prefix:
+        if (entry.getText().rfind("Your Score:", 0) == 0) {
+            // Convert score to string and concatenate:
+            std::string scoreString = "Your Score: " + std::to_string(score);
+            entry.setText(scoreString);
             return;
         }
     }
-    return;;
 }
 
 void GameMenu::initMainMenu() {
@@ -89,10 +93,11 @@ void GameMenu::initPauseMenu() {
     font_ptr = std::make_shared<glft2::font_data>(font);
 
     MenuItem play = MenuItem(font_ptr, "Resume", firstItemX, 0, itemW, itemH, textScale);
+    MenuItem exitToMenu = MenuItem(font_ptr, "Exit to Main Menu", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
     MenuItem exit = MenuItem(font_ptr, "Exit", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
 
     // Add the menu items to the entries
-    setEntries({ play, exit });
+    setEntries({ play, exitToMenu, exit });
 }
 
 void GameMenu::initGameOverMenu() {
@@ -123,7 +128,7 @@ void GameMenu::initGameOverMenu() {
 
     MenuItem gameOverTitle = MenuItem(font_ptr, "Game Over!", firstItemX, 0, itemW, itemH, textScale);
     gameOverTitle.setSelectable(false);
-    MenuItem score = MenuItem(font_ptr, "Your score: 9999", firstItemX, 0, itemW, itemH, textScale);
+    MenuItem score = MenuItem(font_ptr, "Your Score: 9999", firstItemX, 0, itemW, itemH, textScale);
     score.setSelectable(false);
     MenuItem exitToMenu = MenuItem(font_ptr, "Exit to Main Menu", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
     MenuItem exit = MenuItem(font_ptr, "Exit", firstItemX, 0 + 2 * (itemH + itemGap), itemW, itemH, textScale);
@@ -144,7 +149,11 @@ void GameMenu::update() {
     GameUserInput& guin = GameUserInput::getInstance();
     int mouseY = guin.getMouseY();
     int mouseX = guin.getMouseX();
-    bool isEntered = guin.isButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON);
+    bool isEntered = false;
+    if (guin.isButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON)) {
+        guin.resetButtonFlagPressedAndReleased(GLUT_LEFT_BUTTON);
+        isEntered = true;
+    }
 
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);

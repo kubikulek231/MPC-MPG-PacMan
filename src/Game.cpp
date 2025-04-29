@@ -98,6 +98,7 @@ void Game::initLevel(int level) {
 void Game::update(int value) {
     Game& game = Game::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
+    GameUserInput& guin = GameUserInput::getInstance();
 
     float newFrameTimeS = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // in s
     
@@ -108,6 +109,12 @@ void Game::update(int value) {
     // HANDLE GAME LOGIC
     // Update the game logic and control only if playing
     if (game.gameState == GameState::Playing) { 
+        if (guin.isKeyFlagPressed('\x1B')) {
+            guin.resetKeyFlagPressed('\x1B');
+            game.gameState = GameState::Paused;
+            game.gameMenu.initPauseMenu();
+        }
+
         // Unlock the user camera movement
         gcam.setLockUserUpdate(false);
 
@@ -144,6 +151,29 @@ void Game::update(int value) {
         }
         if (enteredItem == "Exit") {
             exit(0);
+        }
+        if (enteredItem == "Resume") {
+            // Flush the escape flag just in case
+            guin.resetKeyFlagPressed('\x1B');
+            // Resume
+            game.gameState = GameState::Playing;
+        }
+        if (enteredItem == "Exit to Main Menu") {
+            game.gameState = GameState::MainMenu;
+            game.gameMenu.initMainMenu();
+            // Reset level and init new one
+            game.currentLevel = 0;
+            game.playerLives = 3;
+            game.totalScore = 0;
+            game.initLevel();
+        }
+    }
+
+    // Handle esc to resume
+    if (game.gameState == GameState::Paused) {
+        if (guin.isKeyFlagPressed('\x1B')) {
+            guin.resetKeyFlagPressed('\x1B');
+            game.gameState = GameState::Playing;
         }
     }
 

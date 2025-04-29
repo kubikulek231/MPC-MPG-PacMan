@@ -52,7 +52,7 @@ public:
     bool isSelectable() const { return selectable; }
     const std::string& getText() const { return text; }
     bool isSelected() const { return selected; }
-    bool isEntered() const { return entered; }
+    bool isEntered() const { return selected && entered; }
 
     // Setters
     void setX(float newX) { x = newX; }

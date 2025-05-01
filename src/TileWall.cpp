@@ -74,7 +74,7 @@ void TileWall::setWallTypeByNeighbors() {
 
 void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();
-    glColor3f(0.3f, 0.3f, 1.0f); // Blue for wall
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]); // Blue for wall
 
     float centerX = (abb.min.x + abb.max.x) / 2.0f;
     float centerY = (abb.min.y + abb.max.y) / 2.0f;
@@ -88,7 +88,7 @@ void TileWall::renderWallBlock() const {
 
 void TileWall::renderWallLeft() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(0.3f, 0.3f, 1.0f);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
@@ -107,7 +107,7 @@ void TileWall::renderWallLeft() const {
 
 void TileWall::renderWallRight() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(0.3f, 0.3f, 1.0f);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
@@ -125,7 +125,7 @@ void TileWall::renderWallRight() const {
 
 void TileWall::renderWallTop() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(0.3f, 0.3f, 1.0f);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -142,7 +142,7 @@ void TileWall::renderWallTop() const {
 
 void TileWall::renderWallBottom() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(0.3f, 0.3f, 1.0f);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -177,6 +177,57 @@ void TileWall::renderWallCornerBottomRight() const {
     renderWallLeft();
 }
 
+// helper: draw an axis-aligned box [x0,x1]×[y0,y1]×[z0,z1]
+void TileWall::drawBox(float x0, float x1,
+    float y0, float y1,
+    float z0, float z1) const
+{
+    glBegin(GL_QUADS);
+    // front (z=z1)
+    glNormal3f(0, 0, 1);
+    glVertex3f(x0, y0, z1);
+    glVertex3f(x1, y0, z1);
+    glVertex3f(x1, y1, z1);
+    glVertex3f(x0, y1, z1);
+
+    // back (z=z0)
+    glNormal3f(0, 0, -1);
+    glVertex3f(x1, y0, z0);
+    glVertex3f(x0, y0, z0);
+    glVertex3f(x0, y1, z0);
+    glVertex3f(x1, y1, z0);
+
+    // left (x=x0)
+    glNormal3f(-1, 0, 0);
+    glVertex3f(x0, y0, z0);
+    glVertex3f(x0, y0, z1);
+    glVertex3f(x0, y1, z1);
+    glVertex3f(x0, y1, z0);
+
+    // right (x=x1)
+    glNormal3f(1, 0, 0);
+    glVertex3f(x1, y0, z1);
+    glVertex3f(x1, y0, z0);
+    glVertex3f(x1, y1, z0);
+    glVertex3f(x1, y1, z1);
+
+    // top (y=y1)
+    glNormal3f(0, 1, 0);
+    glVertex3f(x0, y1, z1);
+    glVertex3f(x1, y1, z1);
+    glVertex3f(x1, y1, z0);
+    glVertex3f(x0, y1, z0);
+
+    // bottom (y=y0)
+    glNormal3f(0, -1, 0);
+    glVertex3f(x0, y0, z0);
+    glVertex3f(x1, y0, z0);
+    glVertex3f(x1, y0, z1);
+    glVertex3f(x0, y0, z1);
+    glEnd();
+}
+
+
 void TileWall::drawQuarterCylinder(float radius, float height, float startAngle, float endAngle, int segs) const {
     float halfH = height * 0.5f;
     float step = (endAngle - startAngle) / segs;
@@ -194,76 +245,177 @@ void TileWall::drawQuarterCylinder(float radius, float height, float startAngle,
     glEnd();
 }
 
+void TileWall::drawSolidQuarterCylinder(float radius, float height, float angleStart, float angleEnd, int segments) const {
+    float delta = (angleEnd - angleStart) / segments;
+
+    // Curved outer wall
+    glBegin(GL_QUAD_STRIP);
+    for (int i = 0; i <= segments; ++i) {
+        float angle = angleStart + i * delta;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+        glVertex3f(x, -height * 0.5f, z);
+        glVertex3f(x, height * 0.5f, z);
+    }
+    glEnd();
+
+    // Bottom cap
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(0, -height * 0.5f, 0);  // center
+    for (int i = 0; i <= segments; ++i) {
+        float angle = angleStart + i * delta;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+        glVertex3f(x, -height * 0.5f, z);
+    }
+    glEnd();
+
+    // Top cap
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(0, height * 0.5f, 0);  // center
+    for (int i = 0; i <= segments; ++i) {
+        float angle = angleStart + i * delta;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+        glVertex3f(x, height * 0.5f, z);
+    }
+    glEnd();
+
+    // Side wall 1 (start angle)
+    {
+        float x = cosf(angleStart) * radius;
+        float z = sinf(angleStart) * radius;
+        glBegin(GL_QUADS);
+        glVertex3f(0, -height * 0.5f, 0);
+        glVertex3f(0, height * 0.5f, 0);
+        glVertex3f(x, height * 0.5f, z);
+        glVertex3f(x, -height * 0.5f, z);
+        glEnd();
+    }
+
+    // Side wall 2 (end angle)
+    {
+        float x = cosf(angleEnd) * radius;
+        float z = sinf(angleEnd) * radius;
+        glBegin(GL_QUADS);
+        glVertex3f(0, -height * 0.5f, 0);
+        glVertex3f(0, height * 0.5f, 0);
+        glVertex3f(x, height * 0.5f, z);
+        glVertex3f(x, -height * 0.5f, z);
+        glEnd();
+    }
+}
+
+
 // ------ inner-corner renders ------
 void TileWall::renderWallInnerTopLeft() const {
-    auto abb = getAbsoluteBoundingBox();
-    glColor3f(0.2f, 0.2f, 0.8f);
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float wall = WALL_THICKNESS_FRAC;
 
-    float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
-    float tileH = abb.max.y - abb.min.y;
-    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
-    float cx = halfX - radius;
-    float cz = halfZ + radius;
+    // place cylinder exactly in tile corner
+    float cx = bb.min.x + (wall + r);
+    float cz = bb.max.z - (wall + r);
+
+    glDisable(GL_CULL_FACE);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
-    drawQuarterCylinder(radius, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+
+    // Quarter-cylinder in the corner
+    drawSolidQuarterCylinder(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(bb.min.x, 0.0f, bb.min.z);
+    // Brick strip along X (horizontal bar)
+    drawBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f);
+    // Brick strip along Z (vertical bar)
+    drawBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, wall, 0.0f);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerTopRight() const {
-    auto abb = getAbsoluteBoundingBox();
-    glColor3f(0.2f, 0.2f, 0.8f);
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float wall = WALL_THICKNESS_FRAC;
 
-    float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
-    float tileH = abb.max.y - abb.min.y;
-    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
-    float cx = halfX + radius;
-    float cz = halfZ + radius;
+    float cx = bb.max.x - (wall + r);
+    float cz = bb.max.z - (wall + r);
+
+    glDisable(GL_CULL_FACE);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
-    drawQuarterCylinder(radius, tileH, 0.0f, PI * 0.5f, CYLINDER_SEGMENTS);
+    drawSolidQuarterCylinder(r, tileH, 0.0f, PI * 0.5f, CYLINDER_SEGMENTS);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(bb.max.x, 0.0f, bb.min.z);
+    // Horizontal strip
+    drawBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f);
+    // Vertical strip
+    drawBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, wall, 0.0f);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerBottomLeft() const {
-    auto abb = getAbsoluteBoundingBox();
-    glColor3f(0.2f, 0.2f, 0.8f);
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float wall = WALL_THICKNESS_FRAC;
 
-    float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
-    float tileH = abb.max.y - abb.min.y;
-    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
-    float cx = halfX - radius;
-    float cz = halfZ - radius;
+    float cx = bb.min.x + (wall + r);
+    float cz = bb.min.z + (wall + r);
+
+    glDisable(GL_CULL_FACE);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
-    drawQuarterCylinder(radius, tileH, PI, PI * 1.5f, CYLINDER_SEGMENTS);
+    drawSolidQuarterCylinder(r, tileH, PI, PI * 1.5f, CYLINDER_SEGMENTS);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(bb.min.x, 0.0f, bb.max.z);
+    // Horizontal strip
+    drawBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f);
+    // Vertical strip
+    drawBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerBottomRight() const {
-    auto abb = getAbsoluteBoundingBox();
-    glColor3f(0.2f, 0.2f, 0.8f);
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float wall = WALL_THICKNESS_FRAC;
 
-    float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
-    float tileH = abb.max.y - abb.min.y;
-    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
-    float cx = halfX + radius;
-    float cz = halfZ - radius;
+    float cx = bb.max.x - (wall + r);
+    float cz = bb.min.z + (wall + r);
+
+    glDisable(GL_CULL_FACE);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
-    drawQuarterCylinder(radius, tileH, PI * 1.5f, 2.0f * PI, CYLINDER_SEGMENTS);
+    drawSolidQuarterCylinder(r, tileH, PI * 1.5f, 2.0f * PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(bb.max.x, 0.0f, bb.max.z);
+    // Horizontal strip
+    drawBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f);
+    // Vertical strip
+    drawBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f);
     glPopMatrix();
 }
 

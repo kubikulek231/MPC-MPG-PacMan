@@ -60,6 +60,7 @@ public:
     std::string toString();
     bool isEqual(const Tile* other) const;
     bool isNeighbor(const Tile* other) const;
+    bool isGhostHouseTile() const;
 private:
     void setTileType(TileType tileType);
     int tileRow;

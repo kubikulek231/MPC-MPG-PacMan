@@ -25,6 +25,10 @@ enum class WallType {
 };
 
 class TileWall : public Tile {
+    // Fraction of the tile that the wall occupies
+    static constexpr float WALL_THICKNESS_FRAC = 0.5f;
+    // The remaining gap on each side, in fraction of tile
+    static constexpr float GAP_FRAC = (1.0f - WALL_THICKNESS_FRAC) * 0.5f;
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;
@@ -40,6 +44,8 @@ private:
     void renderWallInnerTopRight() const;
     void renderWallInnerBottomLeft() const;
     void renderWallInnerBottomRight() const;
+    void setWallTypeStraight();
+    void setWallTypeOuterCorners();
 public:
     TileWall(WallType wallType, TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     ~TileWall() override = default;

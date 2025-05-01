@@ -33,6 +33,14 @@ TileType Tile::getTileType() const {
 	return tileType;
 }
 
+bool Tile::isGhostHouseTile() const {
+	if (tileType == TileType::GHOST_HOUSE ||
+		tileType == TileType::SPAWN_CLYDE) {
+		return true;
+	}
+	return false;
+}
+
 Point3D Tile::getCenterPoint() const {
 	const auto& absBB = getAbsoluteBoundingBox();
 	const auto& min = absBB.min;

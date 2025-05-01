@@ -66,71 +66,95 @@ void TileWall::render() const {
 }
 
 void TileWall::setWallTypeByNeighbors() {
-    TileWall* up = dynamic_cast<TileWall*>(getTileUp());
-    TileWall* down = dynamic_cast<TileWall*>(getTileDown());
-    TileWall* left = dynamic_cast<TileWall*>(getTileLeft());
-    TileWall* right = dynamic_cast<TileWall*>(getTileRight());
+    // Get neighboring tiles
+    Tile* tu = getTileUp();
+    Tile* td = getTileDown();
+    Tile* tl = getTileLeft();
+    Tile* tr = getTileRight();
 
-    bool hasUp = up != nullptr;
-    bool hasDown = down != nullptr;
-    bool hasLeft = left != nullptr;
-    bool hasRight = right != nullptr;
+    // A side is open if there is a corridor (walkable tile) on that side
+    bool openUp = (tu != nullptr) && tu->isWalkable();
+    bool openDown = (td != nullptr) && td->isWalkable();
+    bool openLeft = (tl != nullptr) && tl->isWalkable();
+    bool openRight = (tr != nullptr) && tr->isWalkable();
 
-    // Full block (isolated)
-    if (!hasUp && !hasDown && !hasLeft && !hasRight) {
+    // All four sides open -> isolated block
+    if (openUp && openDown && openLeft && openRight) {
         wallType = WallType::BLOCK;
+        return;
     }
-    // Straight walls
-    else if (hasLeft && hasRight && !hasUp && !hasDown) {
+
+    // Single-sided segments (corridor on one side -> thin wall on the opposite)
+    if (openUp && !openDown && !openLeft && !openRight) {
+        // Corridor above -> draw top edge only
         wallType = WallType::TOP;
+        return;
     }
-    else if (hasUp && hasDown && !hasLeft && !hasRight) {
-        wallType = WallType::LEFT;
-    }
-    // Corners
-    else if (!hasUp && hasRight && hasDown && !hasLeft) {
-        wallType = WallType::TOP_LEFT_CORNER;
-    }
-    else if (!hasUp && hasLeft && hasDown && !hasRight) {
-        wallType = WallType::TOP_RIGHT_CORNER;
-    }
-    else if (!hasDown && hasRight && hasUp && !hasLeft) {
-        wallType = WallType::BOTTOM_LEFT_CORNER;
-    }
-    else if (!hasDown && hasLeft && hasUp && !hasRight) {
-        wallType = WallType::BOTTOM_RIGHT_CORNER;
-    }
-    // Inner corners
-    else if (hasUp && hasLeft && !hasDown && !hasRight) {
-        wallType = WallType::INNER_BOTTOM_RIGHT;
-    }
-    else if (hasUp && hasRight && !hasDown && !hasLeft) {
-        wallType = WallType::INNER_BOTTOM_LEFT;
-    }
-    else if (hasDown && hasLeft && !hasUp && !hasRight) {
-        wallType = WallType::INNER_TOP_RIGHT;
-    }
-    else if (hasDown && hasRight && !hasUp && !hasLeft) {
-        wallType = WallType::INNER_TOP_LEFT;
-    }
-    // Edges
-    else if (hasLeft && !hasRight && !hasUp && !hasDown) {
-        wallType = WallType::RIGHT;
-    }
-    else if (hasRight && !hasLeft && !hasUp && !hasDown) {
-        wallType = WallType::LEFT;
-    }
-    else if (hasUp && !hasDown && !hasLeft && !hasRight) {
+    if (openDown && !openUp && !openLeft && !openRight) {
+        // Corridor below -> draw bottom edge only
         wallType = WallType::BOTTOM;
+        return;
     }
-    else if (hasDown && !hasUp && !hasLeft && !hasRight) {
-        wallType = WallType::TOP;
+    if (openLeft && !openRight && !openUp && !openDown) {
+        // Corridor to the left -> draw left edge only
+        wallType = WallType::RIGHT;
+        return;
     }
-    // Default fallback
-    else {
-        wallType = WallType::BLOCK;
+    if (openRight && !openLeft && !openUp && !openDown) {
+        // Corridor to the right -> draw right edge only
+        wallType = WallType::LEFT;
+        return;
     }
+
+    // Inner corners (corridors on two adjacent sides -> concave corner)
+    if (openUp && openRight && !openDown && !openLeft) {
+        // Corridor above and right -> concave at top-right
+        wallType = WallType::INNER_BOTTOM_RIGHT;
+        return;
+    }
+    if (openUp && openLeft && !openDown && !openRight) {
+        // Corridor above and left -> concave at top-left
+        wallType = WallType::INNER_BOTTOM_LEFT;
+        return;
+    }
+    if (openDown && openRight && !openUp && !openLeft) {
+        // Corridor below and right -> concave at bottom-right
+        wallType = WallType::INNER_TOP_RIGHT;
+        return;
+    }
+    if (openDown && openLeft && !openUp && !openRight) {
+        // Corridor below and left -> concave at bottom-left
+        wallType = WallType::INNER_TOP_LEFT;
+        return;
+    }
+
+    // Outer corners (walls on two adjacent sides -> L-shaped corner)
+    if (!openUp && !openLeft && openDown && openRight) {
+        // Walls above and left -> outer corner at top-left
+        wallType = WallType::TOP_LEFT_CORNER;
+        return;
+    }
+    if (!openUp && !openRight && openDown && openLeft) {
+        // Walls above and right -> outer corner at top-right
+        wallType = WallType::TOP_RIGHT_CORNER;
+        return;
+    }
+    if (!openDown && !openLeft && openUp && openRight) {
+        // Walls below and left -> outer corner at bottom-left
+        wallType = WallType::BOTTOM_LEFT_CORNER;
+        return;
+    }
+    if (!openDown && !openRight && openUp && openLeft) {
+        // Walls below and right -> outer corner at bottom-right
+        wallType = WallType::BOTTOM_RIGHT_CORNER;
+        return;
+    }
+
+    // Fallback to full block
+    wallType = WallType::BLOCK;
 }
+
+
 
 void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();

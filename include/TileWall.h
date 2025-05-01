@@ -28,6 +28,8 @@ class TileWall : public Tile {
     static constexpr float WALL_THICKNESS_FRAC = MapFactory::TILE_SIZE / 2.0f;
     // The remaining gap on each side, in fraction of tile
     static constexpr float GAP_FRAC = (MapFactory::TILE_SIZE - WALL_THICKNESS_FRAC) * 0.5f;
+    static constexpr float INNER_RADIUS_FRAC = 0.3f;
+    static constexpr int   CYLINDER_SEGMENTS = 16;
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;
@@ -45,6 +47,7 @@ private:
     void renderWallInnerBottomRight() const;
     void setWallTypeStraight();
     void setWallTypeOuterCorners();
+    void drawQuarterCylinder(float radius, float height, float startAngle, float endAngle, int segs) const;
 public:
     TileWall(WallType wallType, TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     ~TileWall() override = default;

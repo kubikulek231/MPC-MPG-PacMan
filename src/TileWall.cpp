@@ -1,6 +1,8 @@
 #include "TileWall.h"
 #include "MapFactory.h"
 
+#define PI 3.14159265358979323846f
+
 TileWall::TileWall(WallType wallType,
                    TileType tileType, 
                    Point3D tileOrigin, 
@@ -175,72 +177,93 @@ void TileWall::renderWallCornerBottomRight() const {
     renderWallLeft();
 }
 
+void TileWall::drawQuarterCylinder(float radius, float height, float startAngle, float endAngle, int segs) const {
+    float halfH = height * 0.5f;
+    float step = (endAngle - startAngle) / segs;
+
+    glBegin(GL_TRIANGLE_STRIP);
+    for (int i = 0; i <= segs; ++i) {
+        float a = startAngle + i * step;
+        float x = cosf(a) * radius;
+        float z = sinf(a) * radius;
+        // bottom vertex
+        glVertex3f(x, -halfH, z);
+        // top vertex
+        glVertex3f(x, halfH, z);
+    }
+    glEnd();
+}
+
+// ------ inner-corner renders ------
 void TileWall::renderWallInnerTopLeft() const {
-    BoundingBox3D abb = getAbsoluteBoundingBox();
+    auto abb = getAbsoluteBoundingBox();
     glColor3f(0.2f, 0.2f, 0.8f);
 
+    float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float gap = MapFactory::TILE_SIZE * GAP_FRAC;
-
-    // inner corner is also thickness × thickness
-    float centerX = ((abb.min.x + abb.max.x) * 0.5f) + gap;
-    float centerZ = ((abb.min.z + abb.max.z) * 0.5f) - gap;
+    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
+    float tileH = abb.max.y - abb.min.y;
+    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
+    float cx = halfX - radius;
+    float cz = halfZ + radius;
 
     glPushMatrix();
-    glTranslatef(centerX, halfY, centerZ);
-    glScalef(WALL_THICKNESS_FRAC, 1.0f, WALL_THICKNESS_FRAC);
-    glutSolidCube(MapFactory::TILE_SIZE);
+    glTranslatef(cx, halfY, cz);
+    drawQuarterCylinder(radius, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerTopRight() const {
-    BoundingBox3D abb = getAbsoluteBoundingBox();
+    auto abb = getAbsoluteBoundingBox();
     glColor3f(0.2f, 0.2f, 0.8f);
 
+    float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float gap = MapFactory::TILE_SIZE * GAP_FRAC;
-
-    float centerX = ((abb.min.x + abb.max.x) * 0.5f) - gap;
-    float centerZ = ((abb.min.z + abb.max.z) * 0.5f) - gap;
+    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
+    float tileH = abb.max.y - abb.min.y;
+    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
+    float cx = halfX + radius;
+    float cz = halfZ + radius;
 
     glPushMatrix();
-    glTranslatef(centerX, halfY, centerZ);
-    glScalef(WALL_THICKNESS_FRAC, 1.0f, WALL_THICKNESS_FRAC);
-    glutSolidCube(MapFactory::TILE_SIZE);
+    glTranslatef(cx, halfY, cz);
+    drawQuarterCylinder(radius, tileH, 0.0f, PI * 0.5f, CYLINDER_SEGMENTS);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerBottomLeft() const {
-    BoundingBox3D abb = getAbsoluteBoundingBox();
+    auto abb = getAbsoluteBoundingBox();
     glColor3f(0.2f, 0.2f, 0.8f);
 
+    float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float gap = MapFactory::TILE_SIZE * GAP_FRAC;
-
-    float centerX = ((abb.min.x + abb.max.x) * 0.5f) + gap;
-    float centerZ = ((abb.min.z + abb.max.z) * 0.5f) + gap;
+    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
+    float tileH = abb.max.y - abb.min.y;
+    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
+    float cx = halfX - radius;
+    float cz = halfZ - radius;
 
     glPushMatrix();
-    glTranslatef(centerX, halfY, centerZ);
-    glScalef(WALL_THICKNESS_FRAC, 1.0f, WALL_THICKNESS_FRAC);
-    glutSolidCube(MapFactory::TILE_SIZE);
+    glTranslatef(cx, halfY, cz);
+    drawQuarterCylinder(radius, tileH, PI, PI * 1.5f, CYLINDER_SEGMENTS);
     glPopMatrix();
 }
 
 void TileWall::renderWallInnerBottomRight() const {
-    BoundingBox3D abb = getAbsoluteBoundingBox();
+    auto abb = getAbsoluteBoundingBox();
     glColor3f(0.2f, 0.2f, 0.8f);
 
+    float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
-    float gap = MapFactory::TILE_SIZE * GAP_FRAC;
-
-    float centerX = ((abb.min.x + abb.max.x) * 0.5f) - gap;
-    float centerZ = ((abb.min.z + abb.max.z) * 0.5f) + gap;
+    float halfZ = (abb.min.z + abb.max.z) * 0.5f;
+    float tileH = abb.max.y - abb.min.y;
+    float radius = MapFactory::TILE_SIZE * INNER_RADIUS_FRAC;
+    float cx = halfX + radius;
+    float cz = halfZ - radius;
 
     glPushMatrix();
-    glTranslatef(centerX, halfY, centerZ);
-    glScalef(WALL_THICKNESS_FRAC, 1.0f, WALL_THICKNESS_FRAC);
-    glutSolidCube(MapFactory::TILE_SIZE);
+    glTranslatef(cx, halfY, cz);
+    drawQuarterCylinder(radius, tileH, PI * 1.5f, 2.0f * PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 }
 

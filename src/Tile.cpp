@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 
-
 Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol) : Entity(tileOrigin, tileBoundingBox) {
 	this->tileRow = tileRow;
 	this->tileCol = tileCol;

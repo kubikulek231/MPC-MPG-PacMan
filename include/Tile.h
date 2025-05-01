@@ -25,6 +25,7 @@ enum class TileType {
 class Tile : public Entity {
 public:
     Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
+    virtual ~Tile() = default;
     bool collectPellet();
     
     bool isWalkable() const;

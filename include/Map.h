@@ -7,6 +7,7 @@
 #include "Point3D.h"
 #include "BoundingBox3D.h"
 #include "Map.h"
+#include <memory>
 
 struct MapCornerPoints {
     Point3D lowerLeft = Point3D();
@@ -26,7 +27,7 @@ class Map {
 public:
     static const std::vector<MapCorner> corners;
     Map();
-    Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellets);
+    Map(const std::vector<std::vector<std::shared_ptr<Tile>>>& mapGrid, float tileSize, int totalPellets);
     void render(bool resetHighlighted = false, int resetTimerMs = 5000);  // Draws the map
     Tile* getTileWithPoint3D(Point3D point);
     Tile* getTileAt(int row, int col);
@@ -45,7 +46,7 @@ public:
 private:
     Tile* getFirstTileOfType(TileType type);
     int totalPellets;
-    std::vector<std::vector<Tile>> grid;
+    std::vector<std::vector<std::shared_ptr<Tile>>> grid;
     int width;
     int height;
     float tileSize;

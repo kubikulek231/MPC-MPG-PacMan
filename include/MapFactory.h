@@ -4,6 +4,7 @@
 #include "gl_includes.h"
 #include "Map.h"
 #include <string>
+#include <memory>
 
 class MapFactory {
 public:
@@ -15,7 +16,7 @@ public:
     static constexpr float TILE_SIZE = 1.0f;
 
 private:
-    std::vector<std::vector<Tile>> grid;
+    std::vector<std::vector<std::shared_ptr<Tile>>> grid;
     bool isValidCoord(int x, int y);
     bool loadMapFile(const std::string& filename);
     void generateEmptyMapFile(const std::string& filename);

@@ -17,7 +17,7 @@ const std::vector<MapCorner> Map::corners = {
 Map::Map() {
 }
 
-Map::Map(std::vector<std::vector<Tile>> mapGrid, float tileSize, int totalPellets) {
+Map::Map(const std::vector<std::vector<std::shared_ptr<Tile>>>& mapGrid, float tileSize, int totalPellets) {
     this->grid = mapGrid;
     this->height = mapGrid.size();  // Number of rows
     this->width = (this->height > 0) ? mapGrid[0].size() : 0;  // Number of columns (checking if the grid is not empty)
@@ -37,44 +37,41 @@ Tile* Map::getTileWithPoint3D(Point3D point) {
     int tileY = static_cast<int>(std::floor((point.y - originY) / tileSize));
 
     if (tileX >= 0 && tileX < width && tileY >= 0 && tileY < height) {
-        return &grid[tileY][tileX];
+        return grid[tileY][tileX].get();
     }
     return nullptr;
 }
 
+
 Tile* Map::getTileAt(int row, int col) {
     if (row >= 0 && row < height && col >= 0 && col < width) {
-        return &grid[row][col];
+        return grid[row][col].get();
     }
-    return nullptr; // Out of bounds
+    return nullptr;
 }
 
 // Returns absoluteBoundingBox intersecting tiles 
 std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingBox) {
     std::vector<Tile*> intersectedTiles;
 
-    // Get 2D bounds of the bounding box (XZ plane in OpenGL)
     float minX = absoluteBoundingBox->min.x;
     float maxX = absoluteBoundingBox->max.x;
     float minZ = absoluteBoundingBox->min.z;
     float maxZ = absoluteBoundingBox->max.z;
 
-    // Convert world coordinates to tile indices based on the XZ plane
     int startX = std::max(0, static_cast<int>(std::floor((minX + (width / 2.0f) * tileSize) / tileSize)));
     int endX = std::min(width - 1, static_cast<int>(std::floor((maxX + (width / 2.0f) * tileSize) / tileSize)));
     int startZ = std::max(0, static_cast<int>(std::floor((minZ + (height / 2.0f) * tileSize) / tileSize)));
     int endZ = std::min(height - 1, static_cast<int>(std::floor((maxZ + (height / 2.0f) * tileSize) / tileSize)));
 
-    // Iterate only over potentially intersecting tiles
     for (int z = startZ; z <= endZ; ++z) {
         for (int x = startX; x <= endX; ++x) {
-            Tile& tile = grid[z][x];
-            BoundingBox3D tileBox = tile.getAbsoluteBoundingBox();
-            if (absoluteBoundingBox->intersects(tileBox)) {
-                intersectedTiles.push_back(&tile);
+            const auto& tilePtr = grid[z][x];
+            if (tilePtr && absoluteBoundingBox->intersects(tilePtr->getAbsoluteBoundingBox())) {
+                intersectedTiles.push_back(tilePtr.get());
 
-                // Print the coordinates of the intersected tile
-                //std::cout << "Intersecting tile at: (" << x << ", " << z << ")\n";
+                // Optional debug output
+                // std::cout << "Intersecting tile at: (" << x << ", " << z << ")\n";
             }
         }
     }
@@ -83,24 +80,21 @@ std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingB
 }
 
 void Map::render(bool resetHighlighted, int resetTimerMs) {
-    // Center marker
-    //glColor3f(1.0f, 0.0f, 0.0f);
-    //glPushMatrix();
-    //glutSolidSphere(0.15f, 16, 16); // Origin marker
-    //glPopMatrix();
-    //drawCenterAxes(2.0f);
     if (resetHighlighted) {
         Map::scheduleHighlightReset(resetTimerMs);
     }
 
-    for (const std::vector<Tile>& tileRow : grid) {        
-        for (const Tile& tile : tileRow) {
-            //tile.renderOrigin();
-            tile.render();
-            //renderTileCoordinates(&tile);
+    for (const auto& tileRow : grid) {
+        for (const auto& tilePtr : tileRow) {
+            if (tilePtr) {
+                // tilePtr->renderOrigin(); // Uncomment if needed
+                tilePtr->render();
+                // renderTileCoordinates(tilePtr.get()); // Uncomment if needed
+            }
         }
     }
 }
+
 
 void Map::renderWorldCoordinates(const Tile* tile) {
     BoundingBox3D abb = tile->getAbsoluteBoundingBox();
@@ -147,9 +141,11 @@ void Map::renderTileCoordinates(const Tile* tile) {
 }
 
 void Map::resetHighlightedTiles() {
-    for (std::vector<Tile>& tileRow : grid) {
-        for (Tile& tile : tileRow) {
-            tile.setHighlight(false);
+    for (const auto& tileRow : grid) {
+        for (const auto& tilePtr : tileRow) {
+            if (tilePtr) {
+                tilePtr->setHighlight(false);
+            }
         }
     }
 }
@@ -179,20 +175,19 @@ Tile* Map::getRandomTile() {
     int attempts = 0;
     const int maxAttempts = 100;
 
-    // Optional: Try to pick a walkable tile
     while (attempts < maxAttempts) {
         int row = rowDist(gen);
         int col = colDist(gen);
-        tile = &grid[row][col];
+        std::shared_ptr<Tile> tilePtr = grid[row][col];
 
-        if (tile && tile->isWalkable()) {
-            return tile;
+        if (tilePtr && tilePtr->isWalkable()) {
+            return tilePtr.get();  // Return raw Tile* from shared_ptr
         }
 
         attempts++;
     }
 
-    return nullptr; // Fallback if no walkable tile found after maxAttempts
+    return nullptr; // Fallback if no walkable tile found
 }
 
 
@@ -271,8 +266,8 @@ Tile* Map::getClydeSpawn() {
 Tile* Map::getFirstTileOfType(TileType type) {
     for (int y = 0; y < MapFactory::MAP_HEIGHT; ++y) {
         for (int x = 0; x < MapFactory::MAP_WIDTH; ++x) {
-            if (grid[y][x].getTileType() == type) {
-                return &grid[y][x];
+            if (grid[y][x]->getTileType() == type) {
+                return grid[y][x].get(); // returns raw Tile* from shared_ptr
             }
         }
     }

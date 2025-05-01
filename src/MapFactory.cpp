@@ -5,6 +5,7 @@
 #include <iostream>   // For error handling
 #include "Tile.h"
 #include "Macro.h"
+#include "TileWall.h"
 
 MapFactory::MapFactory() {
     // Initialize the grid with the specified dimensions, filled with EMPTY tiles
@@ -20,7 +21,7 @@ Map MapFactory::createMap() {
 void MapFactory::createDefaultGrid() {
     // Initialize the grid with tiles of specific types or positions
     for (int y = 0; y < MAP_HEIGHT; ++y) {  // Loop through rows (height)
-        std::vector<Tile> row;  // Temporary vector to hold a row of tiles
+        std::vector<std::shared_ptr<Tile>> row;  // Temporary vector to hold a row of tiles
 
         for (int x = 0; x < MAP_WIDTH; ++x) {  // Loop through columns (width)
             // Center the grid around (0,0) in world space
@@ -38,7 +39,7 @@ void MapFactory::createDefaultGrid() {
             BoundingBox3D tileBoundingBox = BoundingBox3D(bbMin, bbMax);
 
             // Add a tile to the row
-            row.push_back(Tile(TileType::EMPTY, tileOrigin, tileBoundingBox, y, x));
+            row.push_back(std::make_shared<Tile>(TileType::EMPTY, tileOrigin, tileBoundingBox, y, x));
         }
 
         // Add the completed row to the grid
@@ -51,51 +52,52 @@ void MapFactory::createDefaultGrid() {
 void MapFactory::setTileNeighbors() {
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         for (int x = 0; x < MAP_WIDTH; ++x) {
-            Tile& tile = grid[y][x];
+            // Access the Tile object through shared_ptr
+            std::shared_ptr<Tile> tile = grid[y][x];
 
             // Set adjacent neighbors
-            if (x > 0) tile.setTileLeft(&grid[y][x - 1]);
-            if (x < MAP_WIDTH - 1) tile.setTileRight(&grid[y][x + 1]);
-            if (y > 0) tile.setTileUp(&grid[y - 1][x]);
-            if (y < MAP_HEIGHT - 1) tile.setTileDown(&grid[y + 1][x]);
+            if (x > 0) tile->setTileLeft(grid[y][x - 1].get());
+            if (x < MAP_WIDTH - 1) tile->setTileRight(grid[y][x + 1].get());
+            if (y > 0) tile->setTileUp(grid[y - 1][x].get());
+            if (y < MAP_HEIGHT - 1) tile->setTileDown(grid[y + 1][x].get());
         }
     }
 
     // Set horizontal teleport neighbors (left <-> right)
     for (int y = 0; y < MAP_HEIGHT; ++y) {
-        Tile& leftTile = grid[y][0];
-        Tile& rightTile = grid[y][MAP_WIDTH - 1];
+        std::shared_ptr<Tile> leftTile = grid[y][0];
+        std::shared_ptr<Tile> rightTile = grid[y][MAP_WIDTH - 1];
 
-        if (leftTile.getTileType() == TileType::TELEPORT ||
-            rightTile.getTileType() == TileType::TELEPORT) {
+        if (leftTile->getTileType() == TileType::TELEPORT ||
+            rightTile->getTileType() == TileType::TELEPORT) {
 
             ASSERT_MSG(
-                leftTile.getTileType() == TileType::TELEPORT &&
-                rightTile.getTileType() == TileType::TELEPORT,
+                leftTile->getTileType() == TileType::TELEPORT &&
+                rightTile->getTileType() == TileType::TELEPORT,
                 "Teleport tiles must be paired on both left and right edges at row " + std::to_string(y)
             );
 
-            leftTile.setTileLeft(&rightTile);
-            rightTile.setTileRight(&leftTile);
+            leftTile->setTileLeft(rightTile.get());
+            rightTile->setTileRight(leftTile.get());
         }
     }
 
     // Set vertical teleport neighbors (top <-> bottom)
     for (int x = 0; x < MAP_WIDTH; ++x) {
-        Tile& topTile = grid[0][x];
-        Tile& bottomTile = grid[MAP_HEIGHT - 1][x];
+        std::shared_ptr<Tile> topTile = grid[0][x];
+        std::shared_ptr<Tile> bottomTile = grid[MAP_HEIGHT - 1][x];
 
-        if (topTile.getTileType() == TileType::TELEPORT ||
-            bottomTile.getTileType() == TileType::TELEPORT) {
+        if (topTile->getTileType() == TileType::TELEPORT ||
+            bottomTile->getTileType() == TileType::TELEPORT) {
 
             ASSERT_MSG(
-                topTile.getTileType() == TileType::TELEPORT &&
-                bottomTile.getTileType() == TileType::TELEPORT,
+                topTile->getTileType() == TileType::TELEPORT &&
+                bottomTile->getTileType() == TileType::TELEPORT,
                 "Teleport tiles must be paired on both top and bottom edges at column " + std::to_string(x)
             );
 
-            topTile.setTileUp(&bottomTile);
-            bottomTile.setTileDown(&topTile);
+            topTile->setTileUp(bottomTile.get());
+            bottomTile->setTileDown(topTile.get());
         }
     }
 }
@@ -105,8 +107,7 @@ int MapFactory::getTotalGridPellets() {
     int totalPellets = 0;
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         for (int x = 0; x < MAP_WIDTH; ++x) {
-            const Tile* tile = &grid[y][x];
-            if (tile->getTileType() == TileType::PELLET) {
+            if (grid[y][x]->getTileType() == TileType::PELLET) {
                 totalPellets++;
             }
         }
@@ -139,7 +140,7 @@ bool MapFactory::loadMapFile(const std::string& filename) {
             return false;
         }
 
-        std::vector<Tile> tileRow;
+        std::vector<std::shared_ptr<Tile>> tileRow;
 
         for (int col = 0; col < MAP_WIDTH; col++) {
             char tileChar = line[col];
@@ -179,8 +180,14 @@ bool MapFactory::loadMapFile(const std::string& filename) {
                 ASSERT_MSG(row == 0 || col == 0 || row == MAP_HEIGHT - 1 || col == MAP_WIDTH - 1, "Teleports can be on the edge of the map only!");
             }
 
-            // Add the tile to the row
-            tileRow.emplace_back(type, tileOrigin, tileBoundingBox, row, col);
+            if (type == TileType::WALL) {
+                tileRow.push_back(std::make_shared<TileWall>(
+                    WallType::BLOCK, type, tileOrigin, tileBoundingBox, row, col));
+            }
+            else {
+                tileRow.push_back(std::make_shared<Tile>(
+                    type, tileOrigin, tileBoundingBox, row, col));
+            }
         }
 
         grid.push_back(tileRow);

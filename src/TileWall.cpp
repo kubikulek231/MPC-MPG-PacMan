@@ -157,10 +157,112 @@ void TileWall::renderWallBottom() const {
     glPopMatrix();
 }
 
+#include <GL/glu.h>
+
+// file-scope callbacks and state
+static double g_tessY;
+static void CALLBACK tessBeginCallback(GLenum type) { glBegin(type); }
+static void CALLBACK tessEndCallback() { glEnd(); }
+static void CALLBACK tessVertexCallback(void* data) {
+    const GLdouble* xy = (const GLdouble*)data;
+    glVertex3d(xy[0], g_tessY, xy[1]);
+}
+
+void TileWall::drawRectMinusQuarter(float r, float height,
+    float startAngle, float endAngle,
+    int segs) const
+{
+    float halfH = height * 0.5f;
+    float delta = (endAngle - startAngle) / segs;
+
+    // 1) Build the wall contour pts
+    std::vector<std::pair<float, float>> pts;
+    pts.emplace_back(0.0f, r);
+    pts.emplace_back(-r, r);
+    pts.emplace_back(-r, 0.0f);
+    for (int i = 0; i <= segs; ++i) {
+        float a = endAngle - i * delta;
+        pts.emplace_back(cosf(a) * r, sinf(a) * r);
+    }
+
+    // 2) Draw the side walls (unchanged)
+    glBegin(GL_QUAD_STRIP);
+    for (auto& p : pts) {
+        glVertex3f(p.first, +halfH, p.second);
+        glVertex3f(p.first, -halfH, p.second);
+    }
+    // close
+    glVertex3f(pts[0].first, +halfH, pts[0].second);
+    glVertex3f(pts[0].first, -halfH, pts[0].second);
+    glEnd();
+
+    // 3) Copy pts into a flat GLdouble array for tessellation
+    std::vector<GLdouble> contour;
+    contour.reserve(pts.size() * 2);
+    for (auto& p : pts) {
+        contour.push_back(p.first);
+        contour.push_back(p.second);
+    }
+
+    // 4) Create & configure the tessellator
+    GLUtesselator* tess = gluNewTess();
+    gluTessProperty(tess, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
+    gluTessCallback(tess, GLU_TESS_BEGIN, (void(*)())tessBeginCallback);
+    gluTessCallback(tess, GLU_TESS_END, (void(*)())tessEndCallback);
+    gluTessCallback(tess, GLU_TESS_VERTEX, (void(*)())tessVertexCallback);
+
+    // 5) Top cap (+halfH)
+    g_tessY = +halfH;
+    gluTessBeginPolygon(tess, nullptr);
+    gluTessBeginContour(tess);
+    for (size_t i = 0; i < contour.size() / 2; ++i) {
+        gluTessVertex(tess,
+            &contour[i * 2],
+            &contour[i * 2]);
+    }
+    gluTessEndContour(tess);
+    gluTessEndPolygon(tess);
+
+    // 6) Bottom cap (–halfH), reverse winding
+    g_tessY = -halfH;
+    gluTessBeginPolygon(tess, nullptr);
+    gluTessBeginContour(tess);
+    for (int i = (int)contour.size() / 2 - 1; i >= 0; --i) {
+        gluTessVertex(tess,
+            &contour[i * 2],
+            &contour[i * 2]);
+    }
+    gluTessEndContour(tess);
+    gluTessEndPolygon(tess);
+
+    gluDeleteTess(tess);
+}
+
+
 void TileWall::renderWallCornerTopLeft() const {
     renderWallTop();
     renderWallRight();
+
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float w = WALL_THICKNESS_FRAC;
+
+    // position corner
+    float cx = bb.min.x + (w + r);
+    float cz = bb.max.z - (w + r);
+
+    glDisable(GL_CULL_FACE);
+    glColor3f(1, 0, 0);
+
+    glPushMatrix();
+    glTranslatef(cx, halfY + 1.0f, cz);
+
+    drawRectMinusQuarter(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
 }
+
 
 void TileWall::renderWallCornerTopRight() const {
     renderWallTop();
@@ -305,6 +407,76 @@ void TileWall::drawSolidQuarterCylinder(float radius, float height, float angleS
         glEnd();
     }
 }
+
+void TileWall::drawConcaveQuarterCylinder(float radius, float height,
+    float startAngle, float endAngle,
+    int segs) const
+{
+    const float halfH = height * 0.5f;
+    const float step = (endAngle - startAngle) / segs;
+
+    // --- 1) Inner curved surface (normals pointing _inward_) ---
+    glBegin(GL_QUAD_STRIP);
+    for (int i = 0; i <= segs; ++i) {
+        float a = startAngle + i * step;
+        float x = cosf(a) * radius;
+        float z = sinf(a) * radius;
+        // point inward
+        glNormal3f(-cosf(a), 0.0f, -sinf(a));
+        // top then bottom
+        glVertex3f(x, halfH, z);
+        glVertex3f(x, -halfH, z);
+    }
+    glEnd();
+
+    // --- 2) Top “floor” of the carve (flat fan from corner to arc) ---
+    glBegin(GL_TRIANGLE_FAN);
+    glNormal3f(0, +1, 0);
+    glVertex3f(0, halfH, 0);  // fan center
+    for (int i = 0; i <= segs; ++i) {
+        float a = startAngle + i * step;
+        glVertex3f(cosf(a) * radius, halfH, sinf(a) * radius);
+    }
+    glEnd();
+
+    // --- 3) Bottom “ceiling” of the carve (flat fan from corner to arc) ---
+    glBegin(GL_TRIANGLE_FAN);
+    glNormal3f(0, -1, 0);
+    glVertex3f(0, -halfH, 0);  // fan center
+    for (int i = 0; i <= segs; ++i) {
+        float a = startAngle + i * step;
+        glVertex3f(cosf(a) * radius, -halfH, sinf(a) * radius);
+    }
+    glEnd();
+
+    // --- 4) Side wall at startAngle ---
+    {
+        float x0 = cosf(startAngle) * radius;
+        float z0 = sinf(startAngle) * radius;
+        glBegin(GL_QUADS);
+        // normal points into the carved volume
+        glNormal3f(sinf(startAngle), 0, -cosf(startAngle));
+        glVertex3f(x0, halfH, z0);
+        glVertex3f(x0, -halfH, z0);
+        glVertex3f(0.0f, -halfH, 0.0f);
+        glVertex3f(0.0f, halfH, 0.0f);
+        glEnd();
+    }
+
+    // --- 5) Side wall at endAngle ---
+    {
+        float x1 = cosf(endAngle) * radius;
+        float z1 = sinf(endAngle) * radius;
+        glBegin(GL_QUADS);
+        glNormal3f(-sinf(endAngle), 0, +cosf(endAngle));
+        glVertex3f(x1, halfH, z1);
+        glVertex3f(x1, -halfH, z1);
+        glVertex3f(0.0f, -halfH, 0.0f);
+        glVertex3f(0.0f, halfH, 0.0f);
+        glEnd();
+    }
+}
+
 
 
 // ------ inner-corner renders ------

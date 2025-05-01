@@ -53,6 +53,14 @@ private:
         float z0, float z1) const;
     void drawSolidQuarterCylinder(float radius, float height, float startAngle, float endAngle, int segs) const;
     void drawQuarterCylinder(float radius, float height, float startAngle, float endAngle, int segs) const;
+    void drawConcaveQuarterCylinder(float radius, float height,
+        float startAngle, float endAngle,
+        int segs) const;
+    void drawRectMinusQuarter(float r, float height,
+        float startAngle, float endAngle,
+        int segs) const;
+    void drawArcCapQuads(const std::vector<std::pair<float, float>>& pts, float y, float r, float startAngle, float endAngle) const;
+
 public:
     TileWall(WallType wallType, TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     ~TileWall() override = default;

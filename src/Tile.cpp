@@ -100,7 +100,7 @@ void Tile::renderHighlight() const {
 
 void Tile::renderEmpty() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	glColor3f(0.5f, 0.5f, 0.5f); // Dark gray for floor
+	glColor3f(0.2f, 0.2f, 0.2f); // Dark gray for floor
 
 	glBegin(GL_QUADS);
 	glVertex3f(abb.min.x, abb.min.y, abb.min.z);
@@ -144,7 +144,7 @@ void Tile::renderDoorOpen() const {
 
 	float centerX = (abb.min.x + abb.max.x) / 2.0f;
 	float centerY = (abb.min.y + abb.max.y) / 2.0f;
-	float centerZ = (abb.min.z + abb.max.z) / 2.0f;
+	float centerZ = (abb.min.z + abb.max.z) / 2.0f + MapFactory::TILE_SIZE * 0.25f;
 
 	float width = MapFactory::TILE_SIZE;
 	float height = MapFactory::TILE_SIZE;
@@ -163,9 +163,6 @@ void Tile::render() const {
 	}
 
 	switch (tileType) {
-	case TileType::WALL:
-		renderWall();
-		break;
 	case TileType::PELLET:
 		renderEmpty();
 		renderPellet();

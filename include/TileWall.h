@@ -3,6 +3,7 @@
 
 #include "gl_includes.h"
 #include "Tile.h"
+#include "MapFactory.h"
 
 enum class WallType {
     BLOCK = 0,              // Full wall block

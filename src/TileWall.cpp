@@ -19,6 +19,7 @@ TileWall::TileWall(WallType wallType,
 
 // Public method
 void TileWall::render() const {
+    renderEmpty();
     switch (wallType) {
     case WallType::BLOCK:
         renderWallBlock();
@@ -59,7 +60,6 @@ void TileWall::render() const {
     case WallType::INNER_BOTTOM_RIGHT:
         renderWallInnerBottomRight();
         break;
-    case WallType::NONE:
     default:
         break;
     }

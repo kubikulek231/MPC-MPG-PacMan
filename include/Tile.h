@@ -34,7 +34,7 @@ public:
     Point3D getCenterPoint() const;
     float distanceToCenter(const Tile& other) const;
    
-    void render() const;
+    virtual void render() const;
     void renderEmpty() const;
     void renderWall() const;
     void renderPellet() const;

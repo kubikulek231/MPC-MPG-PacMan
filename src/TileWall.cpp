@@ -65,6 +65,73 @@ void TileWall::render() const {
     }
 }
 
+void TileWall::setWallTypeByNeighbors() {
+    TileWall* up = dynamic_cast<TileWall*>(getTileUp());
+    TileWall* down = dynamic_cast<TileWall*>(getTileDown());
+    TileWall* left = dynamic_cast<TileWall*>(getTileLeft());
+    TileWall* right = dynamic_cast<TileWall*>(getTileRight());
+
+    bool hasUp = up != nullptr;
+    bool hasDown = down != nullptr;
+    bool hasLeft = left != nullptr;
+    bool hasRight = right != nullptr;
+
+    // Full block (isolated)
+    if (!hasUp && !hasDown && !hasLeft && !hasRight) {
+        wallType = WallType::BLOCK;
+    }
+    // Straight walls
+    else if (hasLeft && hasRight && !hasUp && !hasDown) {
+        wallType = WallType::TOP;
+    }
+    else if (hasUp && hasDown && !hasLeft && !hasRight) {
+        wallType = WallType::LEFT;
+    }
+    // Corners
+    else if (!hasUp && hasRight && hasDown && !hasLeft) {
+        wallType = WallType::TOP_LEFT_CORNER;
+    }
+    else if (!hasUp && hasLeft && hasDown && !hasRight) {
+        wallType = WallType::TOP_RIGHT_CORNER;
+    }
+    else if (!hasDown && hasRight && hasUp && !hasLeft) {
+        wallType = WallType::BOTTOM_LEFT_CORNER;
+    }
+    else if (!hasDown && hasLeft && hasUp && !hasRight) {
+        wallType = WallType::BOTTOM_RIGHT_CORNER;
+    }
+    // Inner corners
+    else if (hasUp && hasLeft && !hasDown && !hasRight) {
+        wallType = WallType::INNER_BOTTOM_RIGHT;
+    }
+    else if (hasUp && hasRight && !hasDown && !hasLeft) {
+        wallType = WallType::INNER_BOTTOM_LEFT;
+    }
+    else if (hasDown && hasLeft && !hasUp && !hasRight) {
+        wallType = WallType::INNER_TOP_RIGHT;
+    }
+    else if (hasDown && hasRight && !hasUp && !hasLeft) {
+        wallType = WallType::INNER_TOP_LEFT;
+    }
+    // Edges
+    else if (hasLeft && !hasRight && !hasUp && !hasDown) {
+        wallType = WallType::RIGHT;
+    }
+    else if (hasRight && !hasLeft && !hasUp && !hasDown) {
+        wallType = WallType::LEFT;
+    }
+    else if (hasUp && !hasDown && !hasLeft && !hasRight) {
+        wallType = WallType::BOTTOM;
+    }
+    else if (hasDown && !hasUp && !hasLeft && !hasRight) {
+        wallType = WallType::TOP;
+    }
+    // Default fallback
+    else {
+        wallType = WallType::BLOCK;
+    }
+}
+
 void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();
     glColor3f(0.3f, 0.3f, 1.0f); // Blue for wall

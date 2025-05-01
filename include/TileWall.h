@@ -43,8 +43,10 @@ private:
 public:
     TileWall(WallType wallType, TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     ~TileWall() override = default;
-    void render() const;
+    void render() const override;
     void setWallType(WallType wallType) { this->wallType = wallType; }
+    // Sets WallType according to neighbor tiles
+    void setWallTypeByNeighbors();
 };
 
 #endif

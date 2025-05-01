@@ -22,6 +22,7 @@ private:
     void generateEmptyMapFile(const std::string& filename);
     void createDefaultGrid();
     void setTileNeighbors();
+    void setWallType();
     int getTotalGridPellets();
 };
 

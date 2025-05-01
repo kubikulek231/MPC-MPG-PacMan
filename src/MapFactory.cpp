@@ -102,6 +102,24 @@ void MapFactory::setTileNeighbors() {
     }
 }
 
+void MapFactory::setWallType() {
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            std::shared_ptr<Tile> tile = grid[y][x];
+
+            // Skip if null or not a wall tile
+            if (!tile || tile->getTileType() != TileType::WALL)
+                continue;
+
+            // Cast to TileWall
+            TileWall* wallTile = dynamic_cast<TileWall*>(tile.get());
+            if (wallTile) {
+                wallTile->setWallTypeByNeighbors();
+            }
+        }
+    }
+}
+
 
 int MapFactory::getTotalGridPellets() {
     int totalPellets = 0;
@@ -196,6 +214,8 @@ bool MapFactory::loadMapFile(const std::string& filename) {
 
     // After creating the grid, set tile neighbors for optimized tile search
     setTileNeighbors();
+    // Set Wall type
+    setWallType();
 
     file.close();
 

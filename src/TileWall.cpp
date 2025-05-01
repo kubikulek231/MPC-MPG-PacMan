@@ -307,6 +307,17 @@ void TileWall::setWallTypeStraight() {
         wallType = WallType::TOP;
         return;
     }
+    
+    // Straight walls near doors
+    if (openUp && openDown && openRight && !openLeft && rightGhostHouse) {
+        wallType = WallType::TOP;
+        return;
+    }
+    if (openUp && openDown && openLeft && !openRight && leftGhostHouse) {
+        wallType = WallType::TOP;
+        return;
+    }
+
 
     // Straight walls (corridors on opposite sides -> block)
     if (openLeft && openRight && !openUp && !openDown) {

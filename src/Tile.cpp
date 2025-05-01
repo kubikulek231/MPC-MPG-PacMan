@@ -35,7 +35,9 @@ TileType Tile::getTileType() const {
 
 bool Tile::isGhostHouseTile() const {
 	if (tileType == TileType::GHOST_HOUSE ||
-		tileType == TileType::SPAWN_CLYDE) {
+		tileType == TileType::SPAWN_CLYDE ||
+		tileType == TileType::DOOR_CLOSED ||
+		tileType == TileType::DOOR_OPEN) {
 		return true;
 	}
 	return false;

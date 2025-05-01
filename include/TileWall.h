@@ -6,8 +6,8 @@
 
 enum class WallType {
     BLOCK = 0,              // Full wall block
-    LEFT = 1,               // Left side wall
-    RIGHT = 2,              // Right side wall
+    RIGHT = 1,              // Left side wall
+    LEFT = 2,               // Right side wall
     TOP = 3,                // Top side wall
     BOTTOM = 4,             // Bottom side wall
 
@@ -20,15 +20,13 @@ enum class WallType {
     INNER_TOP_RIGHT = 10,
     INNER_BOTTOM_LEFT = 11,
     INNER_BOTTOM_RIGHT = 12,
-
-    NONE = 13               // Fallback/default if needed
 };
 
 class TileWall : public Tile {
     // Fraction of the tile that the wall occupies
-    static constexpr float WALL_THICKNESS_FRAC = 0.5f;
+    static constexpr float WALL_THICKNESS_FRAC = MapFactory::TILE_SIZE / 2.0f;
     // The remaining gap on each side, in fraction of tile
-    static constexpr float GAP_FRAC = (1.0f - WALL_THICKNESS_FRAC) * 0.5f;
+    static constexpr float GAP_FRAC = (MapFactory::TILE_SIZE - WALL_THICKNESS_FRAC) * 0.5f;
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;

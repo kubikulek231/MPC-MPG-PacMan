@@ -23,10 +23,10 @@ void TileWall::render() const {
     case WallType::BLOCK:
         renderWallBlock();
         break;
-    case WallType::LEFT:
+    case WallType::RIGHT:
         renderWallLeft();
         break;
-    case WallType::RIGHT:
+    case WallType::LEFT:
         renderWallRight();
         break;
     case WallType::TOP:
@@ -292,11 +292,11 @@ void TileWall::setWallTypeStraight() {
 
     // Straight walls near the ghost house
     if (openLeft && openRight && !openUp && !openDown && leftGhostHouse) {
-        wallType = WallType::LEFT;
+        wallType = WallType::RIGHT;
         return;
     }
     if (openLeft && openRight && !openUp && !openDown && rightGhostHouse) {
-        wallType = WallType::RIGHT;
+        wallType = WallType::LEFT;
         return;
     }
     if (openUp && openDown && !openLeft && !openRight && upGhostHouse) {
@@ -317,7 +317,6 @@ void TileWall::setWallTypeStraight() {
         wallType = WallType::TOP;
         return;
     }
-
 
     // Straight walls (corridors on opposite sides -> block)
     if (openLeft && openRight && !openUp && !openDown) {
@@ -344,12 +343,12 @@ void TileWall::setWallTypeStraight() {
     }
     if (openLeft && !openRight && !openUp && !openDown) {
         // Corridor to left -> thin left edge
-        wallType = WallType::RIGHT;
+        wallType = WallType::LEFT;
         return;
     }
     if (openRight && !openLeft && !openUp && !openDown) {
         // Corridor to right -> thin right edge
-        wallType = WallType::LEFT;
+        wallType = WallType::RIGHT;
         return;
     }
 

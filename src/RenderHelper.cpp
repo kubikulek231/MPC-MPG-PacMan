@@ -1,14 +1,5 @@
 #include "RenderHelper.h"
 
-// Tesselation callbacks for rendering rounded concave angles
-static double g_tessY;
-static void CALLBACK tessBeginCallback(GLenum type) { glBegin(type); }
-static void CALLBACK tessEndCallback() { glEnd(); }
-static void CALLBACK tessVertexCallback(void* data) {
-    const GLdouble* xy = (const GLdouble*)data;
-    glVertex3d(xy[0], g_tessY, xy[1]);
-}
-
 // Renders axis-aligned box [x0,x1]×[y0,y1]×[z0,z1]
 void RenderHelper::renderBox(float x0, float x1,
     float y0, float y1,
@@ -59,15 +50,15 @@ void RenderHelper::renderBox(float x0, float x1,
     glEnd();
 }
 
-// Renders inner rounded corner using tesselation
+// Renders inner rounded corner with cap on top
 void RenderHelper::renderInnerRoundedCorner(float r, float height,
     float startAngle, float endAngle,
-    int segs) {
-
+    int segs)
+{
     float halfH = height * 0.5f;
     float delta = (endAngle - startAngle) / segs;
 
-    // 1) Build the wall contour pts
+    // Build the contour points for an inner rounded corner
     std::vector<std::pair<float, float>> pts;
     pts.emplace_back(0.0f, r);
     pts.emplace_back(-r, r);
@@ -77,57 +68,27 @@ void RenderHelper::renderInnerRoundedCorner(float r, float height,
         pts.emplace_back(cosf(a) * r, sinf(a) * r);
     }
 
-    // 2) Draw the side walls (unchanged)
+    // Render the side walls
     glBegin(GL_QUAD_STRIP);
     for (auto& p : pts) {
         glVertex3f(p.first, +halfH, p.second);
         glVertex3f(p.first, -halfH, p.second);
     }
-    // close
+
+    // Close the quad strip
     glVertex3f(pts[0].first, +halfH, pts[0].second);
     glVertex3f(pts[0].first, -halfH, pts[0].second);
     glEnd();
 
-    // 3) Copy pts into a flat GLdouble array for tessellation
-    std::vector<GLdouble> contour;
-    contour.reserve(pts.size() * 2);
-    for (auto& p : pts) {
-        contour.push_back(p.first);
-        contour.push_back(p.second);
+    // Render top cap
+    glBegin(GL_TRIANGLE_FAN);
+    // Anchor is at the convex corner opposite the concave arc
+    glVertex3f(-r, +halfH, +r);
+    for (int i = 0; i <= segs; ++i) {
+        float a = startAngle + i * delta;
+        glVertex3f(cosf(a) * r, +halfH, sinf(a) * r);
     }
-
-    // 4) Create & configure the tessellator
-    GLUtesselator* tess = gluNewTess();
-    gluTessProperty(tess, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
-    gluTessCallback(tess, GLU_TESS_BEGIN, (void(*)())tessBeginCallback);
-    gluTessCallback(tess, GLU_TESS_END, (void(*)())tessEndCallback);
-    gluTessCallback(tess, GLU_TESS_VERTEX, (void(*)())tessVertexCallback);
-
-    // 5) Top cap (+halfH)
-    g_tessY = +halfH;
-    gluTessBeginPolygon(tess, nullptr);
-    gluTessBeginContour(tess);
-    for (size_t i = 0; i < contour.size() / 2; ++i) {
-        gluTessVertex(tess,
-            &contour[i * 2],
-            &contour[i * 2]);
-    }
-    gluTessEndContour(tess);
-    gluTessEndPolygon(tess);
-
-    // 6) Bottom cap (–halfH), reverse winding
-    g_tessY = -halfH;
-    gluTessBeginPolygon(tess, nullptr);
-    gluTessBeginContour(tess);
-    for (int i = (int)contour.size() / 2 - 1; i >= 0; --i) {
-        gluTessVertex(tess,
-            &contour[i * 2],
-            &contour[i * 2]);
-    }
-    gluTessEndContour(tess);
-    gluTessEndPolygon(tess);
-
-    gluDeleteTess(tess);
+    glEnd();
 }
 
 // Renders outer rounded corner
@@ -141,28 +102,6 @@ void RenderHelper::renderOuterRoundedCorner(float radius, float height, float an
         float x = cosf(angle) * radius;
         float z = sinf(angle) * radius;
         glVertex3f(x, -height * 0.5f, z);
-        glVertex3f(x, height * 0.5f, z);
-    }
-    glEnd();
-
-    // Bottom cap
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0, -height * 0.5f, 0);  // center
-    for (int i = 0; i <= segments; ++i) {
-        float angle = angleStart + i * delta;
-        float x = cosf(angle) * radius;
-        float z = sinf(angle) * radius;
-        glVertex3f(x, -height * 0.5f, z);
-    }
-    glEnd();
-
-    // Top cap
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0, height * 0.5f, 0);  // center
-    for (int i = 0; i <= segments; ++i) {
-        float angle = angleStart + i * delta;
-        float x = cosf(angle) * radius;
-        float z = sinf(angle) * radius;
         glVertex3f(x, height * 0.5f, z);
     }
     glEnd();
@@ -190,4 +129,15 @@ void RenderHelper::renderOuterRoundedCorner(float radius, float height, float an
         glVertex3f(x, -height * 0.5f, z);
         glEnd();
     }
+
+    // Top cap
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(0, height * 0.5f, 0);  // center
+    for (int i = 0; i <= segments; ++i) {
+        float angle = angleStart + i * delta;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+        glVertex3f(x, height * 0.5f, z);
+    }
+    glEnd();
 }

@@ -60,6 +60,12 @@ void Game::initLevel(int level) {
     Point3D inkySpawnOrigin = map.getInkySpawn()->getOrigin();
     Point3D clydeSpawnOrigin = map.getClydeSpawn()->getOrigin();
 
+    playerSpawnOrigin.move(MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    blinkySpawnOrigin.move(- MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    pinkySpawnOrigin.move(- MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    inkySpawnOrigin.move(- MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    clydeSpawnOrigin.move(- MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+
     player = Player(&map, playerSpawnOrigin, BoundingBox3D(Point3D(0, 0, 0), Point3D(0.999, 0.999, 0.999)));
     
     float levelSpeed = game.getBaseSpeed() + level * LEVEL_SPEED_INCREMENT;
@@ -207,7 +213,7 @@ void Game::render() {
     );
 
     // Render game elements
-    game.getMap()->render(true);
+    game.getMap()->render(false);
     game.getPlayer()->render();
     for (Ghost* ghost : game.getGhosts()) { ghost->render(); }
 

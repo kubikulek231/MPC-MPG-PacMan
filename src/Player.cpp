@@ -146,8 +146,8 @@ void Player::render() {
 
     glPopMatrix();
 
-    renderBoundingBox();
-    renderOrigin();
+    //renderBoundingBox();
+    //renderOrigin();
 }
 
 

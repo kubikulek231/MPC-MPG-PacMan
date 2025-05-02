@@ -123,9 +123,8 @@ void Ghost::render() {
         glPopMatrix();
     glPopMatrix();
 
-    renderBoundingBox();
-    renderOrigin(); 
-
+    //renderBoundingBox();
+    //renderOrigin(); 
 }
 
 void Ghost::moveOnPath(float frameTimeMs) {

@@ -49,7 +49,7 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
     bool moved;
     // std::cout << this->toString() << std::endl; // Debug entity movement
     Tile* tile = currentTile(intersectingTiles(this));
-    if (tile) { tile->setHighlight(true); }
+    //if (tile) { tile->setHighlight(true); }
     // If it is actually a new request
     if (isNewRequest) {
         // Delete existing request

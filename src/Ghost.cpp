@@ -4,6 +4,7 @@
 #include <queue>
 #include <iostream>
 #include <unordered_set>
+#include "Pi.h"
 
 Ghost::Ghost() {
 }
@@ -29,15 +30,102 @@ void Ghost::render() {
     glColor3f(colorR, colorG, colorB);
     glPushMatrix();
 
-    Point3D centerPoint = getAbsoluteCenterPoint();
-    // Sphere is defined by center point, so needs to be translated
-    glTranslatef(centerPoint.x, centerPoint.y, centerPoint.z);
-    glutSolidSphere(0.5f, 16, 16);
+        Point3D centerPoint = getAbsoluteCenterPoint();
+                
+        // Sphere is defined by center point, so needs to be translated
+        glTranslatef(centerPoint.x, centerPoint.y + 0.25, centerPoint.z);
+        glutSolidSphere(0.75f, 16, 16);
 
+        // Draw cylindrical wavy skirt under the ghost
+        glPushMatrix();
+        glRotatef(90.0f, 1.0f, 0.0f, 0.0f); // Align along Z axis
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f); // Align along Z axis
+        glTranslatef(0.0f, 0.0f, -0.01f);   // Slight offset to connect with sphere
+
+        const float radius = 0.75f;
+        const float height = 0.5f;
+        const int segments = 48;
+        const int waves = 8;              // Number of bumps at bottom
+        const float waveAmplitude = 0.1f;
+
+        glBegin(GL_QUAD_STRIP);
+        for (int i = 0; i <= segments; ++i) {
+            float theta = 2.0f * PI * i / segments;
+            float x = radius * cos(theta);
+            float y = radius * sin(theta);
+
+            // Top vertex (connects to sphere)
+            glVertex3f(x, y, 0.0f);
+
+            // Bottom vertex (with wavy offset)
+            float wave = waveAmplitude * sin(waves * theta);
+            glVertex3f(x, y, -height - wave);
+        }
+        glEnd();
+        glPopMatrix();
+
+
+        // Rotate Ghost to face movement direction
+        float moveDirAngle = getMoveDirRotationAngle();
+        glRotatef(moveDirAngle, 0.0f, 1.0f, 0.0f);
+
+        // Align Ghost vertically (facing direction)
+        glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+
+        // --- LEFT EYE
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPushMatrix();
+            glTranslatef(0.54f, 0.27f, -0.41f);
+
+            glRotatef(35.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-55.0f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+
+            glutSolidSphere(0.20f, 12, 12);
+        glPopMatrix();
+
+        // LEFT PUPIL
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.535f, 0.27f, -0.50f);
+
+            glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-44.5f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+            glutSolidSphere(0.11f, 12, 12);
+        glPopMatrix();
+
+        // --- RIGHT EYE
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPushMatrix();
+            glTranslatef(0.54f, -0.27f, -0.41f);
+
+            glRotatef(145.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-125.0f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+
+            glutSolidSphere(0.20f, 12, 12);
+        glPopMatrix();
+
+        // RIGHT PUPIL
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.535f, -0.27f, -0.50f);
+
+            glRotatef(140.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-135.5f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+            glutSolidSphere(0.11f, 12, 12);
+        glPopMatrix();
     glPopMatrix();
 
     renderBoundingBox();
     renderOrigin(); 
+
 }
 
 void Ghost::moveOnPath(float frameTimeMs) {

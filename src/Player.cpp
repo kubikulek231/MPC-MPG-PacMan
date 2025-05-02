@@ -39,7 +39,7 @@ void Player::render() {
 
     glPushMatrix();
         Point3D c = getAbsoluteCenterPoint();
-        glTranslatef(c.x, c.y, c.z);
+        glTranslatef(c.x, c.y + 0.25, c.z);
 
         // Rotate player to face movement direction
         float moveDirAngle = getMoveDirRotationAngle();

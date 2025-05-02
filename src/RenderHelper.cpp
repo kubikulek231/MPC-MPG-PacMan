@@ -1,4 +1,5 @@
 #include "RenderHelper.h"
+#include <cmath>
 
 void RenderHelper::renderBox(float x0, float x1,
     float y0, float y1,
@@ -113,36 +114,48 @@ void RenderHelper::renderInnerRoundedCorner(float r, float height,
 
     // Build the contour points for an inner rounded corner
     std::vector<std::pair<float, float>> pts;
-    pts.emplace_back(0.0f, r);
-    pts.emplace_back(-r, r);
-    pts.emplace_back(-r, 0.0f);
+    pts.emplace_back(0.0f, r);     // vertical segment
+    pts.emplace_back(-r, r);      // 90° corner
+    pts.emplace_back(-r, 0.0f);   // horizontal segment
     for (int i = 0; i <= segs; ++i) {
         float a = endAngle - i * delta;
         pts.emplace_back(cosf(a) * r, sinf(a) * r);
     }
 
-    // Render the side walls
+    // Render the side walls (vertical quads along contour)
     glBegin(GL_QUAD_STRIP);
     for (auto& p : pts) {
+        // Normal is the outward-facing 2D normal, pointing away from center (0, 0)
+        float dx = p.first;
+        float dz = p.second;
+        float len = std::sqrt(dx * dx + dz * dz);
+        float nx = (len > 0.001f) ? dx / len : 0.0f;
+        float nz = (len > 0.001f) ? dz / len : 0.0f;
+
+        glNormal3f(-nx, 0.0f, -nz); // Same normal for both top and bottom of this vertical strip
         glVertex3f(p.first, +halfH, p.second);
         glVertex3f(p.first, -halfH, p.second);
     }
-
-    // Close the quad strip
+    // Close the quad strip with the first point
+    glNormal3f(0.0f, 0.0f, 1.0f); // Arbitrary consistent normal for last cap
     glVertex3f(pts[0].first, +halfH, pts[0].second);
     glVertex3f(pts[0].first, -halfH, pts[0].second);
     glEnd();
 
     // Render top cap
     glBegin(GL_TRIANGLE_FAN);
-    // Anchor is at the convex corner opposite the concave arc
-    glVertex3f(-r, +halfH, +r);
+    glNormal3f(0.0f, 1.0f, 0.0f); // Upward-facing normal
+    glVertex3f(-r, +halfH, +r); // Center of the fan
+
     for (int i = 0; i <= segs; ++i) {
         float a = startAngle + i * delta;
-        glVertex3f(cosf(a) * r, +halfH, sinf(a) * r);
+        float x = cosf(a) * r;
+        float z = sinf(a) * r;
+        glVertex3f(x, +halfH, z);
     }
     glEnd();
 }
+
 
 // Renders outer rounded corner
 void RenderHelper::renderOuterRoundedCorner(float radius, float height, float angleStart, float angleEnd, int segments) {

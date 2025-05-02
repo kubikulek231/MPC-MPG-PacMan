@@ -36,53 +36,120 @@ void Player::render() {
     glColor3f(playerBodyColorRed,
         playerBodyColorGreen,
         playerBodyColorBlue);
+
     glPushMatrix();
-    Point3D c = getAbsoluteCenterPoint();
-    glTranslatef(c.x, c.y, c.z);
-    
-    // Handle moveDir rotation
-    glRotatef(getMoveDirRotationAngle(), 0.0f, 1.0f, 0.0f);
+        Point3D c = getAbsoluteCenterPoint();
+        glTranslatef(c.x, c.y, c.z);
 
-    // Rotate 90 degrees in Z axis
-    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+        // Rotate player to face movement direction
+        float moveDirAngle = getMoveDirRotationAngle();
+        glRotatef(moveDirAngle, 0.0f, 1.0f, 0.0f);
 
-    // Handle mouth opening
-    // 0.0f degrees -> open
-    // 30.0f degrees -> closed
-    float mouthDegrees = 30.0f * playerAnimationState;
-    float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
-    float half = inverseMouthDegrees * (PI / 180.0f);
-    GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
-    GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
+        // Align Pac-Man vertically (facing direction)
+        glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
-    glClipPlane(GL_CLIP_PLANE0, eq0);
-    glEnable(GL_CLIP_PLANE0);
-    glDisable(GL_CLIP_PLANE1);
-    glutSolidSphere(0.75f, 32, 32);
-    glDisable(GL_CLIP_PLANE0);
+        // Compute mouth opening angle
+        float mouthDegrees = 30.0f * playerAnimationState;
+        float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
+        float half = inverseMouthDegrees * (PI / 180.0f);
 
-    glClipPlane(GL_CLIP_PLANE1, eq1);
-    glEnable(GL_CLIP_PLANE1);
-    glutSolidSphere(0.75f, 32, 32);
-    glDisable(GL_CLIP_PLANE1);
+        // Define clipping planes to carve the mouth
+        GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
+        GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
 
-    GLUquadric* disk = gluNewQuadric();
-    glDisable(GL_CULL_FACE);
-    glPushMatrix();
-    glRotatef(inverseMouthDegrees, 0, 1, 0);
-    gluDisk(disk, 0.0, 0.75, 32, 1);
-    glPopMatrix();
-    glPushMatrix();
-    glRotatef(-inverseMouthDegrees, 0, 1, 0);
-    gluDisk(disk, 0.0, 0.75, 32, 1);
-    glPopMatrix();
-    gluDeleteQuadric(disk);
+        // Render upper clipped sphere
+        glClipPlane(GL_CLIP_PLANE0, eq0);
+        glEnable(GL_CLIP_PLANE0);
+        glDisable(GL_CLIP_PLANE1);
+        glutSolidSphere(0.75f, 32, 32);
+        glDisable(GL_CLIP_PLANE0);
+
+        // Render lower clipped sphere
+        glClipPlane(GL_CLIP_PLANE1, eq1);
+        glEnable(GL_CLIP_PLANE1);
+        glutSolidSphere(0.75f, 32, 32);
+        glDisable(GL_CLIP_PLANE1);
+
+        // Render inner mouth part (more orange)
+        glColor3f(playerBodyColorRed,
+            playerBodyColorGreen * 0.8f,
+            playerBodyColorBlue);
+        glPushMatrix();
+        glClipPlane(GL_CLIP_PLANE1, eq1);
+        glEnable(GL_CLIP_PLANE1);
+        glutSolidSphere(0.75f, 32, 32);
+        glDisable(GL_CLIP_PLANE1);
+        glPopMatrix();
+
+        // Fill the mouth gap with disks
+        GLUquadric* disk = gluNewQuadric();
+        glDisable(GL_CULL_FACE);
+        glPushMatrix();
+        glRotatef(inverseMouthDegrees, 0, 1, 0);
+        gluDisk(disk, 0.0, 0.75, 32, 1);
+        glPopMatrix();
+        glPushMatrix();
+        glRotatef(-inverseMouthDegrees, 0, 1, 0);
+        gluDisk(disk, 0.0, 0.75, 32, 1);
+        glPopMatrix();
+        gluDeleteQuadric(disk);
+
+        // --- LEFT EYE
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPushMatrix();
+            glTranslatef(0.54f, 0.27f, -0.41f);
+
+            glRotatef(35.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-55.0f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+
+            glutSolidSphere(0.20f, 12, 12);
+        glPopMatrix();
+
+        // LEFT PUPIL
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.535f, 0.27f, -0.50f);
+
+            glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-44.5f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+            glutSolidSphere(0.11f, 12, 12);
+        glPopMatrix();
+
+        // --- RIGHT EYE
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPushMatrix();
+            glTranslatef(0.54f, -0.27f, -0.41f);
+
+            glRotatef(145.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-125.0f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+
+            glutSolidSphere(0.20f, 12, 12);
+        glPopMatrix();
+
+        // RIGHT PUPIL
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.535f, -0.27f, -0.50f);
+
+            glRotatef(140.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-135.5f, 0.0f, 1.0f, 0.0f);
+
+            glScalef(1.0f, 1.0f, 0.3f);
+            glutSolidSphere(0.11f, 12, 12);
+        glPopMatrix();
 
     glPopMatrix();
 
     renderBoundingBox();
     renderOrigin();
 }
+
 
 void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeMs) {
     // Handle movement and teleportation

@@ -1,6 +1,11 @@
 #include "RenderHelper.h"
 #include <cmath>
 
+float RenderHelper::cubicBezier(float p0, float p1, float p2, float p3, float t) {
+    float u = 1 - t;
+    return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3;
+}
+
 void RenderHelper::renderBox(float x0, float x1,
     float y0, float y1,
     float z0, float z1,

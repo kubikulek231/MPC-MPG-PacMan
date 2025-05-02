@@ -30,36 +30,24 @@ Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std:
 void Ghost::render() {
     glColor3f(colorR, colorG, colorB);
     glPushMatrix();
+
         Point3D centerPoint = getAbsoluteCenterPoint();
-
-        // Translate before rotation
+                
+        // Sphere is defined by center point, so needs to be translated
         glTranslatef(centerPoint.x, centerPoint.y + 0.25, centerPoint.z);
+        glutSolidSphere(0.75f, 16, 16);
 
-        glutSolidSphere(0.75f, 18, 18);
-
-        // Skirt
+        // Draw cylindrical wavy skirt under the ghost
         glPushMatrix();
-        glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        glRotatef(90.0f, 1.0f, 0.0f, 0.0f); // Align along Z axis
+        glRotatef(180.0f, 0.0f, 1.0f, 0.0f); // Align along Z axis
+        glTranslatef(0.0f, 0.0f, -0.01f);   // Slight offset to connect with sphere
 
         const float radius = 0.75f;
-        const float height = 0.45f;
-        const int   segments = 128;
-        const int   waves = 12;
-        const float waveAmplitude = 0.3f;
-
-        // First half: baseline -> trough
-        const float B1_P0 = 0.0f;                       // start at baseline
-        const float B1_P1 = -0.2f * waveAmplitude;      // first handle (entry slope)
-        const float B1_P2 = -0.9f * waveAmplitude;      // second handle (approach trough)
-        const float B1_P3 = -waveAmplitude;             // reach trough
-
-        // Second half: trough -> baseline
-        const float B2_P0 = -waveAmplitude;             // start at trough
-        const float B2_P1 = -0.9f * waveAmplitude;      // first handle (leaving trough)
-        const float B2_P2 = -0.2f * waveAmplitude;      // second handle (approach baseline)
-        const float B2_P3 = 0.0f;                       // return to baseline
-
+        const float height = 0.5f;
+        const int segments = 48;
+        const int waves = 8;              // Number of bumps at bottom
+        const float waveAmplitude = 0.1f;
 
         glBegin(GL_QUAD_STRIP);
         for (int i = 0; i <= segments; ++i) {
@@ -67,36 +55,19 @@ void Ghost::render() {
             float x = radius * cosf(theta);
             float y = radius * sinf(theta);
 
+            // Bézier bump shaping
             float phase = waves * theta / (2.0f * PI);
-            int   windex = int(floorf(phase));
-            float localT = phase - windex;
-
-            // split into two Bezier segments
-            float wave;
-            if (localT < 0.5f) {
-                float t1 = localT * 2.0f;
-                wave = RenderHelper::cubicBezier(
-                    B1_P0, B1_P1, B1_P2, B1_P3,
-                    t1
-                );
-            }
-            else {
-                float t2 = (localT - 0.5f) * 2.0f;
-                wave = RenderHelper::cubicBezier(
-                    B2_P0, B2_P1, B2_P2, B2_P3,
-                    t2
-                );
-            }
-
-            // Normals & vertices
-            float nx = cosf(theta), ny = sinf(theta);
-            glNormal3f(nx, ny, 0.0f);
-            glVertex3f(x, y, -height + wave);
-            glVertex3f(x, y, 0.0f);
+            float localT = phase - floorf(phase);
+            float wave = RenderHelper::cubicBezier(
+                0.0f, -waveAmplitude, -waveAmplitude, 0.0f,
+                localT
+            );
+            float dx = -sinf(theta);
+            float dy = cosf(theta);
+            glNormal3f(dx, dy, 0.0f);
         }
         glEnd();
         glPopMatrix();
-
 
 
         // Rotate Ghost to face movement direction

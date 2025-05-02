@@ -8,6 +8,7 @@
 static class RenderHelper {
 private:
 public:
+   static float cubicBezier(float p0, float p1, float p2, float p3, float t);
    static void renderInnerRoundedCorner(float r, float height,
         float startAngle, float endAngle,
         int segs);

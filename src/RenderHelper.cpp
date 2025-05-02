@@ -160,6 +160,7 @@ void RenderHelper::renderInnerRoundedCorner(float r, float height,
 // Renders outer rounded corner
 void RenderHelper::renderOuterRoundedCorner(float radius, float height, float angleStart, float angleEnd, int segments) {
     float delta = (angleEnd - angleStart) / segments;
+    float halfH = height * 0.5f;
 
     // Curved outer wall
     glBegin(GL_QUAD_STRIP);
@@ -167,43 +168,63 @@ void RenderHelper::renderOuterRoundedCorner(float radius, float height, float an
         float angle = angleStart + i * delta;
         float x = cosf(angle) * radius;
         float z = sinf(angle) * radius;
-        glVertex3f(x, -height * 0.5f, z);
-        glVertex3f(x, height * 0.5f, z);
+
+        // Normal points outward from center
+        float nx = cosf(angle);
+        float nz = sinf(angle);
+
+        glNormal3f(nx, 0.0f, nz);
+        glVertex3f(x, -halfH, z);
+        glVertex3f(x, +halfH, z);
     }
     glEnd();
 
     // Side wall 1 (start angle)
     {
-        float x = cosf(angleStart) * radius;
-        float z = sinf(angleStart) * radius;
+        float angle = angleStart;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+
+        // Normal: perpendicular to the side plane
+        float nx = sinf(angle); // tangent vector rotated -90°
+        float nz = -cosf(angle);
+
         glBegin(GL_QUADS);
-        glVertex3f(0, -height * 0.5f, 0);
-        glVertex3f(0, height * 0.5f, 0);
-        glVertex3f(x, height * 0.5f, z);
-        glVertex3f(x, -height * 0.5f, z);
+        glNormal3f(nx, 0.0f, nz);
+        glVertex3f(0, -halfH, 0);
+        glVertex3f(0, +halfH, 0);
+        glVertex3f(x, +halfH, z);
+        glVertex3f(x, -halfH, z);
         glEnd();
     }
 
     // Side wall 2 (end angle)
     {
-        float x = cosf(angleEnd) * radius;
-        float z = sinf(angleEnd) * radius;
+        float angle = angleEnd;
+        float x = cosf(angle) * radius;
+        float z = sinf(angle) * radius;
+
+        float nx = -sinf(angle); // tangent vector rotated +90°
+        float nz = cosf(angle);
+
         glBegin(GL_QUADS);
-        glVertex3f(0, -height * 0.5f, 0);
-        glVertex3f(0, height * 0.5f, 0);
-        glVertex3f(x, height * 0.5f, z);
-        glVertex3f(x, -height * 0.5f, z);
+        glNormal3f(nx, 0.0f, nz);
+        glVertex3f(0, -halfH, 0);
+        glVertex3f(0, +halfH, 0);
+        glVertex3f(x, +halfH, z);
+        glVertex3f(x, -halfH, z);
         glEnd();
     }
 
     // Top cap
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0, height * 0.5f, 0);  // center
+    glNormal3f(0.0f, 1.0f, 0.0f); // Upward-facing normal
+    glVertex3f(0, +halfH, 0);  // center
     for (int i = 0; i <= segments; ++i) {
         float angle = angleStart + i * delta;
         float x = cosf(angle) * radius;
         float z = sinf(angle) * radius;
-        glVertex3f(x, height * 0.5f, z);
+        glVertex3f(x, +halfH, z);
     }
     glEnd();
 }

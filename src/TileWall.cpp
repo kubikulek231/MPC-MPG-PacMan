@@ -168,33 +168,84 @@ void TileWall::renderWallCornerTopLeft() const {
     float w = WALL_THICKNESS_FRAC;
 
     // position corner
-    float cx = bb.min.x + (w + r);
-    float cz = bb.max.z - (w + r);
+    float cx = bb.min.x + (w - r);
+    float cz = bb.min.z + (w - r);
 
-    glDisable(GL_CULL_FACE);
-    glColor3f(1, 0, 0);
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
 
     glPushMatrix();
-    glTranslatef(cx, halfY + 1.0f, cz);
-
+    glTranslatef(cx, halfY, cz);
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
     RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 }
 
-
 void TileWall::renderWallCornerTopRight() const {
     renderWallTop();
     renderWallLeft();
+
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float w = WALL_THICKNESS_FRAC;
+
+    // position corner at top-right inside corner
+    float cx = bb.max.x - (w - r);
+    float cz = bb.min.z + (w - r);
+
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+
+    glPushMatrix();
+    glTranslatef(cx, halfY, cz);
+    RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
 }
 
 void TileWall::renderWallCornerBottomLeft() const {
     renderWallBottom();
     renderWallRight();
+
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float w = WALL_THICKNESS_FRAC;
+
+    // position corner at bottom-left inside corner
+    float cx = bb.min.x + (w - r);
+    float cz = bb.max.z - (w - r);
+
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+
+    glPushMatrix();
+    glTranslatef(cx, halfY, cz);
+    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+    RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
 }
 
 void TileWall::renderWallCornerBottomRight() const {
     renderWallBottom();
     renderWallLeft();
+
+    auto bb = getAbsoluteBoundingBox();
+    float halfY = (bb.min.y + bb.max.y) * 0.5f;
+    float tileH = bb.max.y - bb.min.y;
+    float r = INNER_RADIUS_FRAC;
+    float w = WALL_THICKNESS_FRAC;
+
+    // position corner at bottom-right inside corner
+    float cx = bb.max.x - (w - r);
+    float cz = bb.max.z - (w - r);
+
+    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+
+    glPushMatrix();
+    glTranslatef(cx, halfY, cz);
+    glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+    RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glPopMatrix();
 }
 
 // ------ inner-corner renders ------

@@ -20,6 +20,32 @@ static void mouseMotionCallback(int x, int y) { GameUserInput::getInstance().mou
 
 // Inits new game
 void Game::init() {
+    // turn on the whole lighting system
+    glEnable(GL_LIGHTING);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+    GLfloat light_position[] = { 0.0f, 5.0f, 10.0f, 1.0f }; // positional light
+    GLfloat ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+
+    // set a global ambient (dim) so that un-lit surfaces aren’t pure black
+    GLfloat globalAmbient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -211,6 +237,19 @@ void Game::render() {
         cam.lookAtZ,    // LookAt Z
         cam.upX, cam.upY, cam.upZ         // Up Vector
     );
+
+    GLfloat pos0[] = { cam.posX, cam.posY, cam.posZ, 1.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, pos0);
+
+    // white diffuse + specular
+    GLfloat diff0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat spec0[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diff0);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
+
+    // no ambient on the camera light
+    GLfloat amb0[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    glLightfv(GL_LIGHT0, GL_AMBIENT, amb0);
 
     // Render game elements
     game.getMap()->render(false);

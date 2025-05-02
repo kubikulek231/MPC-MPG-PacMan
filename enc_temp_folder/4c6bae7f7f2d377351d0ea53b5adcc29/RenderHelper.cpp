@@ -3,15 +3,13 @@
 void RenderHelper::renderBox(float x0, float x1,
     float y0, float y1,
     float z0, float z1,
-    bool frontInward, bool backInward,
-    bool leftInward, bool rightInward,
-    bool topInward, bool bottomInward)
+    bool inwardNormals)
 {
     glBegin(GL_QUADS);
 
     // Front face (+Z)
-    glNormal3f(0, 0, frontInward ? -1 : 1);
-    if (!frontInward) {
+    glNormal3f(0, 0, inwardNormals ? -1 : 1);
+    if (!inwardNormals) {
         glVertex3f(x0, y0, z1);
         glVertex3f(x1, y0, z1);
         glVertex3f(x1, y1, z1);
@@ -25,8 +23,8 @@ void RenderHelper::renderBox(float x0, float x1,
     }
 
     // Back face (-Z)
-    glNormal3f(0, 0, backInward ? 1 : -1);
-    if (!backInward) {
+    glNormal3f(0, 0, inwardNormals ? 1 : -1);
+    if (!inwardNormals) {
         glVertex3f(x1, y0, z0);
         glVertex3f(x0, y0, z0);
         glVertex3f(x0, y1, z0);
@@ -40,8 +38,8 @@ void RenderHelper::renderBox(float x0, float x1,
     }
 
     // Left face (-X)
-    glNormal3f(leftInward ? 1 : -1, 0, 0);
-    if (!leftInward) {
+    glNormal3f(inwardNormals ? 1 : -1, 0, 0);
+    if (!inwardNormals) {
         glVertex3f(x0, y0, z0);
         glVertex3f(x0, y0, z1);
         glVertex3f(x0, y1, z1);
@@ -55,8 +53,8 @@ void RenderHelper::renderBox(float x0, float x1,
     }
 
     // Right face (+X)
-    glNormal3f(rightInward ? -1 : 1, 0, 0);
-    if (!rightInward) {
+    glNormal3f(inwardNormals ? -1 : 1, 0, 0);
+    if (!inwardNormals) {
         glVertex3f(x1, y0, z1);
         glVertex3f(x1, y0, z0);
         glVertex3f(x1, y1, z0);
@@ -70,8 +68,8 @@ void RenderHelper::renderBox(float x0, float x1,
     }
 
     // Top face (+Y)
-    glNormal3f(0, topInward ? -1 : 1, 0);
-    if (!topInward) {
+    glNormal3f(0, inwardNormals ? -1 : 1, 0);
+    if (!inwardNormals) {
         glVertex3f(x0, y1, z1);
         glVertex3f(x1, y1, z1);
         glVertex3f(x1, y1, z0);
@@ -85,8 +83,8 @@ void RenderHelper::renderBox(float x0, float x1,
     }
 
     // Bottom face (-Y)
-    glNormal3f(0, bottomInward ? 1 : -1, 0);
-    if (!bottomInward) {
+    glNormal3f(0, inwardNormals ? 1 : -1, 0);
+    if (!inwardNormals) {
         glVertex3f(x0, y0, z0);
         glVertex3f(x1, y0, z0);
         glVertex3f(x1, y0, z1);
@@ -101,7 +99,6 @@ void RenderHelper::renderBox(float x0, float x1,
 
     glEnd();
 }
-
 
 // Renders inner rounded corner with cap on top
 void RenderHelper::renderInnerRoundedCorner(float r, float height,

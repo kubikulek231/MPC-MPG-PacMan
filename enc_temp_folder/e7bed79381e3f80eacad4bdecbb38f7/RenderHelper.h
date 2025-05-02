@@ -13,10 +13,7 @@ public:
         int segs);
    static void renderBox(float x0, float x1,
        float y0, float y1,
-       float z0, float z1,
-       bool frontInward = false, bool backInward = false,
-       bool leftInward = false, bool rightInward = false,
-       bool topInward = false, bool bottomInward = false);
+       float z0, float z1, bool inwardNormals = false);
    static void renderOuterRoundedCorner(float radius, float height,
        float startAngle, float endAngle,
        int segs);

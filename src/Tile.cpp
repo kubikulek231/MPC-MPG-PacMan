@@ -103,6 +103,7 @@ void Tile::renderEmpty() const {
 	glColor3f(0.2f, 0.2f, 0.2f); // Dark gray for floor
 
 	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0); // Up-facing surface
 	glVertex3f(abb.min.x, abb.min.y, abb.min.z);
 	glVertex3f(abb.max.x, abb.min.y, abb.min.z);
 	glVertex3f(abb.max.x, abb.min.y, abb.max.z);

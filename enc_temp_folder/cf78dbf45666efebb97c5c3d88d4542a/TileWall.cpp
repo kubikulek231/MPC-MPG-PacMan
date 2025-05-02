@@ -273,11 +273,9 @@ void TileWall::renderWallInnerTopLeft() const {
     glPushMatrix();
     glTranslatef(bb.min.x, 0.0f, bb.min.z);
     // Brick strip along X (horizontal bar)
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
-        true, true, true, true, false, false); // Adjusted normals for the horizontal strip
+    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f);
     // Brick strip along Z (vertical bar)
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the vertical strip
+    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, wall, 0.0f);
     glPopMatrix();
 }
 
@@ -302,11 +300,9 @@ void TileWall::renderWallInnerTopRight() const {
     glPushMatrix();
     glTranslatef(bb.max.x, 0.0f, bb.min.z);
     // Horizontal strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the horizontal strip
+    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f);
     // Vertical strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the vertical strip
+    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, wall, 0.0f);
     glPopMatrix();
 }
 
@@ -331,13 +327,9 @@ void TileWall::renderWallInnerBottomLeft() const {
     glPushMatrix();
     glTranslatef(bb.min.x, 0.0f, bb.max.z);
     // Horizontal strip
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f,
-        true, true, true, true, false, false); // Adjusted normals for the horizontal strip
-
+    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f);
     // Vertical strip
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f,
-        true, false, true, true, false, false); // Adjusted normals for the vertical strip
-
+    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f);
     glPopMatrix();
 }
 
@@ -362,11 +354,9 @@ void TileWall::renderWallInnerBottomRight() const {
     glPushMatrix();
     glTranslatef(bb.max.x, 0.0f, bb.max.z);
     // Horizontal strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f,
-        false, false, false, false, false, false); // Adjusted normals for the horizontal strip
+    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f);
     // Vertical strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f,
-        true, false, true, true, false, false); // Adjusted normals for the vertical strip
+    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, -wall, 0.0f);
     glPopMatrix();
 }
 

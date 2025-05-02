@@ -38,6 +38,7 @@ public:
     void setMoveSpeed(float speed);
     float getMoveSpeed() const;
     void setDirChangeRequestExpireAfterMs(uint64_t expireAfter) { this->dirChangeRequestExpireAfterMs = expireAfter; }
+    float getMoveDirRotationAngle() const;
 
 protected:
     // === State ===

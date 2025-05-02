@@ -16,12 +16,17 @@ private:
     float playerBodyColorRed = 1.0f;
     float playerBodyColorGreen = 1.0f;
     float playerBodyColorBlue = 0.0f;
+    
+    float playerAnimationState = 0.0f;
+    bool playerMouthOpening = true;
+    bool playerMouthClosing = false;
 
     Point3D lastOrigin;
     SpeedoMeter speedoMeter = SpeedoMeter(20);
 
     uint64_t blinkDurationMs;
     uint64_t invincibleEndTimeAfterMs;
+    void animate(float frameTimeMs, bool keepAnimating);
 public:
     static constexpr float DEFAULT_SPEED = 4.0f;
     static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;

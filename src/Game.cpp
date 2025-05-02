@@ -11,8 +11,6 @@
 #include <string>      
 #include <vector>      
 
-#define PI 3.14159265358979323846f
-
 // Global wrapper functions to be passed to GLUT
 static void keyboardCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboard(tolower(key), x, y); }
 static void keyboardUpCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboardUp(tolower(key), x, y); }

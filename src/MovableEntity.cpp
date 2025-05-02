@@ -99,6 +99,13 @@ bool MovableEntity::move(MoveDir requestedMoveDir, bool& isNewRequest, float fra
 float MovableEntity::getMoveSpeed() const { return speed; }
 void MovableEntity::setMoveSpeed(float speed) { this->speed = speed; }
 
+float MovableEntity::getMoveDirRotationAngle() const {
+    if (moveDir == MoveDir::FWD) { return 0.0f; }
+    if (moveDir == MoveDir::BWD) { return 180.0f; }
+    if (moveDir == MoveDir::LEFT) { return 90.0f; }
+    if (moveDir == MoveDir::RIGHT) { return 270.0f; }
+    return 0.0f; // Default
+}
 
 // === Direction Change Management ===
 void MovableEntity::createDirChangeRequest(MoveDir moveDir, float expireAfterMs, bool expire) {

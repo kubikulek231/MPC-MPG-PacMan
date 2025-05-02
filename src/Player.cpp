@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 #include <chrono>
 #include <iostream>
+#include "Pi.h"
 
 using namespace std::chrono;
 
@@ -32,14 +33,50 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
 }
 
 void Player::render() {
-    glColor3f(playerBodyColorRed, playerBodyColorGreen, playerBodyColorBlue);
-
+    glColor3f(playerBodyColorRed,
+        playerBodyColorGreen,
+        playerBodyColorBlue);
     glPushMatrix();
+    Point3D c = getAbsoluteCenterPoint();
+    glTranslatef(c.x, c.y, c.z);
+    
+    // Handle moveDir rotation
+    glRotatef(getMoveDirRotationAngle(), 0.0f, 1.0f, 0.0f);
 
-    Point3D centerPoint = getAbsoluteCenterPoint();
-    // Sphere is defined by center point, so needs to be translated
-    glTranslatef(centerPoint.x, centerPoint.y, centerPoint.z);
-    glutSolidSphere(0.5f, 16, 16);
+    // Rotate 90 degrees in Z axis
+    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+
+    // Handle mouth opening
+    // 0.0f degrees -> open
+    // 30.0f degrees -> closed
+    float mouthDegrees = 30.0f * playerAnimationState;
+    float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
+    float half = inverseMouthDegrees * (PI / 180.0f);
+    GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
+    GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
+
+    glClipPlane(GL_CLIP_PLANE0, eq0);
+    glEnable(GL_CLIP_PLANE0);
+    glDisable(GL_CLIP_PLANE1);
+    glutSolidSphere(0.75f, 32, 32);
+    glDisable(GL_CLIP_PLANE0);
+
+    glClipPlane(GL_CLIP_PLANE1, eq1);
+    glEnable(GL_CLIP_PLANE1);
+    glutSolidSphere(0.75f, 32, 32);
+    glDisable(GL_CLIP_PLANE1);
+
+    GLUquadric* disk = gluNewQuadric();
+    glDisable(GL_CULL_FACE);
+    glPushMatrix();
+    glRotatef(inverseMouthDegrees, 0, 1, 0);
+    gluDisk(disk, 0.0, 0.75, 32, 1);
+    glPopMatrix();
+    glPushMatrix();
+    glRotatef(-inverseMouthDegrees, 0, 1, 0);
+    gluDisk(disk, 0.0, 0.75, 32, 1);
+    glPopMatrix();
+    gluDeleteQuadric(disk);
 
     glPopMatrix();
 
@@ -51,6 +88,15 @@ void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeM
     // Handle movement and teleportation
     this->MovableEntity::move(requestedMoveDir, isNewRequest, frameTimeMs);
     this->teleport(moveDir);
+    
+    if (moveDir == MoveDir::UNDEFINED || moveDir == MoveDir::NONE) { return; }
+
+    auto tiles = intersectingTiles(this);
+    Tile* tileCurrent = !tiles.empty() ? currentTile(tiles) : nullptr;
+    Tile* nextTileInDir = tileCurrent != nullptr ? nextTileInDirection(moveDir, tileCurrent) : nullptr;
+    bool isPelletNext = nextTileInDir != nullptr && nextTileInDir->getTileType() == TileType::PELLET;
+
+    animate(frameTimeMs, isPelletNext);
 
     //float newDistance = this->origin.distanceTo2D(this->lastOrigin);
     //if (speedoMeter.update(newDistance, 20)) { std::cout << "Move distance: " << speedoMeter.getAverage() << std::endl; }
@@ -76,6 +122,40 @@ void Player::update(int& totalCollectedPellets) {
         }
         if (invincibleBlink) { playerBodyColorBlue = 1.0f; }
         else { playerBodyColorBlue = 0.0f; }
+    }
+}
+
+void Player::animate(float frameTimeMs, bool keepAnimating) {
+    if (!playerMouthOpening && !playerMouthClosing)
+        return;
+
+    // dt in seconds
+    float dt = frameTimeMs;
+
+    float baseSpeed = speed * 2.0f;            // e.g. speed = 1.0f means 1.0 per second
+
+    const float minFactor = 0.3f;       // never go slower than 30%
+    float f = sinf(PI * playerAnimationState);
+    float easeFactor = minFactor + (1.0f - minFactor) * f;
+
+    // final delta
+    float dstate = baseSpeed * dt * easeFactor;
+
+    // apply to opening / closing
+    if (playerMouthOpening) {
+        playerAnimationState = std::min(playerAnimationState + dstate, 1.0f);
+        if (playerAnimationState >= 1.0f) {
+            playerMouthOpening = false;
+            playerMouthClosing = true;
+        }
+        return;
+    }
+
+    // closing
+    playerAnimationState = std::max(playerAnimationState - dstate, 0.0f);
+    if (playerAnimationState <= 0.0f && keepAnimating) {
+        playerMouthOpening = true;
+        playerMouthClosing = false;
     }
 }
 

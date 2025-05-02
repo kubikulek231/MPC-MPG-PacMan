@@ -111,20 +111,6 @@ void Tile::renderEmpty() const {
 	glEnd();
 }
 
-void Tile::renderWall() const {
-	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	glColor3f(0.3f, 0.3f, 1.0f); // Blue for wall
-
-	float centerX = (abb.min.x + abb.max.x) / 2.0f;
-	float centerY = (abb.min.y + abb.max.y) / 2.0f;
-	float centerZ = (abb.min.z + abb.max.z) / 2.0f;
-
-	glPushMatrix();
-	glTranslatef(centerX, centerY, centerZ);
-	glutSolidCube(MapFactory::TILE_SIZE);
-	glPopMatrix();
-}
-
 void Tile::renderPellet() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
 	glColor3f(1.0f, 0.5f, 0.0f); // Orange for pellet

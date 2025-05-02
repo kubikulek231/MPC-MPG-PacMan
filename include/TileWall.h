@@ -30,7 +30,7 @@ class TileWall : public Tile {
     static constexpr float GAP_FRAC = (MapFactory::TILE_SIZE - WALL_THICKNESS_FRAC) * 0.5f;
     static constexpr float INNER_RADIUS_FRAC = 0.3f;
     static constexpr int   CYLINDER_SEGMENTS = 16;
-    static constexpr float WALL_COLOR[3] = { 0.3f, 0.3f, 1.0f };
+    static constexpr float WALL_COLOR[3] = { 0.0f, 0.3f, 0.6f };
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;
@@ -48,6 +48,8 @@ private:
     void renderWallInnerBottomRight() const;
     void setWallTypeStraight();
     void setWallTypeOuterCorners();
+    void setWallLighting(const GLfloat* wallColor) const;
+    void resetWallLighting() const;
 
 public:
     TileWall(WallType wallType, TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);

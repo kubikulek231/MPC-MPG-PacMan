@@ -25,16 +25,15 @@ void Game::init() {
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-    GLfloat light_position[] = { 0.0f, 5.0f, 10.0f, 1.0f }; // positional light
     GLfloat ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
     GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
     GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
@@ -42,12 +41,13 @@ void Game::init() {
     glEnable(GL_NORMALIZE);
     glShadeModel(GL_SMOOTH);
 
-    // set a global ambient (dim) so that un-lit surfaces aren’t pure black
-    GLfloat globalAmbient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
-
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    // very low attenuation = wide soft light
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5f);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.05f);
 
     // Register mouse callback functions
     glutMouseFunc(mouseButtonCallback);
@@ -220,6 +220,18 @@ void Game::update(int value) {
     glutTimerFunc(8, Game::update, 0);
 }
 
+struct Vec3 {
+    float x, y, z;
+    Vec3() : x(0), y(0), z(0) {}
+    Vec3(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
+    Vec3 operator-(const Vec3& o) const { return Vec3(x - o.x, y - o.y, z - o.z); }
+    Vec3& normalize() {
+        float len = sqrtf(x*x + y*y + z*z);
+        if (len > 1e-6f) { x /= len; y /= len; z /= len; }
+        return *this;
+    }
+};
+
 void Game::render() {
     Game& game = Game::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
@@ -238,18 +250,13 @@ void Game::render() {
         cam.upX, cam.upY, cam.upZ         // Up Vector
     );
 
-    GLfloat pos0[] = { cam.posX, cam.posY, cam.posZ, 1.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, pos0);
-
-    // white diffuse + specular
-    GLfloat diff0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat spec0[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diff0);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
-
-    // no ambient on the camera light
-    GLfloat amb0[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, amb0);
+    float fx = cam.lookAtX - cam.posX;
+    float fy = cam.lookAtY - cam.posY;
+    float fz = cam.lookAtZ - cam.posZ;
+    float len = sqrtf(fx * fx + fy * fy + fz * fz);
+    if (len > 1e-6f) { fx /= len; fy /= len; fz /= len; }
+    GLfloat headDir[] = { -fx, -fy, -fz, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, headDir);
 
     // Render game elements
     game.getMap()->render(false);

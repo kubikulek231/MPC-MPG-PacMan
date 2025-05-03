@@ -233,6 +233,10 @@ struct Vec3 {
 };
 
 void Game::render() {
+    // Enable anti-aliasing (multisampling)
+    glEnable(GL_MULTISAMPLE);
+
+
     Game& game = Game::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
     CameraGlu cam = gcam.getCameraGLU();

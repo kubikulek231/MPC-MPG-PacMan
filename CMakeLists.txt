@@ -74,7 +74,7 @@ file(GLOB HEADERS "include/*.h")
 add_executable(MPG-PacMan ${SOURCES} ${HEADERS} "include/RenderHelper.h" "src/RenderHelper.cpp" "include/Pi.h")
 
 # Link Freeglut, glft2_lib to the main program
-target_link_libraries(MPG-PacMan glft2_lib "${GLUT_LIB_DIR}/freeglut.lib")
+target_link_libraries(MPG-PacMan glft2_lib "${GLUT_LIB_DIR}/freeglut.lib" "${GLUT_LIB_DIR}/glew32.lib" "${GLUT_LIB_DIR}/glfw3dll.lib")
 
 # Message for binary directory
 message(STATUS "CMake binary directory: ${CMAKE_BINARY_DIR}")
@@ -83,6 +83,20 @@ message(STATUS "CMake binary directory: ${CMAKE_BINARY_DIR}")
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${GLUT_DLL_DIR}/freeglut.dll"
+    ${CMAKE_BINARY_DIR}
+)
+
+# Copy glew32.dll to the output directory
+add_custom_command(TARGET MPG-PacMan POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${GLUT_DLL_DIR}/glew32.dll"
+    ${CMAKE_BINARY_DIR}
+)
+
+# Copy glfw3dll.dll to the output directory
+add_custom_command(TARGET MPG-PacMan POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${GLUT_DLL_DIR}/glfw3dll.dll"
     ${CMAKE_BINARY_DIR}
 )
 

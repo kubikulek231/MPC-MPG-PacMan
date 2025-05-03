@@ -213,8 +213,6 @@ void GameMenu::render() {
         entries[i].updateXY(currentX, currentY);
         entries[i].render();
     }
-
-    glEnable(GL_LIGHTING);
 }
 
 void GameMenu::renderMenuBackground() {

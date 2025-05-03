@@ -1,5 +1,5 @@
 #include "RenderHelper.h"
-#include "LightingHelper.h"
+#include "GameLighting.h"
 #include "TileWall.h"
 #include <cmath>
 

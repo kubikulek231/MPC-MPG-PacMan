@@ -6,6 +6,7 @@
 #include "GameLogic.h"
 #include "GameCamera.h"
 #include "GameMenu.h"
+#include "GameLighting.h"
 #include "math.h"
 #include <sstream>     
 #include <string>      
@@ -20,35 +21,6 @@ static void mouseMotionCallback(int x, int y) { GameUserInput::getInstance().mou
 
 // Inits new game
 void Game::init() {
-    // turn on the whole lighting system
-    glEnable(GL_LIGHTING);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    GLfloat ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-
-    glEnable(GL_NORMALIZE);
-    glShadeModel(GL_SMOOTH);
-
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // very low attenuation = wide soft light
-    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f);
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5f);
-    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.05f);
-
     // Register mouse callback functions
     glutMouseFunc(mouseButtonCallback);
     glutPassiveMotionFunc(mouseMotionCallback);
@@ -56,16 +28,41 @@ void Game::init() {
     glutKeyboardFunc(keyboardCallback);
     glutKeyboardUpFunc(keyboardUpCallback);
 
-    currentLevel = 0;
-    playerLives = 3;
+    // Enable anti-aliasing (multisampling)
+    glEnable(GL_MULTISAMPLE);
 
     gameFont.init("assets/fonts/Roboto-Regular.ttf", 128);
     menuFont.init("assets/fonts/Roboto-Regular.ttf", 72);
+
+    // After creating your window, but before setting the projection:
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    if (h == 0) h = 1;  // guard against divide-by-zero
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(
+        45.0,               // vertical FOV in degrees
+        (double)w / (double)h,
+        0.1,                // near clip plane
+        1000.0              // far clip plane
+    );
+    glMatrixMode(GL_MODELVIEW);
+
+
     Game::initLevel();
     Game& game = getInstance();
     glft2::font_data font = game.getMenuFont();
+
+    currentLevel = 0;
+    playerLives = 3;
+
     // Preload main menu
     game.gameMenu.initMainMenu();
+
+    glDisable(GL_CULL_FACE);
+
+    GameLighting::init();
 }
 
 void Game::initLevel(int level) {
@@ -233,16 +230,16 @@ struct Vec3 {
 };
 
 void Game::render() {
-    // Enable anti-aliasing (multisampling)
-    glEnable(GL_MULTISAMPLE);
-
-
     Game& game = Game::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
     CameraGlu cam = gcam.getCameraGLU();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    glDisable(GL_CULL_FACE);
 
     gluLookAt(
         cam.posX,       // Camera Position X
@@ -254,13 +251,33 @@ void Game::render() {
         cam.upX, cam.upY, cam.upZ         // Up Vector
     );
 
-    float fx = cam.lookAtX - cam.posX;
-    float fy = cam.lookAtY - cam.posY;
-    float fz = cam.lookAtZ - cam.posZ;
-    float len = sqrtf(fx * fx + fy * fy + fz * fz);
-    if (len > 1e-6f) { fx /= len; fy /= len; fz /= len; }
-    GLfloat headDir[] = { -fx, -fy, -fz, 0.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, headDir);
+    GLfloat clPos[4] = { cam.posX, cam.posY, cam.posZ, 1.0f };
+
+    GLfloat clDir[3] = {
+        cam.lookAtX - cam.posX,
+        cam.lookAtY - cam.posY,
+        cam.lookAtZ - cam.posZ
+    };
+
+    // Normalize the direction
+    float len = sqrt(clDir[0] * clDir[0] + clDir[1] * clDir[1] + clDir[2] * clDir[2]);
+    if (len > 0.0001f) {
+        clDir[0] /= len;
+        clDir[1] /= len;
+        clDir[2] /= len;
+    }
+
+    GameLighting::updateCameraLight(clPos, clDir);
+
+    glDisable(GL_COLOR_MATERIAL);    // ensure pure materials
+
+    // Set up a simple shaded material
+    GLfloat amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat dif[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dif);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, amb); // or zero if you don’t want highlights
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
 
     // Render game elements
     game.getMap()->render(false);
@@ -295,12 +312,12 @@ void Game::reshape(int w, int h) {
         return;
     }
 
-    // Normal viewport/projection setup
+    if (h == 0) h = 1;
     glViewport(0, 0, w, h);
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, float(w) / float(h), 0.1, 100.0);
+    gluPerspective(45.0, (double)w / h, 0.1, 1000.0);
+    glMatrixMode(GL_MODELVIEW);
 
     glMatrixMode(GL_MODELVIEW);
 }

@@ -1,7 +1,7 @@
 #include "TileWall.h"
 #include "MapFactory.h"
 #include "RenderHelper.h"
-#include "LightingHelper.h"
+#include "GameLighting.h"
 #include "Pi.h"
 
 TileWall::TileWall(WallType wallType,
@@ -81,14 +81,14 @@ void TileWall::renderWallBlock() const {
     float centerY = (abb.min.y + abb.max.y) / 2.0f;
     float centerZ = (abb.min.z + abb.max.z) / 2.0f;
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, centerY, centerZ);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallLeft() const {
@@ -103,7 +103,7 @@ void TileWall::renderWallLeft() const {
     // shift left by GAP so the wall hugs the left edge
     float centerX = (abb.min.x + abb.max.x) * 0.5f - gap;
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
@@ -111,7 +111,7 @@ void TileWall::renderWallLeft() const {
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallRight() const {
@@ -125,7 +125,7 @@ void TileWall::renderWallRight() const {
     // shift right by GAP
     float centerX = (abb.min.x + abb.max.x) * 0.5f + gap;
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
@@ -133,7 +133,7 @@ void TileWall::renderWallRight() const {
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallTop() const {
@@ -146,7 +146,7 @@ void TileWall::renderWallTop() const {
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f + gap;
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
@@ -154,7 +154,7 @@ void TileWall::renderWallTop() const {
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallBottom() const {
@@ -167,7 +167,7 @@ void TileWall::renderWallBottom() const {
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f - gap;
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
@@ -175,7 +175,7 @@ void TileWall::renderWallBottom() const {
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerTopLeft() const {
@@ -194,7 +194,7 @@ void TileWall::renderWallCornerTopLeft() const {
 
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -202,7 +202,7 @@ void TileWall::renderWallCornerTopLeft() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerTopRight() const {
@@ -221,14 +221,14 @@ void TileWall::renderWallCornerTopRight() const {
 
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerBottomLeft() const {
@@ -247,7 +247,7 @@ void TileWall::renderWallCornerBottomLeft() const {
 
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -255,7 +255,7 @@ void TileWall::renderWallCornerBottomLeft() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerBottomRight() const {
@@ -274,7 +274,7 @@ void TileWall::renderWallCornerBottomRight() const {
 
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -282,7 +282,7 @@ void TileWall::renderWallCornerBottomRight() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 // ------ inner-corner renders ------
@@ -300,7 +300,7 @@ void TileWall::renderWallInnerTopLeft() const {
     glDisable(GL_CULL_FACE);
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
@@ -319,7 +319,7 @@ void TileWall::renderWallInnerTopLeft() const {
         true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerTopRight() const {
@@ -335,7 +335,7 @@ void TileWall::renderWallInnerTopRight() const {
     glDisable(GL_CULL_FACE);
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
@@ -352,7 +352,7 @@ void TileWall::renderWallInnerTopRight() const {
         true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerBottomLeft() const {
@@ -368,7 +368,7 @@ void TileWall::renderWallInnerBottomLeft() const {
     glDisable(GL_CULL_FACE);
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -386,7 +386,7 @@ void TileWall::renderWallInnerBottomLeft() const {
             true, false, true, true, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerBottomRight() const {
@@ -402,7 +402,7 @@ void TileWall::renderWallInnerBottomRight() const {
     glDisable(GL_CULL_FACE);
     glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -419,7 +419,7 @@ void TileWall::renderWallInnerBottomRight() const {
             true, false, true, true, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::setWallTypeStraight() {

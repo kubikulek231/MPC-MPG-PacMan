@@ -4,7 +4,7 @@
 #include "gl_includes.h"
 #include "Tile.h"
 #include "MapFactory.h"
-#include "LightingHelper.h"
+#include "GameLighting.h"
 
 enum class WallType {
     BLOCK = 0,              // Full wall block
@@ -35,10 +35,10 @@ public:
 
     static constexpr float COLOR[3] = { 0.0f, 0.3f, 0.6f };
     static constexpr GLfloat LIGHT_AMBIENT[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    static constexpr GLfloat LIGHT_SPECULAR[4] = { 0.0f, 0.3f, 0.6f, 1.0f };
-    static constexpr GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.3f, 0.6f, 1.0f };
+    static constexpr GLfloat LIGHT_SPECULAR[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    static constexpr GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     static constexpr GLfloat LIGHT_DIFFUSE[4] = { 0.0f, 0.3f, 0.6f, 1.0f };
-    static constexpr float LIGHT_SHININESS = 32.0f;
+    static constexpr float LIGHT_SHININESS = 128.0f;
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;

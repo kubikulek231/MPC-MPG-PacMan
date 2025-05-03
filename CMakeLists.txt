@@ -71,7 +71,7 @@ file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h")
 
 # Add executable
-add_executable(MPG-PacMan ${SOURCES} ${HEADERS} "include/RenderHelper.h" "src/RenderHelper.cpp" "include/Pi.h" "include/LightingHelper.h" "src/LightingHelper.cpp")
+add_executable(MPG-PacMan ${SOURCES} ${HEADERS} "include/RenderHelper.h" "src/RenderHelper.cpp" "include/Pi.h" "include/GameLighting.h" "src/GameLighting.cpp")
 
 # Link Freeglut, glft2_lib to the main program
 target_link_libraries(MPG-PacMan glft2_lib "${GLUT_LIB_DIR}/freeglut.lib" "${GLUT_LIB_DIR}/glew32.lib" "${GLUT_LIB_DIR}/glfw3dll.lib")

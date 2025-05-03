@@ -1,6 +1,7 @@
 #include "TileWall.h"
 #include "MapFactory.h"
 #include "RenderHelper.h"
+#include "LightingHelper.h"
 #include "Pi.h"
 
 TileWall::TileWall(WallType wallType,
@@ -67,43 +68,6 @@ void TileWall::render() const {
     }
 }
 
-void TileWall::setWallLighting(const GLfloat* wallColor) const {
-    // Material properties (includes emissive for glow effect)
-    GLfloat ambient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    GLfloat diffuse[] = { wallColor[0], wallColor[1], wallColor[2], 1.0f };
-    GLfloat specular[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-
-    // Strong emissive glow based on color
-    GLfloat emission[] = {
-        wallColor[0] * 0.5f,
-        wallColor[1] * 0.5f,
-        wallColor[2] * 0.5f,
-        1.0f
-    };
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0f);
-}
-
-void TileWall::resetWallLighting() const {
-    // Reset all material properties after rendering
-    static const GLfloat noEmission[] = { 0.f, 0.f, 0.f, 1.f };
-    static const GLfloat noAmbient[] = { 0.f, 0.f, 0.f, 1.f };
-    static const GLfloat noDiffuse[] = { 0.f, 0.f, 0.f, 1.f };
-    static const GLfloat noSpecular[] = { 0.f, 0.f, 0.f, 1.f };
-
-    // Reset material properties to default (no glow, no lighting)
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, noAmbient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, noDiffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, noSpecular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, noEmission);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
-}
-
-
 void TileWall::setWallTypeByNeighbors() {
     setWallTypeStraight();
     setWallTypeOuterCorners();
@@ -111,48 +75,48 @@ void TileWall::setWallTypeByNeighbors() {
 
 void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]); // Blue for wall
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]); // Blue for wall
 
     float centerX = (abb.min.x + abb.max.x) / 2.0f;
     float centerY = (abb.min.y + abb.max.y) / 2.0f;
     float centerZ = (abb.min.z + abb.max.z) / 2.0f;
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, centerY, centerZ);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallLeft() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
     float gap = MapFactory::TILE_SIZE * GAP_FRAC;
-    float thickness = MapFactory::TILE_SIZE * WALL_THICKNESS_FRAC;
+    float thickness = MapFactory::TILE_SIZE * THICKNESS_FRAC;
 
     // shift left by GAP so the wall hugs the left edge
     float centerX = (abb.min.x + abb.max.x) * 0.5f - gap;
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
-        glScalef(WALL_THICKNESS_FRAC, 1.0f, 1.0f);
+        glScalef(THICKNESS_FRAC, 1.0f, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallRight() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
@@ -161,20 +125,20 @@ void TileWall::renderWallRight() const {
     // shift right by GAP
     float centerX = (abb.min.x + abb.max.x) * 0.5f + gap;
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
-        glScalef(WALL_THICKNESS_FRAC, 1.0f, 1.0f);
+        glScalef(THICKNESS_FRAC, 1.0f, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallTop() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -182,20 +146,20 @@ void TileWall::renderWallTop() const {
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f + gap;
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
-        glScalef(1.0f, 1.0f, WALL_THICKNESS_FRAC);
+        glScalef(1.0f, 1.0f, THICKNESS_FRAC);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallBottom() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -203,15 +167,15 @@ void TileWall::renderWallBottom() const {
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f - gap;
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
-        glScalef(1.0f, 1.0f, WALL_THICKNESS_FRAC);
+        glScalef(1.0f, 1.0f, THICKNESS_FRAC);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerTopLeft() const {
@@ -222,15 +186,15 @@ void TileWall::renderWallCornerTopLeft() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float w = WALL_THICKNESS_FRAC;
+    float w = THICKNESS_FRAC;
 
     // position corner
     float cx = bb.min.x + (w - r);
     float cz = bb.min.z + (w - r);
 
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -238,7 +202,7 @@ void TileWall::renderWallCornerTopLeft() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerTopRight() const {
@@ -249,22 +213,22 @@ void TileWall::renderWallCornerTopRight() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float w = WALL_THICKNESS_FRAC;
+    float w = THICKNESS_FRAC;
 
     // position corner at top-right inside corner
     float cx = bb.max.x - (w - r);
     float cz = bb.min.z + (w - r);
 
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerBottomLeft() const {
@@ -275,15 +239,15 @@ void TileWall::renderWallCornerBottomLeft() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float w = WALL_THICKNESS_FRAC;
+    float w = THICKNESS_FRAC;
 
     // position corner at bottom-left inside corner
     float cx = bb.min.x + (w - r);
     float cz = bb.max.z - (w - r);
 
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -291,7 +255,7 @@ void TileWall::renderWallCornerBottomLeft() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallCornerBottomRight() const {
@@ -302,15 +266,15 @@ void TileWall::renderWallCornerBottomRight() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float w = WALL_THICKNESS_FRAC;
+    float w = THICKNESS_FRAC;
 
     // position corner at bottom-right inside corner
     float cx = bb.max.x - (w - r);
     float cz = bb.max.z - (w - r);
 
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -318,7 +282,7 @@ void TileWall::renderWallCornerBottomRight() const {
         RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 // ------ inner-corner renders ------
@@ -327,16 +291,16 @@ void TileWall::renderWallInnerTopLeft() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float wall = WALL_THICKNESS_FRAC;
+    float wall = THICKNESS_FRAC;
 
     // place cylinder exactly in tile corner
     float cx = bb.min.x + (wall + r);
     float cz = bb.max.z - (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
@@ -355,7 +319,7 @@ void TileWall::renderWallInnerTopLeft() const {
         true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerTopRight() const {
@@ -363,15 +327,15 @@ void TileWall::renderWallInnerTopRight() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float wall = WALL_THICKNESS_FRAC;
+    float wall = THICKNESS_FRAC;
 
     float cx = bb.max.x - (wall + r);
     float cz = bb.max.z - (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
     glTranslatef(cx, halfY, cz);
@@ -388,7 +352,7 @@ void TileWall::renderWallInnerTopRight() const {
         true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerBottomLeft() const {
@@ -396,15 +360,15 @@ void TileWall::renderWallInnerBottomLeft() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float wall = WALL_THICKNESS_FRAC;
+    float wall = THICKNESS_FRAC;
 
     float cx = bb.min.x + (wall + r);
     float cz = bb.min.z + (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -422,7 +386,7 @@ void TileWall::renderWallInnerBottomLeft() const {
             true, false, true, true, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::renderWallInnerBottomRight() const {
@@ -430,15 +394,15 @@ void TileWall::renderWallInnerBottomRight() const {
     float halfY = (bb.min.y + bb.max.y) * 0.5f;
     float tileH = bb.max.y - bb.min.y;
     float r = INNER_RADIUS_FRAC;
-    float wall = WALL_THICKNESS_FRAC;
+    float wall = THICKNESS_FRAC;
 
     float cx = bb.max.x - (wall + r);
     float cz = bb.min.z + (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(WALL_COLOR[0], WALL_COLOR[1], WALL_COLOR[2]);
+    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
-    setWallLighting(WALL_COLOR);
+    LightingHelper::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(cx, halfY, cz);
@@ -455,7 +419,7 @@ void TileWall::renderWallInnerBottomRight() const {
             true, false, true, true, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
-    resetWallLighting();
+    LightingHelper::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void TileWall::setWallTypeStraight() {

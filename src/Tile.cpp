@@ -124,10 +124,10 @@ void Tile::renderEmpty() const {
 void Tile::renderPellet() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
 	GLfloat LIGHT_AMBIENT[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	GLfloat LIGHT_DIFFUSE[4] = { 1.0f, 0.3f, 0.0f, 1.0f };  // Orange
-	GLfloat LIGHT_SPECULAR[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
-	GLfloat LIGHT_EMISSION[4] = { 0.3f, 0.05f, 0.0f, 1.0f };  // No emission
-	GLfloat LIGHT_SHININESS = 128.0f;
+	GLfloat LIGHT_DIFFUSE[4] = { 0.8f, 0.3f, 0.0f, 1.0f };
+	GLfloat LIGHT_SPECULAR[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	GLfloat LIGHT_EMISSION[4] = { 0.3f, 0.05f, 0.0f, 1.0f };
+	GLfloat LIGHT_SHININESS = 32.0f;
 
 	float centerX = (abb.min.x + abb.max.x) / 2.0f;
 	float centerY = abb.min.y + MapFactory::TILE_SIZE / 2.0f;

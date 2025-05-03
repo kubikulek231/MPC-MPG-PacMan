@@ -46,7 +46,7 @@ void GameLighting::initSceneLight() {
 
     // Light color
     GLfloat ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat diffuse[] = { 0.6f, 0.6f, 0.6f, 1.0f };
     GLfloat specular[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
     // Spotlight settings
@@ -76,8 +76,8 @@ void GameLighting::initCameraLight() {
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 64.0f); // Sharper focus at center
 
     GLfloat amb[] = { 0.05f, 0.05f, 0.05f, 1.0f };  // Dim ambient to simulate focused light
-    GLfloat dif[] = { 0.9f, 0.9f, 0.8f, 1.0f };  // Bright diffuse
-    GLfloat spc[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // Sharp specular
+    GLfloat dif[] = { 0.1f, 0.1f, 0.1f, 1.0f };  // Bright diffuse
+    GLfloat spc[] = { 0.2f, 0.2f, 0.2f, 1.0f };  // Sharp specular
     glLightfv(GL_LIGHT1, GL_AMBIENT, amb);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, dif);
     glLightfv(GL_LIGHT1, GL_SPECULAR, spc);

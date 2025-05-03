@@ -46,7 +46,7 @@ void Player::render() {
 
     // Prepare lighting material (instead of glColor)
     GLfloat bodyAmbient[] = { playerBodyColorRed * 0.2f, playerBodyColorGreen * 0.2f, playerBodyColorBlue * 0.2f, 1.0f };
-    GLfloat bodyDiffuse[] = { playerBodyColorRed, playerBodyColorGreen, playerBodyColorBlue, 1.0f };
+    GLfloat bodyDiffuse[] = { playerBodyColorRed * 0.5f, playerBodyColorGreen * 0.5f, playerBodyColorBlue * 0.5f, 1.0f };
     GLfloat bodySpecular[] = { 0.4f, 0.4f, 0.4f, 1.0f };
     GLfloat bodyEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     GLfloat shininess = 32.0f;
@@ -116,13 +116,13 @@ void Player::render() {
     glEnable(GL_LIGHTING);
 
     // --- EYES & PUPILS ---
+    // Eye
     GLfloat eyeAmbient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
     GLfloat eyeDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White for the eyes
     GLfloat eyeSpecular[4] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Shiny eyes
     GLfloat eyeEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
     GLfloat eyeShininess = 128.0f;
 
-    // Eye
     auto drawEye = [](float tx, float ty, float tz, float rz, float ry) {
         glPushMatrix();
             glColor3f(1.0f, 1.0f, 1.0f);
@@ -134,13 +134,13 @@ void Player::render() {
         glPopMatrix();
         };
 
+    // Pupil
     GLfloat pupilAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black ambient
     GLfloat pupilDiffuse[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black diffuse
     GLfloat pupilSpecular[4] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Slightly shiny (small specular)
     GLfloat pupilEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
     GLfloat pupilShininess = 10.0f;  // Low shininess
 
-    // Pupil
     auto drawPupil = [](float tx, float ty, float tz, float rz, float ry) {
         glPushMatrix();
             glTranslatef(tx, ty, tz);

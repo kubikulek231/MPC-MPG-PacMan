@@ -5,6 +5,7 @@
 #include <iostream>
 #include <unordered_set>
 #include "RenderHelper.h"
+#include "GameLighting.h"
 #include "Pi.h"
 
 Ghost::Ghost() {
@@ -28,17 +29,24 @@ Ghost::Ghost(Map* map, Point3D ghostOrigin, BoundingBox3D ghostBoundingBox, std:
 }
 
 void Ghost::render() {
-    glColor3f(colorR, colorG, colorB);
+    GLfloat matAmbient[] = { colorR * 0.2f,  colorG * 0.2f,  colorB * 0.2f, 1.0f };
+    GLfloat matDiffuse[] = { colorR * 0.5f, colorG * 0.5f, colorB * 0.5f, 1.0f };
+    GLfloat matSpecular[] = { 0.05f, 0.05f, 0.05f, 1.0f };
+    GLfloat matEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat matShininess = 64.0f;
+
+    GameLighting::setMaterial( GL_FRONT_AND_BACK, matAmbient, matDiffuse, matSpecular, matEmission, matShininess);
+
     glPushMatrix();
-        Point3D centerPoint = getAbsoluteCenterPoint();
+    Point3D centerPoint = getAbsoluteCenterPoint();
 
-        // Translate before rotation
-        glTranslatef(centerPoint.x, centerPoint.y + 0.25, centerPoint.z);
+    // Translate before rotation
+    glTranslatef(centerPoint.x, centerPoint.y + 0.25, centerPoint.z);
 
-        glutSolidSphere(0.75f, 18, 18);
+    glutSolidSphere(0.75f, 18, 18);
 
-        // Skirt
-        glPushMatrix();
+    // Skirt
+    glPushMatrix();
         glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
 
@@ -95,68 +103,64 @@ void Ghost::render() {
             glVertex3f(x, y, 0.0f);
         }
         glEnd();
-        glPopMatrix();
+    glPopMatrix();
 
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 
-
+    glPushMatrix();
         // Rotate Ghost to face movement direction
         float moveDirAngle = getMoveDirRotationAngle();
         glRotatef(moveDirAngle, 0.0f, 1.0f, 0.0f);
 
         // Align Ghost vertically (facing direction)
         glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+        // --- EYES & PUPILS ---
+        // Eye
+        GLfloat eyeAmbient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+        GLfloat eyeDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White for the eyes
+        GLfloat eyeSpecular[4] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Shiny eyes
+        GLfloat eyeEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+        GLfloat eyeShininess = 128.0f;
 
-        // --- LEFT EYE
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glPushMatrix();
-            glTranslatef(0.54f, 0.27f, -0.41f);
+        auto drawEye = [](float tx, float ty, float tz, float rz, float ry) {
+            glPushMatrix();
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glTranslatef(tx, ty, tz);
+                glRotatef(rz, 0.0f, 0.0f, 1.0f);
+                glRotatef(ry, 0.0f, 1.0f, 0.0f);
+                glScalef(1.0f, 1.0f, 0.3f);
+                glutSolidSphere(0.20f, 12, 12);
+            glPopMatrix();
+            };
 
-            glRotatef(35.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-55.0f, 0.0f, 1.0f, 0.0f);
+        // Pupil
+        GLfloat pupilAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black ambient
+        GLfloat pupilDiffuse[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black diffuse
+        GLfloat pupilSpecular[4] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Slightly shiny (small specular)
+        GLfloat pupilEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+        GLfloat pupilShininess = 10.0f;  // Low shininess
 
-            glScalef(1.0f, 1.0f, 0.3f);
-
-            glutSolidSphere(0.20f, 12, 12);
-        glPopMatrix();
-
-        // LEFT PUPIL
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glPushMatrix();
-            glTranslatef(0.535f, 0.27f, -0.50f);
-
-            glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-44.5f, 0.0f, 1.0f, 0.0f);
-
-            glScalef(1.0f, 1.0f, 0.3f);
-            glutSolidSphere(0.11f, 12, 12);
-        glPopMatrix();
-
-        // --- RIGHT EYE
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glPushMatrix();
-            glTranslatef(0.54f, -0.27f, -0.41f);
-
-            glRotatef(145.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-125.0f, 0.0f, 1.0f, 0.0f);
-
-            glScalef(1.0f, 1.0f, 0.3f);
-
-            glutSolidSphere(0.20f, 12, 12);
-        glPopMatrix();
-
-        // RIGHT PUPIL
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glPushMatrix();
-            glTranslatef(0.535f, -0.27f, -0.50f);
-
-            glRotatef(140.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-135.5f, 0.0f, 1.0f, 0.0f);
-
+        auto drawPupil = [](float tx, float ty, float tz, float rz, float ry) {
+            glPushMatrix();
+            glTranslatef(tx, ty, tz);
+            glRotatef(rz, 0.0f, 0.0f, 1.0f);
+            glRotatef(ry, 0.0f, 1.0f, 0.0f);
             glScalef(1.0f, 1.0f, 0.3f);
             glutSolidSphere(0.11f, 12, 12);
-        glPopMatrix();
+            glPopMatrix();
+            };
+
+        GameLighting::setMaterial(GL_FRONT_AND_BACK, eyeAmbient, eyeDiffuse, eyeSpecular, eyeEmission, eyeShininess);
+        drawEye(0.54f, 0.27f, -0.41f, 35.0f, -55.0f); // Left eye
+        drawEye(0.54f, -0.27f, -0.41f, 145.0f, -125.0f); // Right eye
+        GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+
+        GameLighting::setMaterial(GL_FRONT_AND_BACK, pupilAmbient, pupilDiffuse, pupilSpecular, pupilEmission, pupilShininess);
+        drawPupil(0.535f, 0.27f, -0.50f, 40.0f, -44.5f); // Left pupil
+        drawPupil(0.535f, -0.27f, -0.50f, 140.0f, -135.5f); // Right pupil
+        GameLighting::resetMaterial(GL_FRONT_AND_BACK);
     glPopMatrix();
-
+    glPopMatrix();
     //renderBoundingBox();
     //renderOrigin(); 
 }

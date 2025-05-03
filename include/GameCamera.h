@@ -43,6 +43,7 @@ public:
     std::string getCameraModeString() const;
 
     CameraGlu getCameraGLU() const { return cameraGlu; }
+    CameraState getCameraState() const { return cameraState; }
     void setLockUserUpdate(bool lock) { lockUserUpdate = lock; }
 private:
     bool lockUserUpdate = false;
@@ -54,7 +55,6 @@ private:
     static float computeInteractiveYaw(float centerFracX);
 
     void setCameraState(CameraState newCameraState) { cameraState = newCameraState; }
-    CameraState getCameraState() const { return cameraState; }
 
     float getMovingPosSensitivity() const { return movingPosSensitivity; }
     float getOrbittingDegPerPixel() const { return orbittingDegPerPixel; }

@@ -1,4 +1,5 @@
 #include "GameLighting.h"
+#include <iostream>
 
 void GameLighting::setMaterial(
     GLenum face,
@@ -37,31 +38,58 @@ void GameLighting::init() {
 }
 
 void GameLighting::initSceneLight() {
+    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT2);
-    GLfloat dirLightPos[] = { 6.0f, 20.0f, 0.0f, 0.0f };
-    GLfloat dirLightColor[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    glLightfv(GL_LIGHT2, GL_POSITION, dirLightPos);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, dirLightColor);
+
+    GLfloat lightPos[] = { 15.0f, 20.0f, 0.0f, 1.0f }; 
+    GLfloat lightDir[] = { -1.0f, -1.0f, 0.0f };
+
+    // Light color
+    GLfloat ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+    GLfloat diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat specular[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+    // Spotlight settings
+    glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 120.0f);          // wide beam
+    glLightf(GL_LIGHT2, GL_SPOT_EXPONENT, 0.0f);        // focus intensity (0-128)
+
+    glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 0.3f);
+    glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 0.f);
+    glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.f);
+
+    // Apply light settings
+    glLightfv(GL_LIGHT2, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT2, GL_SPECULAR, specular);
+
+    glPushMatrix();
+        glLoadIdentity();
+        glLightfv(GL_LIGHT2, GL_POSITION, lightPos);
+        glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, lightDir);
+    glPopMatrix();
 }
 
 void GameLighting::initCameraLight() {
     // Setup camera spotlight as LIGHT1
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 35.0f);
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 300.0f);
+    glEnable(GL_LIGHT1);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 48.0f); // Narrower cone for spotlight
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 64.0f); // Sharper focus at center
 
-    GLfloat amb[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    GLfloat dif[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White light
-    GLfloat spc[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // Strong specular highlights
+    GLfloat amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };  // Dim ambient to simulate focused light
+    GLfloat dif[] = { 0.9f, 0.9f, 0.8f, 1.0f };  // Bright diffuse
+    GLfloat spc[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // Sharp specular
     glLightfv(GL_LIGHT1, GL_AMBIENT, amb);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, dif);
     glLightfv(GL_LIGHT1, GL_SPECULAR, spc);
 
-    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.15f);
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.00015f);
-    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.00015f);
+    // Use more realistic attenuation to limit spotlight reach
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.80f);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.f);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.f);
 }
 
-void GameLighting::updateCameraLight(GLfloat* lightPos, GLfloat* lightDir) {
+
+void GameLighting::updateCameraLight(GLfloat lightPos[4], GLfloat lightDir[3]) {
     glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, lightDir);
 

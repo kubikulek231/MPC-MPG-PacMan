@@ -269,16 +269,6 @@ void Game::render() {
 
     GameLighting::updateCameraLight(clPos, clDir);
 
-    glDisable(GL_COLOR_MATERIAL);    // ensure pure materials
-
-    // Set up a simple shaded material
-    GLfloat amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    GLfloat dif[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dif);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, amb); // or zero if you don’t want highlights
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
-
     // Render game elements
     game.getMap()->render(false);
     game.getPlayer()->render();

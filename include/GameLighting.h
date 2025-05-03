@@ -10,7 +10,7 @@ private:
     static void initCameraLight();
 public:
     static void init();
-    static void updateCameraLight(GLfloat* lightPos, GLfloat* lightDir);
+    static void updateCameraLight(GLfloat lightPos[4], GLfloat lightDir[3]);
     static void setMaterial(
         GLenum face,
         const GLfloat* ambient,

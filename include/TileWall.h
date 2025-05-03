@@ -33,12 +33,14 @@ public:
     static constexpr float INNER_RADIUS_FRAC = 0.3f;
     static constexpr int   CYLINDER_SEGMENTS = 16;
 
-    static constexpr float COLOR[3] = { 0.0f, 0.3f, 0.6f };
-    static constexpr GLfloat LIGHT_AMBIENT[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    static constexpr GLfloat LIGHT_SPECULAR[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    static constexpr float COLOR[3] = { 0.1f, 0.2f, 0.7f };
+    static constexpr GLfloat LIGHT_AMBIENT[4] = { 0.05f, 0.1f, 0.2f, 1.0f };
+    static constexpr GLfloat LIGHT_DIFFUSE[4] = { 0.1f, 0.2f, 0.7f, 1.0f };
+    static constexpr GLfloat LIGHT_SPECULAR[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
     static constexpr GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    static constexpr GLfloat LIGHT_DIFFUSE[4] = { 0.0f, 0.3f, 0.6f, 1.0f };
     static constexpr float LIGHT_SHININESS = 128.0f;
+
+
 private:
     WallType wallType = WallType::BLOCK;
     void renderWallBlock() const;

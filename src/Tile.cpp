@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include "GameLighting.h"
 
 
 Tile::Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol) : Entity(tileOrigin, tileBoundingBox) {
@@ -91,24 +92,34 @@ void Tile::renderHighlight() const {
 
 	// Render the plane just above the floor to prevent clipping
 	glBegin(GL_QUADS);
-	glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.min.z); // Bottom-left
-	glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.min.z); // Bottom-right
-	glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.max.z); // Top-right
-	glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.max.z); // Top-left
+		glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.min.z); // Bottom-left
+		glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.min.z); // Bottom-right
+		glVertex3f(abb.max.x, abb.min.y + 0.01f, abb.max.z); // Top-right
+		glVertex3f(abb.min.x, abb.min.y + 0.01f, abb.max.z); // Top-left
 	glEnd();
 }
 
 void Tile::renderEmpty() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	glColor3f(0.2f, 0.2f, 0.2f); // Dark gray for floor
+	float COLOR[3] = { 0.2f, 0.2f, 0.2f };
+	GLfloat LIGHT_AMBIENT[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat LIGHT_DIFFUSE[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	GLfloat LIGHT_SPECULAR[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat LIGHT_SHININESS = 0.0f;
+
+	GameLighting::setMaterial(GL_FRONT, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
 	glBegin(GL_QUADS);
-	glNormal3f(0, 1, 0); // Up-facing surface
-	glVertex3f(abb.min.x, abb.min.y, abb.min.z);
-	glVertex3f(abb.max.x, abb.min.y, abb.min.z);
-	glVertex3f(abb.max.x, abb.min.y, abb.max.z);
-	glVertex3f(abb.min.x, abb.min.y, abb.max.z);
+		glNormal3f(0, 1, 0); // Up-facing surface
+		glVertex3f(abb.min.x, abb.min.y, abb.min.z);
+		glVertex3f(abb.max.x, abb.min.y, abb.min.z);
+		glVertex3f(abb.max.x, abb.min.y, abb.max.z);
+		glVertex3f(abb.min.x, abb.min.y, abb.max.z);
 	glEnd();
+
+
+	GameLighting::resetMaterial(GL_FRONT);
 }
 
 void Tile::renderPellet() const {
@@ -120,8 +131,8 @@ void Tile::renderPellet() const {
 	float centerZ = (abb.min.z + abb.max.z) / 2.0f;
 
 	glPushMatrix();
-	glTranslatef(centerX, centerY, centerZ);
-	glutSolidSphere(MapFactory::TILE_SIZE / 8.0, 16, 16);
+		glTranslatef(centerX, centerY, centerZ);
+		glutSolidSphere(MapFactory::TILE_SIZE / 8.0, 16, 16);
 	glPopMatrix();
 }
 

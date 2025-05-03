@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include "Pi.h"
+#include "GameLighting.h"
 
 using namespace std::chrono;
 
@@ -33,121 +34,135 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
 }
 
 void Player::render() {
-    glColor3f(playerBodyColorRed,
-        playerBodyColorGreen,
-        playerBodyColorBlue);
-
+    Point3D c = getAbsoluteCenterPoint();
     glPushMatrix();
-        Point3D c = getAbsoluteCenterPoint();
-        glTranslatef(c.x, c.y + 0.25, c.z);
+    glTranslatef(c.x, c.y + 0.25f, c.z);
 
-        // Rotate player to face movement direction
-        float moveDirAngle = getMoveDirRotationAngle();
-        glRotatef(moveDirAngle, 0.0f, 1.0f, 0.0f);
+    // Rotate to face movement direction
+    glRotatef(getMoveDirRotationAngle(), 0.0f, 1.0f, 0.0f);
 
-        // Align Pac-Man vertically (facing direction)
-        glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+    // Rotate so Pac-Man faces forward
+    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
-        // Compute mouth opening angle
-        float mouthDegrees = 30.0f * playerAnimationState;
-        float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
-        float half = inverseMouthDegrees * (PI / 180.0f);
+    // Prepare lighting material (instead of glColor)
+    GLfloat bodyAmbient[] = { playerBodyColorRed * 0.2f, playerBodyColorGreen * 0.2f, playerBodyColorBlue * 0.2f, 1.0f };
+    GLfloat bodyDiffuse[] = { playerBodyColorRed, playerBodyColorGreen, playerBodyColorBlue, 1.0f };
+    GLfloat bodySpecular[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+    GLfloat bodyEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat shininess = 32.0f;
 
-        // Define clipping planes to carve the mouth
-        GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
-        GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, bodyAmbient, bodyDiffuse, bodySpecular, bodyEmission, shininess);
 
-        // Render upper clipped sphere
-        glClipPlane(GL_CLIP_PLANE0, eq0);
-        glEnable(GL_CLIP_PLANE0);
-        glDisable(GL_CLIP_PLANE1);
+    // Compute clipping angles
+    float mouthDegrees = 30.0f * playerAnimationState;
+    float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
+    float half = inverseMouthDegrees * (PI / 180.0f);
+
+    GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
+    GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
+
+    // Render upper half of Pac-Man
+    glClipPlane(GL_CLIP_PLANE0, eq0);
+    glEnable(GL_CLIP_PLANE0);
+    glPushMatrix();
         glutSolidSphere(0.75f, 32, 32);
-        glDisable(GL_CLIP_PLANE0);
+    glPopMatrix();
+    glDisable(GL_CLIP_PLANE0);
 
-        // Render lower clipped sphere
-        glClipPlane(GL_CLIP_PLANE1, eq1);
-        glEnable(GL_CLIP_PLANE1);
+    // Render lower half of Pac-Man
+    glClipPlane(GL_CLIP_PLANE1, eq1);
+    glEnable(GL_CLIP_PLANE1);
+    glPushMatrix();
         glutSolidSphere(0.75f, 32, 32);
-        glDisable(GL_CLIP_PLANE1);
+    glPopMatrix();
+    glDisable(GL_CLIP_PLANE1);
 
-        // Render inner mouth part (more orange)
-        glColor3f(playerBodyColorRed * 0.8f,
-            playerBodyColorGreen * 0.6f,
-            playerBodyColorBlue * 0.8f);
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+
+    // Disable lighting for this part
+    glDisable(GL_LIGHTING);
+        
+        // --- INNER MOUTH ---
+        glColor3f(0.8f, 0.5f, 0.0f);
+        // Render the inner top
         glPushMatrix();
-        glClipPlane(GL_CLIP_PLANE1, eq1);
-        glEnable(GL_CLIP_PLANE1);
-        glutSolidSphere(0.75f, 32, 32);
-        glDisable(GL_CLIP_PLANE1);
+            glClipPlane(GL_CLIP_PLANE0, eq0);
+            glEnable(GL_CLIP_PLANE0);
+            glutSolidSphere(0.75f, 32, 32);
+            glDisable(GL_CLIP_PLANE0);
         glPopMatrix();
 
-        // Fill the mouth gap with disks
+        // Render the inner bot
+        glPushMatrix();
+            glClipPlane(GL_CLIP_PLANE1, eq1);
+            glEnable(GL_CLIP_PLANE1);
+            glutSolidSphere(0.75f, 32, 32);
+            glDisable(GL_CLIP_PLANE1);
+        glPopMatrix();
+
+        // --- FILL MOUTH GAP WITH DISKS ---
         GLUquadric* disk = gluNewQuadric();
         glDisable(GL_CULL_FACE);
         glPushMatrix();
-        glRotatef(inverseMouthDegrees, 0, 1, 0);
-        gluDisk(disk, 0.0, 0.75, 32, 1);
+            glRotatef(inverseMouthDegrees, 0, 1, 0);
+            gluDisk(disk, 0.0, 0.75, 32, 1);
         glPopMatrix();
         glPushMatrix();
-        glRotatef(-inverseMouthDegrees, 0, 1, 0);
-        gluDisk(disk, 0.0, 0.75, 32, 1);
+            glRotatef(-inverseMouthDegrees, 0, 1, 0);
+            gluDisk(disk, 0.0, 0.75, 32, 1);
         glPopMatrix();
         gluDeleteQuadric(disk);
 
-        // --- LEFT EYE
-        glColor3f(1.0f, 1.0f, 1.0f);
+    glEnable(GL_LIGHTING);
+
+    // --- EYES & PUPILS ---
+    GLfloat eyeAmbient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    GLfloat eyeDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White for the eyes
+    GLfloat eyeSpecular[4] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Shiny eyes
+    GLfloat eyeEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+    GLfloat eyeShininess = 128.0f;
+
+    // Eye
+    auto drawEye = [](float tx, float ty, float tz, float rz, float ry) {
         glPushMatrix();
-            glTranslatef(0.54f, 0.27f, -0.41f);
-
-            glRotatef(35.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-55.0f, 0.0f, 1.0f, 0.0f);
-
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTranslatef(tx, ty, tz);
+            glRotatef(rz, 0.0f, 0.0f, 1.0f);
+            glRotatef(ry, 0.0f, 1.0f, 0.0f);
             glScalef(1.0f, 1.0f, 0.3f);
-
             glutSolidSphere(0.20f, 12, 12);
         glPopMatrix();
+        };
 
-        // LEFT PUPIL
-        glColor3f(0.0f, 0.0f, 0.0f);
+    GLfloat pupilAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black ambient
+    GLfloat pupilDiffuse[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black diffuse
+    GLfloat pupilSpecular[4] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Slightly shiny (small specular)
+    GLfloat pupilEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+    GLfloat pupilShininess = 10.0f;  // Low shininess
+
+    // Pupil
+    auto drawPupil = [](float tx, float ty, float tz, float rz, float ry) {
         glPushMatrix();
-            glTranslatef(0.535f, 0.27f, -0.50f);
-
-            glRotatef(40.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-44.5f, 0.0f, 1.0f, 0.0f);
-
+            glTranslatef(tx, ty, tz);
+            glRotatef(rz, 0.0f, 0.0f, 1.0f);
+            glRotatef(ry, 0.0f, 1.0f, 0.0f);
             glScalef(1.0f, 1.0f, 0.3f);
             glutSolidSphere(0.11f, 12, 12);
         glPopMatrix();
+        };
 
-        // --- RIGHT EYE
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glPushMatrix();
-            glTranslatef(0.54f, -0.27f, -0.41f);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, eyeAmbient, eyeDiffuse, eyeSpecular, eyeEmission, eyeShininess);
+        drawEye(0.54f, 0.27f, -0.41f, 35.0f, -55.0f); // Left eye
+        drawEye(0.54f, -0.27f, -0.41f, 145.0f, -125.0f); // Right eye
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 
-            glRotatef(145.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-125.0f, 0.0f, 1.0f, 0.0f);
+    GameLighting::setMaterial(GL_FRONT_AND_BACK, pupilAmbient, pupilDiffuse, pupilSpecular, pupilEmission, pupilShininess);
+        drawPupil(0.535f, 0.27f, -0.50f, 40.0f, -44.5f); // Left pupil
+        drawPupil(0.535f, -0.27f, -0.50f, 140.0f, -135.5f); // Right pupil
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 
-            glScalef(1.0f, 1.0f, 0.3f);
-
-            glutSolidSphere(0.20f, 12, 12);
-        glPopMatrix();
-
-        // RIGHT PUPIL
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glPushMatrix();
-            glTranslatef(0.535f, -0.27f, -0.50f);
-
-            glRotatef(140.0f, 0.0f, 0.0f, 1.0f);
-            glRotatef(-135.5f, 0.0f, 1.0f, 0.0f);
-
-            glScalef(1.0f, 1.0f, 0.3f);
-            glutSolidSphere(0.11f, 12, 12);
-        glPopMatrix();
 
     glPopMatrix();
-
-    //renderBoundingBox();
-    //renderOrigin();
 }
 
 

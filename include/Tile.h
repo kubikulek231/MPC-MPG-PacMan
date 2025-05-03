@@ -36,7 +36,6 @@ public:
    
     virtual void render() const;
     void renderEmpty() const;
-    void renderWall() const;
     void renderPellet() const;
     void renderDoorOpen() const;
     void renderHighlight() const;

@@ -62,6 +62,8 @@ void Game::init() {
 
     glDisable(GL_CULL_FACE);
 
+    glDisable(GL_COLOR_MATERIAL);
+
     GameLighting::init();
 }
 

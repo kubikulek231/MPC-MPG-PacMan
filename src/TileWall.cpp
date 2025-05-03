@@ -75,7 +75,6 @@ void TileWall::setWallTypeByNeighbors() {
 
 void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]); // Blue for wall
 
     float centerX = (abb.min.x + abb.max.x) / 2.0f;
     float centerY = (abb.min.y + abb.max.y) / 2.0f;
@@ -93,7 +92,6 @@ void TileWall::renderWallBlock() const {
 
 void TileWall::renderWallLeft() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
@@ -116,7 +114,6 @@ void TileWall::renderWallLeft() const {
 
 void TileWall::renderWallRight() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
@@ -138,7 +135,6 @@ void TileWall::renderWallRight() const {
 
 void TileWall::renderWallTop() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -159,7 +155,6 @@ void TileWall::renderWallTop() const {
 
 void TileWall::renderWallBottom() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
     float halfY = (abb.min.y + abb.max.y) * 0.5f;
@@ -192,8 +187,6 @@ void TileWall::renderWallCornerTopLeft() const {
     float cx = bb.min.x + (w - r);
     float cz = bb.min.z + (w - r);
 
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -219,8 +212,6 @@ void TileWall::renderWallCornerTopRight() const {
     float cx = bb.max.x - (w - r);
     float cz = bb.min.z + (w - r);
 
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -244,8 +235,6 @@ void TileWall::renderWallCornerBottomLeft() const {
     // position corner at bottom-left inside corner
     float cx = bb.min.x + (w - r);
     float cz = bb.max.z - (w - r);
-
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
 
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
@@ -272,8 +261,6 @@ void TileWall::renderWallCornerBottomRight() const {
     float cx = bb.max.x - (w - r);
     float cz = bb.max.z - (w - r);
 
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -298,8 +285,6 @@ void TileWall::renderWallInnerTopLeft() const {
     float cz = bb.max.z - (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -333,8 +318,6 @@ void TileWall::renderWallInnerTopRight() const {
     float cz = bb.max.z - (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -366,8 +349,6 @@ void TileWall::renderWallInnerBottomLeft() const {
     float cz = bb.min.z + (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
@@ -400,8 +381,6 @@ void TileWall::renderWallInnerBottomRight() const {
     float cz = bb.min.z + (wall + r);
 
     glDisable(GL_CULL_FACE);
-    glColor3f(COLOR[0], COLOR[1], COLOR[2]);
-
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();

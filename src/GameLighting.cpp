@@ -75,7 +75,7 @@ void GameLighting::initCameraLight() {
     glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 48.0f); // Narrower cone for spotlight
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 64.0f); // Sharper focus at center
 
-    GLfloat amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };  // Dim ambient to simulate focused light
+    GLfloat amb[] = { 0.05f, 0.05f, 0.05f, 1.0f };  // Dim ambient to simulate focused light
     GLfloat dif[] = { 0.9f, 0.9f, 0.8f, 1.0f };  // Bright diffuse
     GLfloat spc[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // Sharp specular
     glLightfv(GL_LIGHT1, GL_AMBIENT, amb);

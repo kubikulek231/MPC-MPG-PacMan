@@ -101,10 +101,10 @@ void Tile::renderHighlight() const {
 
 void Tile::renderEmpty() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	float COLOR[3] = { 0.2f, 0.2f, 0.2f };
+	float COLOR[3] = { 0.0f, 0.0f, 0.0f };
 	GLfloat LIGHT_AMBIENT[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	GLfloat LIGHT_DIFFUSE[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	GLfloat LIGHT_SPECULAR[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat LIGHT_DIFFUSE[4] = { 0.05f, 0.05f, 0.05f, 1.0f };
+	GLfloat LIGHT_SPECULAR[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat LIGHT_SHININESS = 0.0f;
 
@@ -118,27 +118,42 @@ void Tile::renderEmpty() const {
 		glVertex3f(abb.min.x, abb.min.y, abb.max.z);
 	glEnd();
 
-
 	GameLighting::resetMaterial(GL_FRONT);
 }
 
 void Tile::renderPellet() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	glColor3f(1.0f, 0.5f, 0.0f); // Orange for pellet
+	GLfloat LIGHT_AMBIENT[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat LIGHT_DIFFUSE[4] = { 1.0f, 0.3f, 0.0f, 1.0f };  // Orange
+	GLfloat LIGHT_SPECULAR[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	GLfloat LIGHT_EMISSION[4] = { 0.3f, 0.05f, 0.0f, 1.0f };  // No emission
+	GLfloat LIGHT_SHININESS = 128.0f;
 
 	float centerX = (abb.min.x + abb.max.x) / 2.0f;
 	float centerY = abb.min.y + MapFactory::TILE_SIZE / 2.0f;
 	float centerZ = (abb.min.z + abb.max.z) / 2.0f;
 
+	GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
+
 	glPushMatrix();
-		glTranslatef(centerX, centerY, centerZ);
-		glutSolidSphere(MapFactory::TILE_SIZE / 8.0, 16, 16);
+	glTranslatef(centerX, centerY, centerZ);
+	glutSolidSphere(MapFactory::TILE_SIZE / 8.0, 16, 16);  // Has normals by default
 	glPopMatrix();
+
+	GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
 
 void Tile::renderDoorOpen() const {
 	BoundingBox3D abb = this->getAbsoluteBoundingBox();
-	glColor3f(0.627f, 0.322f, 0.176f); // Normalized RGB (saddle brown-ish)
+
+	// Dark brown material with no shine
+	GLfloat LIGHT_AMBIENT[4] = { 0.1f, 0.05f, 0.025f, 1.0f };
+	GLfloat LIGHT_DIFFUSE[4] = { 0.3f, 0.15f, 0.05f, 1.0f }; // Dark brown
+	GLfloat LIGHT_SPECULAR[4] = { 0.0f, 0.0f, 0.0f, 1.0f };   // No specular
+	GLfloat LIGHT_EMISSION[4] = { 0.0f, 0.0f, 0.0f, 1.0f };   // No glow
+	GLfloat LIGHT_SHININESS = 0.0f;
+
+	GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
 	float centerX = (abb.min.x + abb.max.x) / 2.0f;
 	float centerY = (abb.min.y + abb.max.y) / 2.0f;
@@ -150,10 +165,13 @@ void Tile::renderDoorOpen() const {
 
 	glPushMatrix();
 	glTranslatef(centerX, centerY, centerZ);
-	glScalef(width, height, depth); // scale unit cube into a brick
-	glutSolidCube(1.0f); // cube of size 1, scaled above
+	glScalef(width, height, depth); // scale unit cube into a door block
+	glutSolidCube(1.0f);
 	glPopMatrix();
+
+	GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 }
+
 
 void Tile::render() const {
 	if (highlight) {

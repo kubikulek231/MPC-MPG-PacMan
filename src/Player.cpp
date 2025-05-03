@@ -71,9 +71,9 @@ void Player::render() {
         glDisable(GL_CLIP_PLANE1);
 
         // Render inner mouth part (more orange)
-        glColor3f(playerBodyColorRed,
-            playerBodyColorGreen * 0.8f,
-            playerBodyColorBlue);
+        glColor3f(playerBodyColorRed * 0.8f,
+            playerBodyColorGreen * 0.6f,
+            playerBodyColorBlue * 0.8f);
         glPushMatrix();
         glClipPlane(GL_CLIP_PLANE1, eq1);
         glEnable(GL_CLIP_PLANE1);

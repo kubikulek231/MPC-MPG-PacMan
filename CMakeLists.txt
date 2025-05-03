@@ -93,10 +93,10 @@ add_custom_command(TARGET MPG-PacMan POST_BUILD
     ${CMAKE_BINARY_DIR}
 )
 
-# Copy glfw3dll.dll to the output directory
+# Copy glfw3.dll to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${GLUT_DLL_DIR}/glfw3dll.dll"
+    "${GLUT_DLL_DIR}/glfw3.dll"
     ${CMAKE_BINARY_DIR}
 )
 

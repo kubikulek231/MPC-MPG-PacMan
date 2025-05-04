@@ -13,7 +13,7 @@ enum class CameraMode {
     FollowingPlayer = 2
 };
 
-class GameCamera {
+static class GameCamera {
 public:
     static constexpr float PI = 3.14159265358979323846f;
     static constexpr float DEFAULT_MOUSE_SENSITIVITY = 0.08f;

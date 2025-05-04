@@ -7,6 +7,7 @@
 #include "Macro.h"
 #include "GameCamera.h"
 #include "GameControl.h"
+#include "GameSounds.h"
 
 void GameLogic::initLevel() {
 	// Create ghosts path to move them into corners
@@ -109,8 +110,10 @@ void GameLogic::updatePlayerLives() {
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
 		if (ghost->intersects(player)) {
+			if (player.getIsInvincible()) { continue; }
 			game.setPlayerLives(game.getPlayerLives() - 1);
 			player.setIsInvincible();
+			GameSounds::getInstance().playDeath();
 		}
 	}
 }

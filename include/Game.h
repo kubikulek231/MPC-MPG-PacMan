@@ -96,7 +96,7 @@ private:
     float lastFrameTimeS = 0.0f;
     float lastFrameTimeDeltaS = 0.0f;
 
-    float baseMoveSpeed = 4.5f;
+    float baseMoveSpeed = 6.5f;
     const float maxFrametimeNormalizedSpeed = 0.5f;
     int playerLives;
     int currentLevel;

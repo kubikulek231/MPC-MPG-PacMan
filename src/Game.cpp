@@ -11,6 +11,7 @@
 #include <sstream>     
 #include <string>      
 #include <vector>      
+#include "GameSounds.h"
 
 // Global wrapper functions to be passed to GLUT
 static void keyboardCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboard(tolower(key), x, y); }
@@ -21,6 +22,8 @@ static void mouseMotionCallback(int x, int y) { GameUserInput::getInstance().mou
 
 // Inits new game
 void Game::init() {
+    GameSounds::getInstance().init();
+
     // Register mouse callback functions
     glutMouseFunc(mouseButtonCallback);
     glutPassiveMotionFunc(mouseMotionCallback);
@@ -177,6 +180,7 @@ void Game::update(int value) {
         game.gameMenu.update();
         std::string enteredItem = game.gameMenu.getEnteredMenuItemString();
         if (enteredItem == "Play") {
+            GameSounds::getInstance().playBeginning();
             game.gameState = GameState::Playing;
         }
         if (enteredItem == "Sandbox") {

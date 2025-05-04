@@ -30,6 +30,9 @@ set(DEPS_DIR "${CMAKE_SOURCE_DIR}/deps")
 set(GLUT_INCLUDE_DIR "${DEPS_DIR}/nupengl.core.0.1.0.1/build/native/include")
 set(GLUT_LIB_DIR "${DEPS_DIR}/nupengl.core.0.1.0.1/build/native/lib/x64")
 set(GLUT_DLL_DIR "${DEPS_DIR}/nupengl.core.redist.0.1.0.1/build/native/bin/x64")
+set(GLUT_GLFW3_DLL "${GLUT_DLL_DIR}/glfw3.dll")
+set(GLUT_GLEW32_DLL "${GLUT_DLL_DIR}/glew32.dll")
+set(GLUT_FREEGLUT_DLL "${GLUT_DLL_DIR}/freeglut.dll")
 
 # Locate FreeType deps
 set(FREETYPE_INCLUDE_DIRS "${DEPS_DIR}/freetype.2.8.0.1/build/native/include")
@@ -37,18 +40,32 @@ set(FREETYPE_LIB_DIR "${DEPS_DIR}/freetype.2.8.0.1/build/native/lib/x64/v141/dyn
 set(FREETYPE_LIB "${FREETYPE_LIB_DIR}/freetype28.lib")
 set(FREETYPE_DLL "${DEPS_DIR}/freetype.redist.2.8.0.1/build/native/bin/x64/v141/dynamic/Release/freetype28.dll")
 
+# Locate SDL3 deps
+set(SDL3_INCLUDE_DIRS "${DEPS_DIR}/SDL3_mixer/include/")
+set(SDL3_LIB_DIR "${DEPS_DIR}/SDL3_mixer/lib/")
+set(SDL3_DLL "${DEPS_DIR}/SDL3_mixer/bin/SDL3.dll")
+
+# Locate SDL3_mixer deps
+set(SDL3_MIXER_DLL "${DEPS_DIR}/SDL3_mixer/bin/SDL3_mixer.dll")
+
 # Extract deps
 message("Extracting dependencies...")
 if (NOT EXISTS "${GLUT_INCLUDE_DIR}") 
     extract_zip("${DEPS_DIR}/nupengl.zip" "${DEPS_DIR}/") 
 else()
-    message("Deps for nupengl already extracted.")
+    message("Deps for NupenGL already extracted.")
 endif()
 
 if (NOT EXISTS "${FREETYPE_INCLUDE_DIRS}")
     extract_zip("${DEPS_DIR}/freetype.zip" "${DEPS_DIR}/")
 else()
-    message("Deps for freetype already extracted.")
+    message("Deps for FreeType already extracted.")
+endif()
+
+if (NOT EXISTS "${SDL3_INCLUDE_DIRS}")
+    extract_zip("${DEPS_DIR}/SDL3_mixer.zip" "${DEPS_DIR}/")
+else()
+    message("Deps for SDL3 already extracted.")
 endif()
 
 # Setup glft2 library (custom GL font loading and rendering lib using freetype fonts)
@@ -60,21 +77,28 @@ add_subdirectory("${GLFT2_LIB_DIR}")
 include_directories(
     ${GLUT_INCLUDE_DIR}          # Include GLUT headers for the whole project
     ${FREETYPE_INCLUDE_DIRS}     # Include FreeType headers for the whole project
-    ${CMAKE_SOURCE_DIR}/include  # Your project headers
+    ${SDL3_INCLUDE_DIRS}         # Include SDL3 headers for the whole project
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 # Link directories (where the libraries are located)
-link_directories(${GLUT_LIB_DIR} ${FREETYPE_LIB_DIR})
+link_directories(${GLUT_LIB_DIR} ${FREETYPE_LIB_DIR} ${SDL3_LIB_DIR})
 
 # Collect all .cpp and .h source files
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h")
 
 # Add executable
-add_executable(MPG-PacMan ${SOURCES} ${HEADERS} "include/RenderHelper.h" "src/RenderHelper.cpp" "include/Pi.h" "include/GameLighting.h" "src/GameLighting.cpp")
+add_executable(MPG-PacMan ${SOURCES} ${HEADERS})
 
 # Link Freeglut, glft2_lib to the main program
-target_link_libraries(MPG-PacMan glft2_lib "${GLUT_LIB_DIR}/freeglut.lib" "${GLUT_LIB_DIR}/glew32.lib" "${GLUT_LIB_DIR}/glfw3dll.lib")
+target_link_libraries(MPG-PacMan glft2_lib)
+
+# Link the SDL3 libs with mixer
+target_link_libraries(MPG-PacMan
+    "${SDL3_LIB_DIR}/SDL3.lib"
+    "${SDL3_LIB_DIR}/SDL3_mixer.lib"
+)
 
 # Message for binary directory
 message(STATUS "CMake binary directory: ${CMAKE_BINARY_DIR}")
@@ -82,32 +106,46 @@ message(STATUS "CMake binary directory: ${CMAKE_BINARY_DIR}")
 # Copy freeglut.dll to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${GLUT_DLL_DIR}/freeglut.dll"
+    "${GLUT_FREEGLUT_DLL}"
     ${CMAKE_BINARY_DIR}
 )
 
 # Copy glew32.dll to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${GLUT_DLL_DIR}/glew32.dll"
+    "${GLUT_GLEW32_DLL}"
     ${CMAKE_BINARY_DIR}
 )
 
 # Copy glfw3.dll to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${GLUT_DLL_DIR}/glfw3.dll"
+    "${GLUT_GLFW3_DLL}"
     ${CMAKE_BINARY_DIR}
 )
 
-# Copy Freetype dll
+# Copy Freetype dll to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${FREETYPE_DLL}"
     ${CMAKE_BINARY_DIR}
 )
 
-# Copy maps dir to the output directory
+# Copy SDL3.dll to the output directory
+add_custom_command(TARGET MPG-PacMan POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${SDL3_DLL}"
+    ${CMAKE_BINARY_DIR}
+)
+
+# Copy SDL3_mixer.dll to the output directory
+add_custom_command(TARGET MPG-PacMan POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${SDL3_MIXER_DLL}"
+    ${CMAKE_BINARY_DIR}
+)
+
+# Copy assets dir to the output directory
 add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/assets/"

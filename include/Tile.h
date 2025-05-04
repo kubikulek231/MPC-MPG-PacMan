@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include "Entity.h"
+#include "MoveDir.h"
 
 enum class TileType {
     EMPTY = 1,   // Empty space
@@ -45,6 +46,8 @@ public:
     Tile* getTileDown() const;
     Tile* getTileLeft() const;
     Tile* getTileRight() const;
+
+    Tile* getTileInMoveDir(MoveDir moveDir) const;
 
     int getTileRow() const;
     int getTileCol() const;

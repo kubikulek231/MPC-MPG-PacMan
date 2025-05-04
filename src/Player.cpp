@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Pi.h"
 #include "GameLighting.h"
+#include "GameSounds.h"
 
 using namespace std::chrono;
 
@@ -176,9 +177,18 @@ void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeM
     auto tiles = intersectingTiles(this);
     Tile* tileCurrent = !tiles.empty() ? currentTile(tiles) : nullptr;
     Tile* nextTileInDir = tileCurrent != nullptr ? nextTileInDirection(moveDir, tileCurrent) : nullptr;
+    Tile* nextNextTileInDir = tileCurrent != nullptr ? nextTileInDir->getTileInMoveDir(moveDir) : nullptr;
     bool isPelletNext = nextTileInDir != nullptr && nextTileInDir->getTileType() == TileType::PELLET;
-
+    bool isPelletNextNext = nextNextTileInDir != nullptr && nextNextTileInDir->getTileType() == TileType::PELLET;
     animate(frameTimeMs, isPelletNext);
+
+    if (isPelletNext || isPelletNextNext) {
+        GameSounds::getInstance().startChomp();
+    }
+    else {
+        GameSounds::getInstance().stopChomp();
+    }
+    GameSounds::getInstance().GameSounds::playChomp();
 
     //float newDistance = this->origin.distanceTo2D(this->lastOrigin);
     //if (speedoMeter.update(newDistance, 20)) { std::cout << "Move distance: " << speedoMeter.getAverage() << std::endl; }

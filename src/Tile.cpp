@@ -251,12 +251,21 @@ void Tile::setHighlight(bool value) {
 	this->highlight = value;
 }
 
+Tile* Tile::getTileInMoveDir(MoveDir moveDir) const {
+	if (moveDir == MoveDir::BWD) { return tileDown; }
+	if (moveDir == MoveDir::FWD) { return tileUp; }
+	if (moveDir == MoveDir::LEFT) { return tileLeft; }
+	if (moveDir == MoveDir::RIGHT) { return tileRight; }
+	return nullptr;
+}
+
 void Tile::setHighlightColor(float r, float g, float b, float a) {
 	this->highlightR = r;
 	this->highlightG = g;
 	this->highlightB = b;
 	this->highlightA = a;
 }
+
 
 
 std::string Tile::toString() {

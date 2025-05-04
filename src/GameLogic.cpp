@@ -15,14 +15,15 @@ void GameLogic::initLevel() {
 	std::vector<Ghost*>& ghosts = game.getGhosts();
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
-		if (ghost->isPathEmpty()) {
-			MapCorner corner = game.getMap()->corners[i % game.getMap()->corners.size()];
-			Tile* targetTile = ghost->furthestTileTowardCorner(corner);
-			if (targetTile) {
-				ghost->createAndSetPathToTileWhenPossible(targetTile);
-			}
+		ghost->clearMovePath();
+		MapCorner corner = game.getMap()->corners[i % game.getMap()->corners.size()];
+		Tile* targetTile = ghost->furthestTileTowardCorner(corner);
+		if (targetTile) {
+			ghost->createAndSetPathToTileWhenPossible(targetTile);
 		}
 	}
+	game.getPlayer()->forceSetMoveDir(MoveDir::NONE);
+	GameControl& gc = GameControl::getInstance();
 }
 
 void GameLogic::updateScore() {
@@ -32,7 +33,7 @@ void GameLogic::updateScore() {
 	if (map.areAllPelletsCollected()) {
 		// Set new level
 		game.setCurrentLevel(game.getCurrentLevel() + 1);
-		game.initLevel();
+		game.initNewLevel();
 	}
 }
 
@@ -45,8 +46,9 @@ void GameLogic::updatePlayer() {
 
 	// Move and update only if animation is finished
 	if (game.isPlayerDying()) {
-		if (player.updateDeathAnimation(lastframetimeS)) { game.resetPlayerDying(); 
-			// Init new game with same map
+		if (player.updateDeathAnimation(lastframetimeS)) { 
+			game.resetPlayerDying(); 
+			game.resetLevelOnDeath();
 		};
 		return;
 	}
@@ -116,12 +118,11 @@ void GameLogic::updatePlayerLives() {
 	std::vector<Ghost*>& ghosts = game.getGhosts();
 	Player& player = *game.getPlayer();
 
-	if (player.getIsInvincible()) { return; }
+	if (game.isPlayerDying()) { return; }
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
 		if (ghost->intersects(player)) {
 			if (player.getIsInvincible()) { continue; }
-			player.setIsInvincible();
 			game.killPlayer();
 		}
 	}

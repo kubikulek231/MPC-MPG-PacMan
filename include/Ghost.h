@@ -49,6 +49,7 @@ public:
     }
     bool isPathEmpty() { return movePath.empty(); }
     Tile* furthestTileTowardCorner(MapCorner mapCorner);
+    void clearMovePath() { movePath.clear(); }
 };
 
 #endif // PLAYER_H

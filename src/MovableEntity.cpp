@@ -104,7 +104,7 @@ float MovableEntity::getMoveDirRotationAngle() const {
     if (moveDir == MoveDir::BWD) { return 180.0f; }
     if (moveDir == MoveDir::LEFT) { return 90.0f; }
     if (moveDir == MoveDir::RIGHT) { return 270.0f; }
-    return 0.0f; // Default
+    return 180.0f; // Default
 }
 
 // === Direction Change Management ===

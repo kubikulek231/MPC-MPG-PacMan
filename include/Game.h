@@ -34,7 +34,11 @@ public:
     static constexpr float LEVEL_DURATION_MULTIPLIER = 0.88f;
 
     void init();    // Init new game along with OpenGL settings
-    void initLevel(int level = -1);
+    void initNewLevel(int level = -1);
+    void resetLevelOnDeath();
+    void startNewCasualSession();
+    void startNewSandboxSession();
+
     static void update(int value = 0);  // Update game logic
     static void render();  // Display the game scene
     static void renderScore();

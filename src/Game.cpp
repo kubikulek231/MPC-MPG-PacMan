@@ -52,8 +52,7 @@ void Game::init() {
     );
     glMatrixMode(GL_MODELVIEW);
 
-
-    Game::initLevel();
+    Game::initNewLevel();
     Game& game = getInstance();
     glft2::font_data font = game.getMenuFont();
 
@@ -70,7 +69,7 @@ void Game::init() {
     GameLighting::init();
 }
 
-void Game::initLevel(int level) {
+void Game::initNewLevel(int level) {
     Game& game = getInstance();
     game.moveDir = MoveDir::NONE;
     if (level < 0) { level = getCurrentLevel(); }
@@ -131,6 +130,54 @@ void Game::initLevel(int level) {
     GameLogic::initLevel();
 }
 
+void Game::resetLevelOnDeath() {
+    Game& game = getInstance();
+    game.moveDir = MoveDir::NONE;
+    GameControl& gc = GameControl::getInstance();
+    // Press and release movement key to start the level
+    gc.enableWasdAfterFullPressCycle();
+    // Reset moveDir
+    gc.setMoveDir(MoveDir::NONE);
+
+    Point3D playerSpawnOrigin = map.getPlayerSpawn()->getOrigin();
+    Point3D blinkySpawnOrigin = map.getBlinkySpawn()->getOrigin();
+    Point3D pinkySpawnOrigin = map.getPinkySpawn()->getOrigin();
+    Point3D inkySpawnOrigin = map.getInkySpawn()->getOrigin();
+    Point3D clydeSpawnOrigin = map.getClydeSpawn()->getOrigin();
+
+    playerSpawnOrigin.move(MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    blinkySpawnOrigin.move(-MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    pinkySpawnOrigin.move(-MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    inkySpawnOrigin.move(-MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+    clydeSpawnOrigin.move(-MapFactory::TILE_SIZE / 2.0f, 0.0f, 0.0f);
+
+    player.setOrigin(playerSpawnOrigin);
+    blinky.setOrigin(blinkySpawnOrigin);
+    pinky.setOrigin(pinkySpawnOrigin);
+    inky.setOrigin(inkySpawnOrigin);
+    clyde.setOrigin(clydeSpawnOrigin);
+
+    GameLogic::initLevel();
+}
+
+void Game::startNewCasualSession() {
+    Game& game = Game::getInstance();
+    game.currentLevel = 0;
+    game.playerLives = 7;
+    game.totalScore = 0;
+    game.initNewLevel();
+    GameSounds::getInstance().playBeginning();
+}
+
+void Game::startNewSandboxSession() {
+    Game& game = Game::getInstance();
+    game.currentLevel = 0;
+    game.playerLives = 9999;
+    game.totalScore = 0;
+    game.initNewLevel();
+    GameSounds::getInstance().playBeginning();
+}
+
 // First interface to handle game logic
 void Game::update(int value) {
     Game& game = Game::getInstance();
@@ -180,12 +227,12 @@ void Game::update(int value) {
         game.gameMenu.update();
         std::string enteredItem = game.gameMenu.getEnteredMenuItemString();
         if (enteredItem == "Play") {
-            GameSounds::getInstance().playBeginning();
             game.gameState = GameState::Playing;
+            game.startNewCasualSession();
         }
         if (enteredItem == "Sandbox") {
-            game.playerLives = 9999;
             game.gameState = GameState::Playing;
+            game.startNewSandboxSession();
         }
         if (enteredItem == "Exit") {
             exit(0);
@@ -199,11 +246,6 @@ void Game::update(int value) {
         if (enteredItem == "Exit to Main Menu") {
             game.gameState = GameState::MainMenu;
             game.gameMenu.initMainMenu();
-            // Reset level and init new one
-            game.currentLevel = 0;
-            game.playerLives = 7;
-            game.totalScore = 0;
-            game.initLevel();
         }
     }
 

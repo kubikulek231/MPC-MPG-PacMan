@@ -23,7 +23,6 @@ void GameLogic::initLevel() {
 		}
 	}
 	game.getPlayer()->forceSetMoveDir(MoveDir::NONE);
-	GameControl& gc = GameControl::getInstance();
 }
 
 void GameLogic::updateScore() {

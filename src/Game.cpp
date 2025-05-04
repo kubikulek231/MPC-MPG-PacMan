@@ -167,6 +167,8 @@ void Game::startNewCasualSession() {
     game.totalScore = 0;
     game.initNewLevel();
     GameSounds::getInstance().playBeginning();
+    GameCamera& gc = GameCamera::getInstance();
+    gc.setCameraMode(CameraMode::InteractiveMapView);
 }
 
 void Game::startNewSandboxSession() {
@@ -176,6 +178,8 @@ void Game::startNewSandboxSession() {
     game.totalScore = 0;
     game.initNewLevel();
     GameSounds::getInstance().playBeginning();
+    GameCamera& gc = GameCamera::getInstance();
+    gc.setCameraMode(CameraMode::InteractiveMapView);
 }
 
 // First interface to handle game logic

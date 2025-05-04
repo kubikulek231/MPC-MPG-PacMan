@@ -291,7 +291,7 @@ uint64_t Player::getTimeMs() {
 }
 
 void Player::renderDeathAnimation() {
-    float deathMouth = 180.0f * playerDeathAnimationState;
+    float deathMouth = 180.0f;
     float deathScale = 1.0f - playerDeathAnimationState;
 
     glPushMatrix();
@@ -309,16 +309,16 @@ void Player::renderDeathAnimation() {
         GLdouble eq0[4] = { +sin(halfRad), 0.0, -cos(halfRad), 0.0 };
         GLdouble eq1[4] = { -sin(halfRad), 0.0, -cos(halfRad), 0.0 };
         // render clipped sphere once, no inner mouth/fill
-        glEnable(GL_CLIP_PLANE0);
-        glClipPlane(GL_CLIP_PLANE0, eq0);
-        glEnable(GL_CLIP_PLANE1);
-        glClipPlane(GL_CLIP_PLANE1, eq1);
+        //glEnable(GL_CLIP_PLANE0);
+        //glClipPlane(GL_CLIP_PLANE0, eq0);
+        //glEnable(GL_CLIP_PLANE1);
+        //glClipPlane(GL_CLIP_PLANE1, eq1);
 
         // draw the body
         glutSolidSphere(0.75f, 32, 32);
 
-        glDisable(GL_CLIP_PLANE0);
-        glDisable(GL_CLIP_PLANE1);
+        //glDisable(GL_CLIP_PLANE0);
+        //glDisable(GL_CLIP_PLANE1);
     glPopMatrix();
     return;   // done
 }

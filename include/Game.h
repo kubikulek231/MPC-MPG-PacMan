@@ -12,6 +12,7 @@
 #include "GameMenu.h"
 #include "glft2/TextRenderer.hpp"
 #include "FadeTimer.h"
+#include "GameSounds.h"
 
 enum class GameState {
     MainMenu = 0,
@@ -69,6 +70,16 @@ public:
     GameState getGameState() const { return gameState; };
     GameState setGameState(GameState newGameState) { gameState = newGameState; }
 
+    void killPlayer() {
+        GameSounds::getInstance().playDeath();
+        setPlayerLives(playerLives - 1);
+        player.startDeathAnimation();
+        playerDying = true;
+    }
+
+    bool isPlayerDying() const { return playerDying; }
+    void resetPlayerDying() { playerDying = false; }
+
     int gameCollectedPellets = 0;
 private:
     Game() = default;
@@ -92,6 +103,8 @@ private:
     MoveDir moveDir;
 
     GameState gameState;
+
+    bool playerDying = false;
 
     float lastFrameTimeS = 0.0f;
     float lastFrameTimeDeltaS = 0.0f;

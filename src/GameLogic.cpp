@@ -43,6 +43,14 @@ void GameLogic::updatePlayer() {
 	Player& player = *game.getPlayer();
 	float lastframetimeS = game.getLastFrameTimeDeltaSeconds();
 
+	// Move and update only if animation is finished
+	if (game.isPlayerDying()) {
+		if (player.updateDeathAnimation(lastframetimeS)) { game.resetPlayerDying(); 
+			// Init new game with same map
+		};
+		return;
+	}
+
 	player.move(moveDir, gc.getMovementChanged(), lastframetimeS);
 	player.update(game.gameCollectedPellets);
 }
@@ -57,7 +65,9 @@ void GameLogic::updateGhosts() {
 
 	GameUserInput& gc = GameUserInput::getInstance();
 
-	// Render ghosts
+	// Move ghosts only when player is not dying
+	if (game.isPlayerDying()) { return; }
+
 	auto& ghosts = game.getGhosts();
 	for (size_t i = 0; i < ghosts.size(); ++i) {
 		Ghost* ghost = ghosts[i];
@@ -69,36 +79,36 @@ void GameLogic::updateGhosts() {
 		ghost->moveOnRandomPath(lastFrametimeS);
 	}
 
-	// Debug
-	if (gc.isKeyFlagPressed('x')) {
-		gc.resetKeyFlagPressed('x');
-		for (size_t i = 0; i < ghosts.size(); ++i) {
-			Map* map = game.getMap();
-			Ghost* ghost = ghosts[i];
-			Tile* tile = map->getTileAt(17, 1);
-			if (!ghost->isPathEmpty()) {
-				ghost->createAndSetPathToTileWhenPossible(tile);
-				continue;
-			}
-			// Move randomly if path is empty
-			ghost->moveOnRandomPath(lastFrametimeS);
-		}
-	}
+	//// Debug
+	//if (gc.isKeyFlagPressed('x')) {
+	//	gc.resetKeyFlagPressed('x');
+	//	for (size_t i = 0; i < ghosts.size(); ++i) {
+	//		Map* map = game.getMap();
+	//		Ghost* ghost = ghosts[i];
+	//		Tile* tile = map->getTileAt(17, 1);
+	//		if (!ghost->isPathEmpty()) {
+	//			ghost->createAndSetPathToTileWhenPossible(tile);
+	//			continue;
+	//		}
+	//		// Move randomly if path is empty
+	//		ghost->moveOnRandomPath(lastFrametimeS);
+	//	}
+	//}
 
-	if (gc.isKeyFlagPressed('y')) {
-		gc.resetKeyFlagPressed('y');
-		for (size_t i = 0; i < ghosts.size(); ++i) {
-			Map* map = game.getMap();
-			Ghost* ghost = ghosts[i];
-			Tile* tile = map->getTileAt(17, 26);
-			if (!ghost->isPathEmpty()) {
-				ghost->createAndSetPathToTileWhenPossible(tile);
-				continue;
-			}
-			// Move randomly if path is empty
-			ghost->moveOnRandomPath(lastFrametimeS);
-		}
-	}
+	//if (gc.isKeyFlagPressed('y')) {
+	//	gc.resetKeyFlagPressed('y');
+	//	for (size_t i = 0; i < ghosts.size(); ++i) {
+	//		Map* map = game.getMap();
+	//		Ghost* ghost = ghosts[i];
+	//		Tile* tile = map->getTileAt(17, 26);
+	//		if (!ghost->isPathEmpty()) {
+	//			ghost->createAndSetPathToTileWhenPossible(tile);
+	//			continue;
+	//		}
+	//		// Move randomly if path is empty
+	//		ghost->moveOnRandomPath(lastFrametimeS);
+	//	}
+	//}
 }
 
 void GameLogic::updatePlayerLives() {
@@ -111,9 +121,8 @@ void GameLogic::updatePlayerLives() {
 		Ghost* ghost = ghosts[i];
 		if (ghost->intersects(player)) {
 			if (player.getIsInvincible()) { continue; }
-			game.setPlayerLives(game.getPlayerLives() - 1);
 			player.setIsInvincible();
-			GameSounds::getInstance().playDeath();
+			game.killPlayer();
 		}
 	}
 }

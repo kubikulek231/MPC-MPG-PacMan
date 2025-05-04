@@ -17,7 +17,7 @@ private:
     float playerBodyColorGreen = 1.0f;
     float playerBodyColorBlue = 0.0f;
     
-    float playerAnimationState = 0.0f;
+    float playerMouthAnimationState = 0.0f;
     bool playerMouthOpening = true;
     bool playerMouthClosing = false;
 
@@ -26,8 +26,14 @@ private:
 
     uint64_t blinkDurationMs;
     uint64_t invincibleEndTimeAfterMs;
-    void animate(float frameTimeMs, bool keepAnimating);
+
+    float playerDeathAnimationState = 0.0f;
+    bool playerDeathAnimating = false;
+
+    void updateMouthAnimation(float frameTimeMs, bool keepAnimating);
+    void renderDeathAnimation();
 public:
+    bool updateDeathAnimation(float frameTimeMs);
     static constexpr float DEFAULT_SPEED = 4.0f;
     static constexpr float DEFAULT_SNAP_DISTANCE = 0.05f;
     static const MoveDir DEFAULT_MOVE_DIR = MoveDir::NONE;
@@ -44,6 +50,7 @@ public:
     void setIsInvincible();
     bool getIsInvincible() const { return isInvincible; }
     void forceSetMoveDir(MoveDir moveDir) { this->moveDir = moveDir; }
+    void startDeathAnimation() { playerDeathAnimating = true, playerDeathAnimationState = 0.0f; };
 
     uint64_t getBlinkDuration() const { return blinkDurationMs; }
     uint64_t getDirChangeRequestExpireAfterMs() const { return dirChangeRequestExpireAfterMs; }

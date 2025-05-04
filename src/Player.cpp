@@ -45,6 +45,14 @@ void Player::render() {
     // Rotate so Pac-Man faces forward
     glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
+    float scale = 1.0f;
+    float mouthDeg = 30.0f * playerMouthAnimationState;
+    if (playerDeathAnimating) {
+        mouthDeg = 180.0f * playerDeathAnimationState;
+        scale = 1.0f - playerDeathAnimationState;
+    }
+    glScalef(scale, scale, scale);
+
     // Prepare lighting material (instead of glColor)
     GLfloat bodyAmbient[] = { playerBodyColorRed * 0.2f, playerBodyColorGreen * 0.2f, playerBodyColorBlue * 0.2f, 1.0f };
     GLfloat bodyDiffuse[] = { playerBodyColorRed * 0.5f, playerBodyColorGreen * 0.5f, playerBodyColorBlue * 0.5f, 1.0f };
@@ -55,10 +63,8 @@ void Player::render() {
     GameLighting::setMaterial(GL_FRONT_AND_BACK, bodyAmbient, bodyDiffuse, bodySpecular, bodyEmission, shininess);
 
     // Compute clipping angles
-    float mouthDegrees = 30.0f * playerAnimationState;
-    float inverseMouthDegrees = 180.0f - 60.0f - mouthDegrees;
-    float half = inverseMouthDegrees * (PI / 180.0f);
-
+    float invDeg = 180.0f - 60.0f - mouthDeg;
+    float half = invDeg * (PI / 180.0f);
     GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
     GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
 
@@ -79,6 +85,12 @@ void Player::render() {
     glDisable(GL_CLIP_PLANE1);
 
     GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+
+    // If dying, skip eyes etc
+    if (playerDeathAnimating) {
+        glPopMatrix();
+        return;
+    }
 
     // Disable lighting for this part
     glDisable(GL_LIGHTING);
@@ -105,11 +117,11 @@ void Player::render() {
         GLUquadric* disk = gluNewQuadric();
         glDisable(GL_CULL_FACE);
         glPushMatrix();
-            glRotatef(inverseMouthDegrees, 0, 1, 0);
+            glRotatef(invDeg, 0, 1, 0);
             gluDisk(disk, 0.0, 0.75, 32, 1);
         glPopMatrix();
         glPushMatrix();
-            glRotatef(-inverseMouthDegrees, 0, 1, 0);
+            glRotatef(-invDeg, 0, 1, 0);
             gluDisk(disk, 0.0, 0.75, 32, 1);
         glPopMatrix();
         gluDeleteQuadric(disk);
@@ -180,7 +192,7 @@ void Player::move(MoveDir requestedMoveDir, bool& isNewRequest, float frameTimeM
     Tile* nextNextTileInDir = tileCurrent != nullptr ? nextTileInDir->getTileInMoveDir(moveDir) : nullptr;
     bool isPelletNext = nextTileInDir != nullptr && nextTileInDir->getTileType() == TileType::PELLET;
     bool isPelletNextNext = nextNextTileInDir != nullptr && nextNextTileInDir->getTileType() == TileType::PELLET;
-    animate(frameTimeMs, isPelletNext);
+    updateMouthAnimation(frameTimeMs, isPelletNext);
 
     if (isPelletNext || isPelletNextNext) {
         GameSounds::getInstance().startChomp();
@@ -217,7 +229,7 @@ void Player::update(int& totalCollectedPellets) {
     }
 }
 
-void Player::animate(float frameTimeMs, bool keepAnimating) {
+void Player::updateMouthAnimation(float frameTimeMs, bool keepAnimating) {
     if (!playerMouthOpening && !playerMouthClosing)
         return;
 
@@ -227,7 +239,7 @@ void Player::animate(float frameTimeMs, bool keepAnimating) {
     float baseSpeed = speed * 2.0f;            // e.g. speed = 1.0f means 1.0 per second
 
     const float minFactor = 0.3f;       // never go slower than 30%
-    float f = sinf(PI * playerAnimationState);
+    float f = sinf(PI * playerMouthAnimationState);
     float easeFactor = minFactor + (1.0f - minFactor) * f;
 
     // final delta
@@ -235,8 +247,8 @@ void Player::animate(float frameTimeMs, bool keepAnimating) {
 
     // apply to opening / closing
     if (playerMouthOpening) {
-        playerAnimationState = std::min(playerAnimationState + dstate, 1.0f);
-        if (playerAnimationState >= 1.0f) {
+        playerMouthAnimationState = std::min(playerMouthAnimationState + dstate, 1.0f);
+        if (playerMouthAnimationState >= 1.0f) {
             playerMouthOpening = false;
             playerMouthClosing = true;
         }
@@ -244,11 +256,28 @@ void Player::animate(float frameTimeMs, bool keepAnimating) {
     }
 
     // closing
-    playerAnimationState = std::max(playerAnimationState - dstate, 0.0f);
-    if (playerAnimationState <= 0.0f && keepAnimating) {
+    playerMouthAnimationState = std::max(playerMouthAnimationState - dstate, 0.0f);
+    if (playerMouthAnimationState <= 0.0f && keepAnimating) {
         playerMouthOpening = true;
         playerMouthClosing = false;
     }
+}
+
+bool Player::updateDeathAnimation(float frameTimeMs) {
+    if (!playerDeathAnimating) return true;
+
+    float dt = frameTimeMs;
+    const float duration = 1.0f;
+
+    // Advance the timer
+    playerDeathAnimationState += dt / duration;
+
+    if (playerDeathAnimationState >= 1.0f) {
+        playerDeathAnimationState = 1.0f;
+        playerDeathAnimating = false;
+        return true;
+    }
+    return false;
 }
 
 void Player::setIsInvincible() {
@@ -259,4 +288,37 @@ void Player::setIsInvincible() {
 
 uint64_t Player::getTimeMs() {
     return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
+void Player::renderDeathAnimation() {
+    float deathMouth = 180.0f * playerDeathAnimationState;
+    float deathScale = 1.0f - playerDeathAnimationState;
+
+    glPushMatrix();
+        // scale down the whole mesh
+        glScalef(deathScale, deathScale, deathScale);
+
+        // position/orientation same as alive
+        Point3D c = getAbsoluteCenterPoint();
+        glTranslatef(c.x, c.y + 0.25f, c.z);
+        glRotatef(getMoveDirRotationAngle(), 0, 1, 0);
+        glRotatef(90, 0, 0, 1);
+
+        // Now clip Pac-Man open by deathMouth on each side
+        float halfRad = (180.0f - deathMouth) * (PI / 180.0f) * 0.5f;
+        GLdouble eq0[4] = { +sin(halfRad), 0.0, -cos(halfRad), 0.0 };
+        GLdouble eq1[4] = { -sin(halfRad), 0.0, -cos(halfRad), 0.0 };
+        // render clipped sphere once, no inner mouth/fill
+        glEnable(GL_CLIP_PLANE0);
+        glClipPlane(GL_CLIP_PLANE0, eq0);
+        glEnable(GL_CLIP_PLANE1);
+        glClipPlane(GL_CLIP_PLANE1, eq1);
+
+        // draw the body
+        glutSolidSphere(0.75f, 32, 32);
+
+        glDisable(GL_CLIP_PLANE0);
+        glDisable(GL_CLIP_PLANE1);
+    glPopMatrix();
+    return;   // done
 }

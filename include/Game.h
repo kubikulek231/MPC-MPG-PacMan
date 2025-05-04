@@ -85,6 +85,9 @@ private:
     Ghost blinky;
     Ghost inky;
     Ghost clyde;
+
+    Player dummyPlayer = Player();
+
     std::vector<Ghost*> ghosts;
     MoveDir moveDir;
 

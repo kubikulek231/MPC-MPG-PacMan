@@ -43,6 +43,7 @@ public:
     void update(int& collectedPellets);
     void setIsInvincible();
     bool getIsInvincible() const { return isInvincible; }
+    void forceSetMoveDir(MoveDir moveDir) { this->moveDir = moveDir; }
 
     uint64_t getBlinkDuration() const { return blinkDurationMs; }
     uint64_t getDirChangeRequestExpireAfterMs() const { return dirChangeRequestExpireAfterMs; }

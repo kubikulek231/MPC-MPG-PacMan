@@ -83,7 +83,7 @@ void Player::render() {
     glDisable(GL_LIGHTING);
         
         // --- INNER MOUTH ---
-        glColor3f(0.8f, 0.5f, 0.0f);
+        glColor3f(0.6f, 0.3f, 0.0f);
         // Render the inner top
         glPushMatrix();
             glClipPlane(GL_CLIP_PLANE0, eq0);

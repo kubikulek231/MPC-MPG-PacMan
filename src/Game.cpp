@@ -55,7 +55,7 @@ void Game::init() {
     glft2::font_data font = game.getMenuFont();
 
     currentLevel = 0;
-    playerLives = 3;
+    playerLives = 7;
 
     // Preload main menu
     game.gameMenu.initMainMenu();
@@ -197,7 +197,7 @@ void Game::update(int value) {
             game.gameMenu.initMainMenu();
             // Reset level and init new one
             game.currentLevel = 0;
-            game.playerLives = 3;
+            game.playerLives = 7;
             game.totalScore = 0;
             game.initLevel();
         }
@@ -346,27 +346,72 @@ void Game::renderScore() {
 void Game::renderLives() {
     Game& game = Game::getInstance();
     Map* map = game.getMap();
-    Tile* tile = map->getTileAt(MapFactory::MAP_HEIGHT - 1, 1); // Get the target tile
+    Tile* tile = map->getTileAt(MapFactory::MAP_HEIGHT - 1, 1); // bottom-left corner
 
-    Point3D textOrigin = tile->getOrigin(); // Get the 3D position of the tile
+    Point3D livesOrigin = tile->getOrigin();
 
-    std::string livesText = "Remaining lives: " + std::to_string(game.getPlayerLives());
-
+    // ----- Render Player Lives -----
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
+        Player dummy = game.dummyPlayer;
+        dummy.forceSetMoveDir(MoveDir::RIGHT);
+        Point3D dummyOrigin = livesOrigin;
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+        for (int live = 0; live < game.getPlayerLives() && live < 6; ++live) {
+            dummy.setOrigin(dummyOrigin);
+            dummy.render();
 
-    // Move to the text's origin
-    glTranslatef(textOrigin.x, textOrigin.y + 0.01, textOrigin.z + MapFactory::TILE_SIZE / 2);
-
-    // Single rotation to orient the text
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-
-    float scale = 0.008f;
-    glft2::render3D(game.gameFont, livesText, scale);
-    
+            dummyOrigin.x += MapFactory::TILE_SIZE * 1.8f;
+        }
     glPopMatrix();
+
+    // ----- Only render "+" if enough lives -----
+    if (game.getPlayerLives() < 7) return;
+
+    // ----- Material Setup for the "+"
+    GLfloat crossAmbient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat crossDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat crossSpecular[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat crossEmission[] = { 0.05f, 0.05f, 0.05f, 1.0f };
+    GLfloat crossShininess = 64.0f;
+
+    GameLighting::setMaterial(
+        GL_FRONT_AND_BACK,
+        crossAmbient, crossDiffuse,
+        crossSpecular, crossEmission,
+        crossShininess
+    );
+
+    // ----- Render "+" -----
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+        glTranslatef(dummyOrigin.x, dummyOrigin.y + 0.01f, dummyOrigin.z);
+
+        float L = MapFactory::TILE_SIZE;
+        float H = L * 0.15f;
+        float T = L * 0.15f;
+
+        // Vertical bar
+        glPushMatrix();
+            glTranslatef(0.0f, H * 0.5f, 0.0f);
+            glScalef(L, H, T);
+            glutSolidCube(1.0f);
+        glPopMatrix();
+
+        // Horizontal bar
+        glPushMatrix();
+            glTranslatef(0.0f, H * 0.5f, 0.0f);
+            glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+            glScalef(L, H, T);
+            glutSolidCube(1.0f);
+        glPopMatrix();
+    glPopMatrix();
+
+    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+
+    glMatrixMode(GL_MODELVIEW);
 }
+
 
 void Game::renderCameraInfo() {
     Game& game = Game::getInstance();

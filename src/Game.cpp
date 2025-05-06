@@ -165,6 +165,7 @@ void Game::startNewCasualSession() {
     game.currentLevel = 0;
     game.playerLives = 7;
     game.totalScore = 0;
+    game.gameCollectedPellets = 0;
     game.initNewLevel();
     GameSounds::getInstance().playBeginning();
     GameCamera& gc = GameCamera::getInstance();
@@ -176,6 +177,7 @@ void Game::startNewSandboxSession() {
     game.currentLevel = 0;
     game.playerLives = 9999;
     game.totalScore = 0;
+    game.gameCollectedPellets = 0;
     game.initNewLevel();
     GameSounds::getInstance().playBeginning();
     GameCamera& gc = GameCamera::getInstance();

@@ -406,6 +406,7 @@ void Game::renderLives() {
         Player dummy = game.dummyPlayer;
         dummy.forceSetMoveDir(MoveDir::RIGHT);
         Point3D dummyOrigin = livesOrigin;
+        dummyOrigin.move(0.0f, 0.0f + MapFactory::TILE_SIZE / 2.0f, 0.0f);
 
         for (int live = 0; live < game.getPlayerLives() && live < 6; ++live) {
             dummy.setOrigin(dummyOrigin);

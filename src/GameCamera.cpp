@@ -254,6 +254,7 @@ void GameCamera::handleCameraOrbitting() {
         autoCameraOrbitting = false;
         cameraState.yaw += gc.getMouseXDelta() * orbittingDegPerPixel;
         cameraState.pitch -= gc.getMouseYDelta() * orbittingDegPerPixel;
+        cameraState.pitch = std::clamp(cameraState.pitch, MIN_PITCH, MAX_PITCH);
 
         updateGluFromState();
         gc.resetMouseDelta();
@@ -271,6 +272,7 @@ void GameCamera::handleCameraZooming() {
         autoCameraZooming = false;
         float zoomStep = 0.5f;
         cameraState.distance = cameraState.distance + zoomStep;
+        cameraState.distance = std::clamp(cameraState.distance + zoomStep, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE);
         updateGluFromState();
     }
 
@@ -279,6 +281,7 @@ void GameCamera::handleCameraZooming() {
         autoCameraZooming = false;
         float zoomStep = 0.5f;
         cameraState.distance = cameraState.distance - zoomStep;
+        cameraState.distance = std::clamp(cameraState.distance - zoomStep, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE);
         updateGluFromState();
     }
 }

@@ -39,6 +39,7 @@ public:
     static constexpr GLfloat LIGHT_SPECULAR[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
     static constexpr GLfloat LIGHT_EMISSION[4] = { 0.05f, 0.1f, 0.35f, 1.0f };
     static constexpr float LIGHT_SHININESS = 64.0f;
+    static constexpr float WALL_HEIGHT = 0.5f;
 
 private:
     WallType wallType = WallType::BLOCK;

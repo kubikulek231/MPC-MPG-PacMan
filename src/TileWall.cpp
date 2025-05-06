@@ -77,13 +77,14 @@ void TileWall::renderWallBlock() const {
     BoundingBox3D abb = this->getAbsoluteBoundingBox();
 
     float centerX = (abb.min.x + abb.max.x) / 2.0f;
-    float centerY = (abb.min.y + abb.max.y) / 2.0f;
+    float centerY = (abb.min.y + WALL_HEIGHT) / 2.0f;
     float centerZ = (abb.min.z + abb.max.z) / 2.0f;
 
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
         glTranslatef(centerX, centerY, centerZ);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
@@ -93,7 +94,7 @@ void TileWall::renderWallBlock() const {
 void TileWall::renderWallLeft() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
 
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
+    float halfY = (abb.min.y + WALL_HEIGHT) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
     float gap = MapFactory::TILE_SIZE * GAP_FRAC;
     float thickness = MapFactory::TILE_SIZE * THICKNESS_FRAC;
@@ -106,6 +107,7 @@ void TileWall::renderWallLeft() const {
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
         glScalef(THICKNESS_FRAC, 1.0f, 1.0f);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
@@ -115,7 +117,7 @@ void TileWall::renderWallLeft() const {
 void TileWall::renderWallRight() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
 
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
+    float halfY = (abb.min.y + WALL_HEIGHT) * 0.5f;
     float halfZ = (abb.min.z + abb.max.z) * 0.5f;
     float gap = MapFactory::TILE_SIZE * GAP_FRAC;
 
@@ -127,6 +129,7 @@ void TileWall::renderWallRight() const {
     glPushMatrix();
         glTranslatef(centerX, halfY, halfZ);
         glScalef(THICKNESS_FRAC, 1.0f, 1.0f);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
@@ -137,7 +140,7 @@ void TileWall::renderWallTop() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
+    float halfY = (abb.min.y + WALL_HEIGHT) * 0.5f;
     float gap = MapFactory::TILE_SIZE * GAP_FRAC;
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f + gap;
@@ -147,6 +150,7 @@ void TileWall::renderWallTop() const {
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
         glScalef(1.0f, 1.0f, THICKNESS_FRAC);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
@@ -157,7 +161,7 @@ void TileWall::renderWallBottom() const {
     BoundingBox3D abb = getAbsoluteBoundingBox();
 
     float halfX = (abb.min.x + abb.max.x) * 0.5f;
-    float halfY = (abb.min.y + abb.max.y) * 0.5f;
+    float halfY = (abb.min.y + WALL_HEIGHT) * 0.5f;
     float gap = MapFactory::TILE_SIZE * GAP_FRAC;
 
     float centerZ = (abb.min.z + abb.max.z) * 0.5f - gap;
@@ -167,6 +171,7 @@ void TileWall::renderWallBottom() const {
     glPushMatrix();
         glTranslatef(halfX, halfY, centerZ);
         glScalef(1.0f, 1.0f, THICKNESS_FRAC);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         glutSolidCube(MapFactory::TILE_SIZE);
     glPopMatrix();
 
@@ -178,8 +183,8 @@ void TileWall::renderWallCornerTopLeft() const {
     renderWallRight();
 
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float w = THICKNESS_FRAC;
 
@@ -190,9 +195,9 @@ void TileWall::renderWallCornerTopLeft() const {
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
-        glTranslatef(cx, halfY, cz);
-        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+    glTranslatef(cx, halfY, cz);
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    RenderHelper::renderInnerRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
     GameLighting::resetMaterial(GL_FRONT_AND_BACK);
@@ -203,8 +208,8 @@ void TileWall::renderWallCornerTopRight() const {
     renderWallLeft();
 
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float w = THICKNESS_FRAC;
 
@@ -227,8 +232,8 @@ void TileWall::renderWallCornerBottomLeft() const {
     renderWallRight();
 
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float w = THICKNESS_FRAC;
 
@@ -252,8 +257,8 @@ void TileWall::renderWallCornerBottomRight() const {
     renderWallLeft();
 
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float w = THICKNESS_FRAC;
 
@@ -275,8 +280,8 @@ void TileWall::renderWallCornerBottomRight() const {
 // ------ inner-corner renders ------
 void TileWall::renderWallInnerTopLeft() const {
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float wall = THICKNESS_FRAC;
 
@@ -288,20 +293,21 @@ void TileWall::renderWallInnerTopLeft() const {
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
-    glTranslatef(cx, halfY, cz);
+        glTranslatef(cx, halfY, cz);
 
-    // Quarter-cylinder in the corner
-    RenderHelper::renderOuterRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
+        // Quarter-cylinder in the corner
+        RenderHelper::renderOuterRoundedCorner(r, tileH, PI * 0.5f, PI, CYLINDER_SEGMENTS);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(bb.min.x, 0.0f, bb.min.z);
-    // Brick strip along X (horizontal bar)
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
-        true, true, true, true, false, false); // Adjusted normals for the horizontal strip
-    // Brick strip along Z (vertical bar)
-    RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the vertical strip
+        glTranslatef(bb.min.x, 0.0f, bb.min.z);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
+        // Brick strip along X (horizontal bar)
+        RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
+            true, true, true, true, false, false); // Adjusted normals for the horizontal strip
+        // Brick strip along Z (vertical bar)
+        RenderHelper::renderBox(MapFactory::TILE_SIZE, wall + r, 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
+            true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
     GameLighting::resetMaterial(GL_FRONT_AND_BACK);
@@ -309,8 +315,8 @@ void TileWall::renderWallInnerTopLeft() const {
 
 void TileWall::renderWallInnerTopRight() const {
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float wall = THICKNESS_FRAC;
 
@@ -321,18 +327,19 @@ void TileWall::renderWallInnerTopRight() const {
     GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
     glPushMatrix();
-    glTranslatef(cx, halfY, cz);
-    RenderHelper::renderOuterRoundedCorner(r, tileH, 0.0f, PI * 0.5f, CYLINDER_SEGMENTS);
+        glTranslatef(cx, halfY, cz);
+        RenderHelper::renderOuterRoundedCorner(r, tileH, 0.0f, PI * 0.5f, CYLINDER_SEGMENTS);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(bb.max.x, 0.0f, bb.min.z);
-    // Horizontal strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the horizontal strip
-    // Vertical strip
-    RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
-        true, true, true, false, false, false); // Adjusted normals for the vertical strip
+        glTranslatef(bb.max.x, 0.0f, bb.min.z);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
+        // Horizontal strip
+        RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, (wall - r), 0.0f,
+            true, true, true, false, false, false); // Adjusted normals for the horizontal strip
+        // Vertical strip
+        RenderHelper::renderBox(-MapFactory::TILE_SIZE, -(wall + r), 0.0f, MapFactory::TILE_SIZE, wall, 0.0f,
+            true, true, true, false, false, false); // Adjusted normals for the vertical strip
     glPopMatrix();
 
     GameLighting::resetMaterial(GL_FRONT_AND_BACK);
@@ -340,8 +347,8 @@ void TileWall::renderWallInnerTopRight() const {
 
 void TileWall::renderWallInnerBottomLeft() const {
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float wall = THICKNESS_FRAC;
 
@@ -358,6 +365,7 @@ void TileWall::renderWallInnerBottomLeft() const {
 
     glPushMatrix();
         glTranslatef(bb.min.x, 0.0f, bb.max.z);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         // Horizontal strip
         RenderHelper::renderBox(MapFactory::TILE_SIZE, wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f,
             true, true, true, true, false, false); // Adjusted normals for the horizontal strip
@@ -372,8 +380,8 @@ void TileWall::renderWallInnerBottomLeft() const {
 
 void TileWall::renderWallInnerBottomRight() const {
     auto bb = getAbsoluteBoundingBox();
-    float halfY = (bb.min.y + bb.max.y) * 0.5f;
-    float tileH = bb.max.y - bb.min.y;
+    float halfY = (bb.min.y + WALL_HEIGHT) * 0.5f;
+    float tileH = WALL_HEIGHT;
     float r = INNER_RADIUS_FRAC;
     float wall = THICKNESS_FRAC;
 
@@ -389,7 +397,8 @@ void TileWall::renderWallInnerBottomRight() const {
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(bb.max.x, 0.0f, bb.max.z);
+        glTranslatef(bb.max.x, 0.0f, bb.max.z);
+        glScalef(1.0f, WALL_HEIGHT, 1.0f);
         // Horizontal strip
         RenderHelper::renderBox(-MapFactory::TILE_SIZE, -wall, 0.0f, MapFactory::TILE_SIZE, -wall + r, 0.0f,
             false, false, false, false, false, false); // Adjusted normals for the horizontal strip

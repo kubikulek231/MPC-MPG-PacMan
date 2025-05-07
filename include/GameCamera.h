@@ -30,7 +30,7 @@ public:
     static constexpr float IMV_MAX_YAW_DELTA = 5.0f;
     static constexpr float IMV_Z_OFFSET = 1.0f;
     static constexpr float MIN_ZOOM_DISTANCE = 2.0f;
-    static constexpr float MAX_ZOOM_DISTANCE = 100.0f;
+    static constexpr float MAX_ZOOM_DISTANCE = 90.0f;
     static constexpr float MIN_PITCH = 1.0f;
     static constexpr float MAX_PITCH = 179.0f;
 

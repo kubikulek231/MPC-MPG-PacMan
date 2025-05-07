@@ -25,6 +25,8 @@ enum class TileType {
 
 class Tile : public Entity {
 public:
+    static constexpr float DOOR_HEIGHT = 0.5f;
+
     Tile(TileType tileType, Point3D tileOrigin, BoundingBox3D tileBoundingBox, int tileRow, int tileCol);
     virtual ~Tile() = default;
     bool collectPellet();

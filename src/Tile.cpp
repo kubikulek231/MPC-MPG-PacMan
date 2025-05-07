@@ -156,7 +156,7 @@ void Tile::renderDoorOpen() const {
 	GameLighting::setMaterial(GL_FRONT_AND_BACK, LIGHT_AMBIENT, LIGHT_DIFFUSE, LIGHT_SPECULAR, LIGHT_EMISSION, LIGHT_SHININESS);
 
 	float centerX = (abb.min.x + abb.max.x) / 2.0f;
-	float centerY = (abb.min.y + abb.max.y) / 2.0f;
+	float centerY = (abb.min.y + DOOR_HEIGHT) / 2.0f;
 	float centerZ = (abb.min.z + abb.max.z) / 2.0f + MapFactory::TILE_SIZE * 0.25f;
 
 	float width = MapFactory::TILE_SIZE;
@@ -166,6 +166,7 @@ void Tile::renderDoorOpen() const {
 	glPushMatrix();
 	glTranslatef(centerX, centerY, centerZ);
 	glScalef(width, height, depth); // scale unit cube into a door block
+	glScalef(1.0f, DOOR_HEIGHT, 1.0f);
 	glutSolidCube(1.0f);
 	glPopMatrix();
 

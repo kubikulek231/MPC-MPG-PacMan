@@ -257,7 +257,7 @@ void Player::updateMouthAnimation(float frameTimeMs, bool keepAnimating) {
     // dt in seconds
     float dt = frameTimeMs;
 
-    float baseSpeed = speed * 0.0f;            // e.g. speed = 1.0f means 1.0 per second
+    float baseSpeed = speed * 2.0f;            // e.g. speed = 1.0f means 1.0 per second
 
     const float minFactor = 0.3f;       // never go slower than 30%
     float f = sinf(PI * playerMouthAnimationState);

@@ -70,6 +70,9 @@ void Game::init() {
     glDisable(GL_COLOR_MATERIAL);
 
     GameLighting::init();
+
+    gameLoading = false;
+    gameLoaded = true;
 }
 
 void Game::initNewLevel(int level) {
@@ -286,6 +289,13 @@ struct Vec3 {
     }
 };
 
+void fastRenderBitmapString(float x, float y, void* font, const std::string& text) {
+    glRasterPos2f(x, y);
+    for (char c : text) {
+        glutBitmapCharacter(font, c);
+    }
+}
+
 void Game::render() {
     Game& game = Game::getInstance();
     GameCamera& gcam = GameCamera::getInstance();
@@ -307,6 +317,51 @@ void Game::render() {
         cam.lookAtZ,    // LookAt Z
         cam.upX, cam.upY, cam.upZ         // Up Vector
     );
+
+    if (!game.gameLoading && !game.gameLoaded) {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        int winW = glutGet(GLUT_WINDOW_WIDTH);
+        int winH = glutGet(GLUT_WINDOW_HEIGHT);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        glOrtho(0, winW, 0, winH, -1, 1);
+
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glColor3f(1.0f, 1.0f, 1.0f);
+
+        const char* text = "Loading the game... :)";
+        void* font = GLUT_BITMAP_HELVETICA_18;
+        int textW = 0;
+        for (const char* p = text; *p; ++p) {
+            textW += glutBitmapWidth(font, *p);
+        }
+
+        int x = (winW - textW) / 2;
+        int y = winH / 2;          // center vertically
+        glRasterPos2i(x, y);
+
+        for (const char* p = text; *p; ++p) {
+            glutBitmapCharacter(font, *p);
+        }
+
+        glPopMatrix();  // modelview
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+
+        glutSwapBuffers();
+
+        game.gameLoading = true;
+        game.init();
+        // Do full new render when loaded
+        return;
+    }
 
     GLfloat clPos[4] = { cam.posX, cam.posY, cam.posZ, 1.0f };
 

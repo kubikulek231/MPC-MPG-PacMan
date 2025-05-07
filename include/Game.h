@@ -90,6 +90,9 @@ private:
     Game(const Game&) = delete;  // Prevent copy constructor
     Game& operator=(const Game&) = delete;  // Prevent assignment operator
 
+    bool gameLoaded = false;
+    bool gameLoading = false;
+
     FadeTimer cameraHintFadeTimer = FadeTimer();
     GameMenu gameMenu = GameMenu();
 

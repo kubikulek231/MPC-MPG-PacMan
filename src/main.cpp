@@ -10,7 +10,6 @@ int main(int argc, char** argv) {
 
     // Singleton static instance
     Game& game = Game::getInstance();
-    game.init();
 
     glutReshapeFunc(Game::reshape);
     glutDisplayFunc(Game::render);

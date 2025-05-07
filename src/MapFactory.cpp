@@ -243,5 +243,5 @@ void MapFactory::generateEmptyMapFile(const std::string& filename) {
         file << '\n';  // New line at the end of each row
     }
     file.close();
-    std::cout << "Empty map generated and saved to " << filename << std::endl;
+    //std::cout << "Empty map generated and saved to " << filename << std::endl;
 }

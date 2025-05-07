@@ -69,8 +69,6 @@ std::vector<Tile*> Map::getTilesWithBoundingBox(BoundingBox3D* absoluteBoundingB
             const auto& tilePtr = grid[z][x];
             if (tilePtr && absoluteBoundingBox->intersects(tilePtr->getAbsoluteBoundingBox())) {
                 intersectedTiles.push_back(tilePtr.get());
-
-                // Optional debug output
                 // std::cout << "Intersecting tile at: (" << x << ", " << z << ")\n";
             }
         }
@@ -94,7 +92,6 @@ void Map::render(bool resetHighlighted, int resetTimerMs) {
         }
     }
 }
-
 
 void Map::renderWorldCoordinates(const Tile* tile) {
     BoundingBox3D abb = tile->getAbsoluteBoundingBox();

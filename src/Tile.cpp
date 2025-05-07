@@ -285,11 +285,11 @@ std::string Tile::toString() {
 
 	std::string coordStr = oss.str();
 
-	// Create the final string with tile coordinates and tile type
+	// Final string with tile coordinates and tile type
 	std::ostringstream result;
 	result << "Tile at (" << textX << ", " << textY << ", " << textZ
 		<< ") - Coordinates: " << coordStr
-		<< " - Type: " << this->getTileTypeString();  // Add tileType here
+		<< " - Type: " << this->getTileTypeString();
 
 	// Return the generated string
 	return result.str();

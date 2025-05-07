@@ -4,7 +4,7 @@
 #ifndef SPEEDOMETER_H
 #define SPEEDOMETER_H
 
-
+// Class for debugging MovableEntity speed :)
 class SpeedoMeter {
 private:
     int counter = 0;

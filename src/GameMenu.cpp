@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "Game.h"        // Make sure Game is included first
-#include "MenuItem.h"    // Now MenuItem is properly defined
+#include "Game.h"
+#include "MenuItem.h"
 #include <glft2/TextRenderer.hpp>
 
 GameMenu::GameMenu() {

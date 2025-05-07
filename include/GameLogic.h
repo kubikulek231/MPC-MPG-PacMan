@@ -10,7 +10,7 @@
 #include <vector>
 #include "GameCamera.h"
 
-class Game; // Forward declaration to avoid circular dependency
+class Game;
 
 class GameLogic {
 public:

@@ -93,7 +93,7 @@ void GameLighting::updateCameraLight(GLfloat lightPos[4], GLfloat lightDir[3]) {
     glLightfv(GL_LIGHT1, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, lightDir);
 
-    // Debug: draw a glowing sphere at the light source
+    // Debug, draw a glowing sphere at the light source
     //glPushMatrix();
     //glTranslatef(camPos[0], camPos[1], camPos[2]);
     //GLfloat z[] = { 0,0,0,1 };

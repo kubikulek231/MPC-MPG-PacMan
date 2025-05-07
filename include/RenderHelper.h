@@ -5,6 +5,7 @@
 #ifndef RENDERHELPER_H
 #define RENDERHELPER_H
 
+// Helpers for rendering
 static class RenderHelper {
 private:
 public:

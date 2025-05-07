@@ -1,4 +1,3 @@
-
 // FadeTimer.cpp
 #include "FadeTimer.h"
 

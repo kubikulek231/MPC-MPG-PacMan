@@ -48,7 +48,6 @@ float Point3D::getAxisValue(char axis) const {
 	if (axis == 'z' || axis == 'Z') {
 		return this->z;  // Return z value
 	}
-	// Return NaN or handle invalid input
 	return std::nanf("");
 }
 

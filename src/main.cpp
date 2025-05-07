@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize(800, 600);
     glutCreateWindow("PacMan3D");
 
-    // Create singleton static instance
+    // Singleton static instance
     Game& game = Game::getInstance();
     game.init();
 

@@ -1,3 +1,4 @@
 deps/*.zip filter=lfs diff=lfs merge=lfs -text
 assets/fonts/* filter=lfs diff=lfs merge=lfs -text
 assets/sounds/* filter=lfs diff=lfs merge=lfs -text
+assets/textures/* filter=lfs diff=lfs merge=lfs -text

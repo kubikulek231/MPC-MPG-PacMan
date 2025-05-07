@@ -79,6 +79,7 @@ include_directories(
     ${FREETYPE_INCLUDE_DIRS}     # Include FreeType headers for the whole project
     ${SDL3_INCLUDE_DIRS}         # Include SDL3 headers for the whole project
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/lib/stb
 )
 
 # Link directories (where the libraries are located)
@@ -87,6 +88,10 @@ link_directories(${GLUT_LIB_DIR} ${FREETYPE_LIB_DIR} ${SDL3_LIB_DIR})
 # Collect all .cpp and .h source files
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h")
+
+# Add stb_image.h to the HEADERS list
+file(GLOB STB_HEADERS "lib/stb/stb_image.h")
+list(APPEND HEADERS ${STB_HEADERS})
 
 # Add executable
 add_executable(MPG-PacMan ${SOURCES} ${HEADERS})

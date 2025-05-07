@@ -12,6 +12,7 @@
 #include <string>      
 #include <vector>      
 #include "GameSounds.h"
+#include "WorldSphere.h"
 
 // Global wrapper functions to be passed to GLUT
 static void keyboardCallback(unsigned char key, int x, int y) { GameUserInput::getInstance().keyboard(tolower(key), x, y); }
@@ -36,6 +37,9 @@ void Game::init() {
 
     gameFont.init("assets/fonts/Roboto-Regular.ttf", 128);
     menuFont.init("assets/fonts/Roboto-Regular.ttf", 72);
+
+    // Load WorldSphere
+    WorldSphere::getInstance().init();
 
     // After creating your window, but before setting the projection:
     int w = glutGet(GLUT_WINDOW_WIDTH);
@@ -63,7 +67,6 @@ void Game::init() {
     game.gameMenu.initMainMenu();
 
     glDisable(GL_CULL_FACE);
-
     glDisable(GL_COLOR_MATERIAL);
 
     GameLighting::init();
@@ -337,6 +340,8 @@ void Game::render() {
     if (game.gameState != GameState::Playing) {
         game.gameMenu.render();
     }
+
+    WorldSphere::getInstance().render();
 
     glutSwapBuffers();
 }

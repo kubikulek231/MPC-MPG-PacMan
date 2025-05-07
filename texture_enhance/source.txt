@@ -1,0 +1,9 @@
+// Original source
+https://skyview.gsfc.nasa.gov/current/cgi/query.pl
+
+coordinates: Eta Carinae
+survey:	     DDS
+size:        8000
+
+// New: Euclid Deep Field Fornax – Preview, 12000x12000 cropped
+https://euclid.caltech.edu/image/euclid20250319k-euclid-deep-field-fornax-preview

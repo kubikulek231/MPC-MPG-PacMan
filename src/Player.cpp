@@ -61,27 +61,51 @@ void Player::render() {
 
         GameLighting::setMaterial(GL_FRONT_AND_BACK, bodyAmbient, bodyDiffuse, bodySpecular, bodyEmission, shininess);
 
+        float R = 0.75f;
+
         // Compute clipping angles
         float invDeg = 180.0f - 60.0f - mouthDeg;
+
+        if (playerDeathAnimating) {
+            float fullyOpen = 150.f;
+            invDeg = invDeg + fullyOpen * playerDeathAnimationState;
+        }
+
         float half = invDeg * (PI / 180.0f);
+
         GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
         GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
 
-        // Render upper half of Pac-Man
-        glClipPlane(GL_CLIP_PLANE0, eq0);
-        glEnable(GL_CLIP_PLANE0);
-        glPushMatrix();
-            glutSolidSphere(0.75f, 32, 32);
-        glPopMatrix();
-        glDisable(GL_CLIP_PLANE0);
+        if (!playerDeathAnimating || invDeg <= 180.0f) {
+            // Draw two spheres separately for mouth
+            glPushMatrix();
+                glClipPlane(GL_CLIP_PLANE0, eq0);  glEnable(GL_CLIP_PLANE0);
+                glutSolidSphere(R, 32, 32);
+                glDisable(GL_CLIP_PLANE0);
+            glPopMatrix();
 
-        // Render lower half of Pac-Man
-        glClipPlane(GL_CLIP_PLANE1, eq1);
-        glEnable(GL_CLIP_PLANE1);
-        glPushMatrix();
-            glutSolidSphere(0.75f, 32, 32);
-        glPopMatrix();
-        glDisable(GL_CLIP_PLANE1);
+            glPushMatrix();
+                glClipPlane(GL_CLIP_PLANE1, eq1);  glEnable(GL_CLIP_PLANE1);
+                glutSolidSphere(R, 32, 32);
+                glDisable(GL_CLIP_PLANE1);
+            glPopMatrix();
+        }
+
+        if (playerDeathAnimating && invDeg > 180.0f) {
+            // Draw only the union if past 180 degrees
+            glPushMatrix();
+                glClipPlane(GL_CLIP_PLANE0, eq0);
+                glEnable(GL_CLIP_PLANE0);
+
+                glClipPlane(GL_CLIP_PLANE1, eq1);
+                glEnable(GL_CLIP_PLANE1);
+
+                glutSolidSphere(R, 32, 32);
+
+                glDisable(GL_CLIP_PLANE0);
+                glDisable(GL_CLIP_PLANE1);
+            glPopMatrix();
+        }
 
         GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 
@@ -233,7 +257,7 @@ void Player::updateMouthAnimation(float frameTimeMs, bool keepAnimating) {
     // dt in seconds
     float dt = frameTimeMs;
 
-    float baseSpeed = speed * 2.0f;            // e.g. speed = 1.0f means 1.0 per second
+    float baseSpeed = speed * 0.0f;            // e.g. speed = 1.0f means 1.0 per second
 
     const float minFactor = 0.3f;       // never go slower than 30%
     float f = sinf(PI * playerMouthAnimationState);
@@ -263,7 +287,7 @@ void Player::updateMouthAnimation(float frameTimeMs, bool keepAnimating) {
 bool Player::updateDeathAnimation(float frameTimeMs) {
     if (!playerDeathAnimating) return true;
 
-    float dt = frameTimeMs;
+    float dt = frameTimeMs / 1.4f;
     const float duration = 1.0f;
 
     // Advance the timer

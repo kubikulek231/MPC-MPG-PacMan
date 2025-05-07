@@ -37,144 +37,141 @@ Player::Player(Map* map, Point3D playerOrigin, BoundingBox3D playerBoundingBox)
 void Player::render() {
     Point3D c = getAbsoluteCenterPoint();
     glPushMatrix();
-    glTranslatef(c.x, c.y + 0.25f, c.z);
+        glTranslatef(c.x, c.y + 0.25f, c.z);
 
-    // Rotate to face movement direction
-    glRotatef(getMoveDirRotationAngle(), 0.0f, 1.0f, 0.0f);
+        // Rotate to face movement direction
+        glRotatef(getMoveDirRotationAngle(), 0.0f, 1.0f, 0.0f);
 
-    // Rotate so Pac-Man faces forward
-    glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+        // Rotate so Pac-Man faces forward
+        glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
 
-    float scale = 1.0f;
-    float mouthDeg = 30.0f * playerMouthAnimationState;
-    if (playerDeathAnimating) {
-        mouthDeg = 180.0f * playerDeathAnimationState;
-        scale = 1.0f - playerDeathAnimationState;
-    }
-    glScalef(scale, scale, scale);
+        float scale = 1.0f;
+        float mouthDeg = 30.0f * playerMouthAnimationState;
+        if (playerDeathAnimating) {
+            scale = 1.0f - playerDeathAnimationState;
+        }
+        glScalef(scale, scale, scale);
 
-    // Prepare lighting material (instead of glColor)
-    GLfloat bodyAmbient[] = { playerBodyColorRed * 0.2f, playerBodyColorGreen * 0.2f, playerBodyColorBlue * 0.2f, 1.0f };
-    GLfloat bodyDiffuse[] = { playerBodyColorRed * 0.5f, playerBodyColorGreen * 0.5f, playerBodyColorBlue * 0.5f, 1.0f };
-    GLfloat bodySpecular[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-    GLfloat bodyEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    GLfloat shininess = 32.0f;
+        // Prepare lighting material (instead of glColor)
+        GLfloat bodyAmbient[] = { playerBodyColorRed * 0.2f, playerBodyColorGreen * 0.2f, playerBodyColorBlue * 0.2f, 1.0f };
+        GLfloat bodyDiffuse[] = { playerBodyColorRed * 0.5f, playerBodyColorGreen * 0.5f, playerBodyColorBlue * 0.5f, 1.0f };
+        GLfloat bodySpecular[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+        GLfloat bodyEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        GLfloat shininess = 32.0f;
 
-    GameLighting::setMaterial(GL_FRONT_AND_BACK, bodyAmbient, bodyDiffuse, bodySpecular, bodyEmission, shininess);
+        GameLighting::setMaterial(GL_FRONT_AND_BACK, bodyAmbient, bodyDiffuse, bodySpecular, bodyEmission, shininess);
 
-    // Compute clipping angles
-    float invDeg = 180.0f - 60.0f - mouthDeg;
-    float half = invDeg * (PI / 180.0f);
-    GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
-    GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
+        // Compute clipping angles
+        float invDeg = 180.0f - 60.0f - mouthDeg;
+        float half = invDeg * (PI / 180.0f);
+        GLdouble eq0[4] = { +sin(half), 0.0, -cos(half), 0.0 };
+        GLdouble eq1[4] = { -sin(half), 0.0, -cos(half), 0.0 };
 
-    // Render upper half of Pac-Man
-    glClipPlane(GL_CLIP_PLANE0, eq0);
-    glEnable(GL_CLIP_PLANE0);
-    glPushMatrix();
-        glutSolidSphere(0.75f, 32, 32);
-    glPopMatrix();
-    glDisable(GL_CLIP_PLANE0);
-
-    // Render lower half of Pac-Man
-    glClipPlane(GL_CLIP_PLANE1, eq1);
-    glEnable(GL_CLIP_PLANE1);
-    glPushMatrix();
-        glutSolidSphere(0.75f, 32, 32);
-    glPopMatrix();
-    glDisable(GL_CLIP_PLANE1);
-
-    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
-
-    // If dying, skip eyes etc
-    if (playerDeathAnimating) {
+        // Render upper half of Pac-Man
+        glClipPlane(GL_CLIP_PLANE0, eq0);
+        glEnable(GL_CLIP_PLANE0);
+        glPushMatrix();
+            glutSolidSphere(0.75f, 32, 32);
         glPopMatrix();
-        return;
-    }
+        glDisable(GL_CLIP_PLANE0);
 
-    // Disable lighting for this part
-    glDisable(GL_LIGHTING);
+        // Render lower half of Pac-Man
+        glClipPlane(GL_CLIP_PLANE1, eq1);
+        glEnable(GL_CLIP_PLANE1);
+        glPushMatrix();
+            glutSolidSphere(0.75f, 32, 32);
+        glPopMatrix();
+        glDisable(GL_CLIP_PLANE1);
+
+        GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+
+        // If dying, skip eyes etc
+        if (playerDeathAnimating) {
+            glPopMatrix();
+            return;
+        }
+
+        // Disable lighting for this part
+        glDisable(GL_LIGHTING);
         
-        // --- INNER MOUTH ---
-        glColor3f(0.6f, 0.3f, 0.0f);
-        // Render the inner top
-        glPushMatrix();
-            glClipPlane(GL_CLIP_PLANE0, eq0);
-            glEnable(GL_CLIP_PLANE0);
-            glutSolidSphere(0.75f, 32, 32);
-            glDisable(GL_CLIP_PLANE0);
-        glPopMatrix();
+            // --- INNER MOUTH ---
+            glColor3f(0.6f, 0.3f, 0.0f);
+            // Render the inner top
+            glPushMatrix();
+                glClipPlane(GL_CLIP_PLANE0, eq0);
+                glEnable(GL_CLIP_PLANE0);
+                glutSolidSphere(0.75f, 32, 32);
+                glDisable(GL_CLIP_PLANE0);
+            glPopMatrix();
 
-        // Render the inner bot
-        glPushMatrix();
-            glClipPlane(GL_CLIP_PLANE1, eq1);
-            glEnable(GL_CLIP_PLANE1);
-            glutSolidSphere(0.75f, 32, 32);
-            glDisable(GL_CLIP_PLANE1);
-        glPopMatrix();
+            // Render the inner bot
+            glPushMatrix();
+                glClipPlane(GL_CLIP_PLANE1, eq1);
+                glEnable(GL_CLIP_PLANE1);
+                glutSolidSphere(0.75f, 32, 32);
+                glDisable(GL_CLIP_PLANE1);
+            glPopMatrix();
 
-        // --- FILL MOUTH GAP WITH DISKS ---
-        GLUquadric* disk = gluNewQuadric();
-        glDisable(GL_CULL_FACE);
-        glPushMatrix();
-            glRotatef(invDeg, 0, 1, 0);
-            gluDisk(disk, 0.0, 0.75, 32, 1);
-        glPopMatrix();
-        glPushMatrix();
-            glRotatef(-invDeg, 0, 1, 0);
-            gluDisk(disk, 0.0, 0.75, 32, 1);
-        glPopMatrix();
-        gluDeleteQuadric(disk);
+            // --- FILL MOUTH GAP WITH DISKS ---
+            GLUquadric* disk = gluNewQuadric();
+            glDisable(GL_CULL_FACE);
+            glPushMatrix();
+                glRotatef(invDeg, 0, 1, 0);
+                gluDisk(disk, 0.0, 0.75, 32, 1);
+            glPopMatrix();
+            glPushMatrix();
+                glRotatef(-invDeg, 0, 1, 0);
+                gluDisk(disk, 0.0, 0.75, 32, 1);
+            glPopMatrix();
+            gluDeleteQuadric(disk);
 
-    glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHTING);
 
-    // --- EYES & PUPILS ---
-    // Eye
-    GLfloat eyeAmbient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-    GLfloat eyeDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White for the eyes
-    GLfloat eyeSpecular[4] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Shiny eyes
-    GLfloat eyeEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
-    GLfloat eyeShininess = 128.0f;
+        // --- EYES & PUPILS ---
+        // Eye
+        GLfloat eyeAmbient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+        GLfloat eyeDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };  // White for the eyes
+        GLfloat eyeSpecular[4] = { 0.9f, 0.9f, 0.9f, 1.0f }; // Shiny eyes
+        GLfloat eyeEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+        GLfloat eyeShininess = 128.0f;
 
-    auto drawEye = [](float tx, float ty, float tz, float rz, float ry) {
-        glPushMatrix();
-            glColor3f(1.0f, 1.0f, 1.0f);
-            glTranslatef(tx, ty, tz);
-            glRotatef(rz, 0.0f, 0.0f, 1.0f);
-            glRotatef(ry, 0.0f, 1.0f, 0.0f);
-            glScalef(1.0f, 1.0f, 0.3f);
-            glutSolidSphere(0.20f, 12, 12);
-        glPopMatrix();
-        };
+        auto drawEye = [](float tx, float ty, float tz, float rz, float ry) {
+            glPushMatrix();
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glTranslatef(tx, ty, tz);
+                glRotatef(rz, 0.0f, 0.0f, 1.0f);
+                glRotatef(ry, 0.0f, 1.0f, 0.0f);
+                glScalef(1.0f, 1.0f, 0.3f);
+                glutSolidSphere(0.20f, 12, 12);
+            glPopMatrix();
+            };
 
-    // Pupil
-    GLfloat pupilAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black ambient
-    GLfloat pupilDiffuse[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black diffuse
-    GLfloat pupilSpecular[4] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Slightly shiny (small specular)
-    GLfloat pupilEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
-    GLfloat pupilShininess = 10.0f;  // Low shininess
+        // Pupil
+        GLfloat pupilAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black ambient
+        GLfloat pupilDiffuse[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // Black diffuse
+        GLfloat pupilSpecular[4] = { 0.2f, 0.2f, 0.2f, 1.0f }; // Slightly shiny (small specular)
+        GLfloat pupilEmission[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // No emission
+        GLfloat pupilShininess = 10.0f;  // Low shininess
 
-    auto drawPupil = [](float tx, float ty, float tz, float rz, float ry) {
-        glPushMatrix();
-            glTranslatef(tx, ty, tz);
-            glRotatef(rz, 0.0f, 0.0f, 1.0f);
-            glRotatef(ry, 0.0f, 1.0f, 0.0f);
-            glScalef(1.0f, 1.0f, 0.3f);
-            glutSolidSphere(0.11f, 12, 12);
-        glPopMatrix();
-        };
+        auto drawPupil = [](float tx, float ty, float tz, float rz, float ry) {
+            glPushMatrix();
+                glTranslatef(tx, ty, tz);
+                glRotatef(rz, 0.0f, 0.0f, 1.0f);
+                glRotatef(ry, 0.0f, 1.0f, 0.0f);
+                glScalef(1.0f, 1.0f, 0.3f);
+                glutSolidSphere(0.11f, 12, 12);
+            glPopMatrix();
+            };
 
-    GameLighting::setMaterial(GL_FRONT_AND_BACK, eyeAmbient, eyeDiffuse, eyeSpecular, eyeEmission, eyeShininess);
-        drawEye(0.54f, 0.27f, -0.41f, 35.0f, -55.0f); // Left eye
-        drawEye(0.54f, -0.27f, -0.41f, 145.0f, -125.0f); // Right eye
-    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
+        GameLighting::setMaterial(GL_FRONT_AND_BACK, eyeAmbient, eyeDiffuse, eyeSpecular, eyeEmission, eyeShininess);
+            drawEye(0.54f, 0.27f, -0.41f, 35.0f, -55.0f); // Left eye
+            drawEye(0.54f, -0.27f, -0.41f, 145.0f, -125.0f); // Right eye
+        GameLighting::resetMaterial(GL_FRONT_AND_BACK);
 
-    GameLighting::setMaterial(GL_FRONT_AND_BACK, pupilAmbient, pupilDiffuse, pupilSpecular, pupilEmission, pupilShininess);
-        drawPupil(0.535f, 0.27f, -0.50f, 40.0f, -44.5f); // Left pupil
-        drawPupil(0.535f, -0.27f, -0.50f, 140.0f, -135.5f); // Right pupil
-    GameLighting::resetMaterial(GL_FRONT_AND_BACK);
-
-
+        GameLighting::setMaterial(GL_FRONT_AND_BACK, pupilAmbient, pupilDiffuse, pupilSpecular, pupilEmission, pupilShininess);
+            drawPupil(0.535f, 0.27f, -0.50f, 40.0f, -44.5f); // Left pupil
+            drawPupil(0.535f, -0.27f, -0.50f, 140.0f, -135.5f); // Right pupil
+        GameLighting::resetMaterial(GL_FRONT_AND_BACK);
     glPopMatrix();
 }
 

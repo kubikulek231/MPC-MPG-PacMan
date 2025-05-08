@@ -433,7 +433,7 @@ void Game::renderScore() {
 
     Point3D textOrigin = tile->getOrigin(); // Get the 3D position of the tile
 
-    std::string scoreText = "Total score: " + std::to_string(game.getTotalScore());
+    std::string scoreText = "Total Score: " + std::to_string(game.getTotalScore());
 
     glPushMatrix();
 

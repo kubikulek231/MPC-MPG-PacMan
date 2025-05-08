@@ -59,7 +59,7 @@ The recommended way to build the project is by using Visual Studio on a Windows 
 1. **Clone the repository:**
     - Either download the source from [releases section](https://github.com/kubikulek231/MPC-MPG-PacMan/releases/tag/v1.0.0) or get the latest source by cloning this repository:
         ```bash
-        git clone https://github.com/kubikulek231/MPG-MPC-PacMan.git 
+        git clone https://github.com/kubikulek231/MPC-MPG-PacMan
         ```
 2. **Open the project in Visual Studio**:
     - Open Visual Studio and use the "Open Local Folder" option to open the cloned repository directory.

@@ -2,3 +2,5 @@ deps/*.zip filter=lfs diff=lfs merge=lfs -text
 assets/fonts/* filter=lfs diff=lfs merge=lfs -text
 assets/sounds/* filter=lfs diff=lfs merge=lfs -text
 assets/textures/* filter=lfs diff=lfs merge=lfs -text
+resources/pacman.ico filter=lfs diff=lfs merge=lfs -text
+resources/pacman_icon.png filter=lfs diff=lfs merge=lfs -text

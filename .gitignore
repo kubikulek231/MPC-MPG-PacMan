@@ -10,5 +10,8 @@ assets/
 # Ignore deps (lfs)
 deps
 
+# Ignore resources (lfs mostly)
+resources/
+
 # Ignore Hot Reload files
 enc_temp_folder/

@@ -7,12 +7,6 @@ endif()
 cmake_minimum_required(VERSION 3.28)
 project (MPG-PacMan)
 
-# Restore NuGet packages
-# execute_process(
-    # COMMAND nuget restore ${CMAKE_SOURCE_DIR}/Project.sln
-    # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-# )
-
 # Include helpers
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Helpers)
@@ -79,11 +73,12 @@ include_directories(
     ${FREETYPE_INCLUDE_DIRS}     # Include FreeType headers for the whole project
     ${SDL3_INCLUDE_DIRS}         # Include SDL3 headers for the whole project
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/resources
     ${CMAKE_SOURCE_DIR}/lib/stb
 )
 
 # Link directories (where the libraries are located)
-link_directories(${GLUT_LIB_DIR} ${FREETYPE_LIB_DIR} ${SDL3_LIB_DIR})
+link_directories(${GLUT_LIB_DIR} ${FREETYPE_LIB_DIR} ${SDL3_LIB_DIR} )
 
 # Collect all .cpp and .h source files
 file(GLOB SOURCES "src/*.cpp")
@@ -93,8 +88,21 @@ file(GLOB HEADERS "include/*.h")
 file(GLOB STB_HEADERS "lib/stb/stb_image.h")
 list(APPEND HEADERS ${STB_HEADERS})
 
-# Add executable
-add_executable(MPG-PacMan ${SOURCES} ${HEADERS})
+# Windows: compile the resources.rc file
+if (WIN32)
+    enable_language(RC)
+    set(RESOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/resource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/resource.rc"
+    )
+endif()
+
+add_executable(MPG-PacMan ${SOURCES} ${HEADERS} ${RESOURCE_FILES})
+
+# Windows: mark the exe as GUI app (won't start console)
+if (WIN32)
+    set_target_properties(MPG-PacMan PROPERTIES WIN32_EXECUTABLE ON )
+endif()
 
 # Link Freeglut, glft2_lib to the main program
 target_link_libraries(MPG-PacMan glft2_lib)
@@ -155,6 +163,13 @@ add_custom_command(TARGET MPG-PacMan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/assets/"
     "${CMAKE_BINARY_DIR}/assets/"
+)
+
+# Copy resources dir to the output directory
+add_custom_command(TARGET MPG-PacMan POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/resources/"
+    "${CMAKE_BINARY_DIR}/resources/"
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

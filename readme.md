@@ -4,7 +4,7 @@
 
 A simple 3D Pac-Man-style game built fully from scratch in modern C++ and raw OpenGL 💻🔥. The game uses the [stb_image.h](https://github.com/nothings/stb) library for image loading 📸, [SDL3_mixer](https://wiki.libsdl.org/SDL3_mixer/FrontPage) for basic sound effects 🔊, and a custom font rendering library, [glfreetype](https://github.com/benhj/glfreetype), which I modified to render FreeType fonts in 3D 🎨.
 
-This repository provides compiled binary for Windows, which you can download from the [latest release](https://github.com/kubikulek231/MPC-MPG-PacMan/releases/tag/v1.0.0), or you can follow the [Build Instructions](#⚙️-build-instructions) to build the game from source! 😎
+This repository provides compiled binary for Windows, which you can download from the [latest release](https://github.com/kubikulek231/MPC-MPG-PacMan/releases/tag/v1.0.0), or you can follow the [Build Instructions](https://github.com/kubikulek231/MPC-MPG-PacMan?tab=readme-ov-file#%EF%B8%8F-build-instructions) to build the game from source! 😎
 
 ![PacMan3D](readme_assets/screenshot3.png)
 

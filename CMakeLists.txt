@@ -175,3 +175,26 @@ add_custom_command(TARGET MPG-PacMan POST_BUILD
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET MPG-PacMan PROPERTY CXX_STANDARD 20)
 endif()
+
+# Windows: publish
+if (WIN32)
+
+    set(PUBLISH_DIR "${CMAKE_BINARY_DIR}/publish")
+    set(PUBLISH_ZIP "${CMAKE_BINARY_DIR}/MPG-PacMan.zip")
+
+    add_custom_target(publish
+        DEPENDS MPG-PacMan
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLISH_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:MPG-PacMan> ${PUBLISH_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/assets" "${PUBLISH_DIR}/assets"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/resources" "${PUBLISH_DIR}/resources"
+        COMMAND ${CMAKE_COMMAND} -E copy "${GLUT_FREEGLUT_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${GLUT_GLEW32_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${GLUT_GLFW3_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${FREETYPE_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${SDL3_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy "${SDL3_MIXER_DLL}" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E chdir ${PUBLISH_DIR} ${CMAKE_COMMAND} -E tar "cfv" ${PUBLISH_ZIP} --format=zip -- .
+        COMMENT "Packaging release build to ${PUBLISH_DIR} and zipping into ${PUBLISH_ZIP}"
+    )
+endif()

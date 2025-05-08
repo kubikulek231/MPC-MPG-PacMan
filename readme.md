@@ -26,9 +26,9 @@ This repository provides compiled binary for Windows, which you can download fro
 - ⚡ **Increasing difficulty**: The speed of the game and ghosts increases with each level, adding more challenge as you progress! 🎮
 
 ## 🎥 Video Showcase
-Check out a gameplay video showcasing the core mechanics and features of **PacMan3D** in action if you are not going to try the game yourself! 🎥✨
+Check out a [gameplay video](https://youtu.be/1BpC74aqoxY) showcasing the core mechanics and features of **PacMan3D** in action if you are not going to try the game yourself! 🎥✨
 
-[![Watch the demo](https://img.youtube.com/vi/1BpC74aqoxY/0.jpg)](https://youtu.be/1BpC74aqoxY)
+[![Watch the demo](readme_assets/screenshot.png)](https://youtu.be/1BpC74aqoxY)
 
 
 ## 🚀 Release

@@ -4,3 +4,4 @@ assets/sounds/* filter=lfs diff=lfs merge=lfs -text
 assets/textures/* filter=lfs diff=lfs merge=lfs -text
 resources/pacman.ico filter=lfs diff=lfs merge=lfs -text
 resources/pacman_icon.png filter=lfs diff=lfs merge=lfs -text
+readme_assets/*.png filter=lfs diff=lfs merge=lfs -text

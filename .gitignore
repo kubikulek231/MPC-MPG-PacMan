@@ -15,3 +15,6 @@ resources/
 
 # Ignore Hot Reload files
 enc_temp_folder/
+
+# Ignore readme_assets
+readme_assets/
